@@ -1,0 +1,6 @@
+{
+  "id": "p.code.render-controller.v7",
+  "baseline": "gen.v7",
+  "expects": ["code.render-controller"],
+  "description": "A legacy render controller for one content type that builds a view model before the template renders."
+}

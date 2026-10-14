@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "backoffice.angular-property-editor",
+  "title": "Project-authored AngularJS property editors",
+  "description": "Property editors registered in a package.manifest under App_Plugins, with AngularJS controllers and HTML views. The backoffice from v14 on no longer runs AngularJS.",
+  "area": "packages-backoffice",
+  "owner": "migrate-packages-backoffice",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detectors": [
+    { "id": "manifest-property-editors", "weight": "strong", "files": ["**/App_Plugins/*/package.manifest"], "regex": "\"propertyEditors\"\\s*:\\s*\\[\\s*\\{", "generations": ["v7", "v8", "v9-v13"] },
+    { "id": "angular-controller", "weight": "strong", "files": ["**/App_Plugins/**/*.js"], "regex": "angular\\.module\\(\\s*[\"']umbraco[\"']\\s*\\)\\s*\\.controller\\s*\\(", "generations": ["v7", "v8", "v9-v13"] },
+    { "id": "editor-view", "weight": "supporting", "files": ["**/App_Plugins/**/*.html"], "regex": "ng-(?:model|controller)\\s*=", "generations": ["v7", "v8", "v9-v13"] }
+  ],
+  "handling": [
+    { "option": "Keep the editor unchanged", "when": "The target is v13 or earlier", "docs": "Package Manifest for the target version" },
+    { "option": "Rewrite as a web component registered in umbraco-package.json, keeping or defining a server-side schema for stored data", "when": "The target is v14 or later", "docs": "Migrate Custom Property Editors to Umbraco Version 14 and Later" }
+  ],
+  "sources": [
+    { "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Extending/Property-Editors/Package-Manifest/index.md", "appliesTo": "8", "fetchedAt": "2026-10-12" },
+    { "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/package-manifest.md", "appliesTo": "13", "fetchedAt": "2026-10-12" },
+    { "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-custom-property-editors-to-umbraco-14.md", "appliesTo": "14+", "fetchedAt": "2026-10-12" }
+  ]
+}

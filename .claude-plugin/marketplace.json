@@ -1,0 +1,12 @@
+{
+  "name": "umbraco-upgrade",
+  "owner": { "name": "David Mazmanov" },
+  "description": "Marketplace for the umbraco-upgrade Claude Code plugin.",
+  "plugins": [
+    {
+      "name": "umbraco-upgrade",
+      "source": "./",
+      "description": "Umbraco CMS major-version upgrade workflow for Claude Code."
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "id": "p.code.api-controller.v13",
+  "baseline": "gen.v13",
+  "expects": ["code.frontend-api-controller"],
+  "description": "An ASP.NET Core API controller derived from the CMS API controller base type, with an attribute route."
+}

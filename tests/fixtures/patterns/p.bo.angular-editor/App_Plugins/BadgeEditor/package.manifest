@@ -1,0 +1,19 @@
+{
+    "name": "SampleSite.BadgeEditor",
+    "version": "1.0.0",
+    "propertyEditors": [
+        {
+            "alias": "SampleSite.BadgeEditor",
+            "name": "Badge",
+            "icon": "icon-tag",
+            "group": "Common",
+            "editor": {
+                "view": "/App_Plugins/BadgeEditor/badge.html",
+                "valueType": "STRING"
+            }
+        }
+    ],
+    "javascript": [
+        "/App_Plugins/BadgeEditor/badge.controller.js"
+    ]
+}

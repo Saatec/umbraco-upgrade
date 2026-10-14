@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "ext.http-client",
+  "title": "HTTP clients to external services",
+  "description": "Code that calls external REST or HTTP services, including static client instances and legacy web clients, often with base URLs and keys in configuration.",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detectors": [
+    { "id": "new-httpclient", "weight": "strong", "files": ["**/*.cs"], "regex": "new\\s+(?:System\\.Net\\.Http\\.)?HttpClient\\s*\\(", "generations": ["v7", "v8", "v9-v13", "v14+"] },
+    { "id": "static-httpclient", "weight": "strong", "files": ["**/*.cs"], "regex": "\\bstatic\\s+(?:readonly\\s+)?(?:System\\.Net\\.Http\\.)?HttpClient\\b", "generations": ["v7", "v8", "v9-v13", "v14+"] },
+    { "id": "legacy-webclient", "weight": "strong", "files": ["**/*.cs"], "regex": "(?:new\\s+(?:System\\.Net\\.)?WebClient\\s*\\(|\\bHttpWebRequest\\b|WebRequest\\.Create\\s*\\()", "generations": ["v7", "v8", "v9-v13", "v14+"] },
+    { "id": "client-factory", "weight": "strong", "files": ["**/*.cs"], "regex": "(?:\\bIHttpClientFactory\\b|\\.AddHttpClient\\s*[<(])", "generations": ["v9-v13", "v14+"] },
+    { "id": "rest-library", "weight": "strong", "files": ["**/*.cs"], "regex": "new\\s+RestClient\\s*\\(", "generations": ["v7", "v8", "v9-v13", "v14+"] },
+    { "id": "endpoint-config", "weight": "supporting", "files": ["**/web.config", "**/appsettings*.json"], "regex": "(?i)(?:base_?url|base_?address|api_?url|service_?url|endpoint)", "generations": ["v7", "v8", "v9-v13", "v14+"] }
+  ],
+  "handling": [
+    { "option": "Register typed or named clients through the HTTP client factory and bind endpoints through options", "when": "The target is ASP.NET Core based", "docs": "Microsoft documentation for IHttpClientFactory" },
+    { "option": "Keep the client and move only its configuration", "when": "The client already uses the factory", "docs": "Microsoft documentation for options binding" }
+  ],
+  "sources": [
+    { "url": "https://learn.microsoft.com/en-us/dotnet/core/extensions/httpclient-factory", "appliesTo": "dotnet", "fetchedAt": "2026-10-12" }
+  ]
+}

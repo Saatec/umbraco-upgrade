@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "code.frontend-api-controller",
+  "title": "Front-end API controllers",
+  "description": "Public API endpoints for front-end scripts or third parties, including auto-routed API controllers and attribute-routed Web API controllers.",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detectors": [
+    { "id": "umbraco-api-base-type", "weight": "strong", "files": ["**/*.cs"], "regex": ":\\s*(?:[\\w\\.]+\\.)?UmbracoApiController\\b", "generations": ["v7", "v8", "v9-v13", "v14+"] },
+    { "id": "webapi-base-type", "weight": "strong", "files": ["**/*.cs"], "regex": ":\\s*(?:System\\.Web\\.Http\\.)?ApiController\\b", "generations": ["v7", "v8"] },
+    { "id": "api-url", "weight": "supporting", "files": ["**/*.js", "**/*.ts", "**/*.cshtml"], "regex": "/umbraco/api/", "generations": ["v7", "v8", "v9-v13", "v14+"] }
+  ],
+  "handling": [
+    { "option": "Port to the target generation's API controller base type", "when": "The target still supports it; verify in the target docs", "docs": "Umbraco API Controllers and Porting Old Umbraco API Controllers" },
+    { "option": "Convert to plain controllers with explicit routes", "when": "The target marks auto-routed API controllers obsolete", "docs": "Porting Old Umbraco API Controllers" }
+  ],
+  "sources": [
+    { "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Reference/Routing/Umbraco-API-Controllers/index-v7.md", "appliesTo": "7", "fetchedAt": "2026-10-12" },
+    { "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/umbraco-api-controllers.md", "appliesTo": "13", "fetchedAt": "2026-10-12" },
+    { "url": "https://docs.umbraco.com/umbraco-cms/develop-with-umbraco/application-code/backend-and-custom-logic/routing/umbraco-api-controllers/porting-old-umbraco-apis.md", "appliesTo": "latest", "fetchedAt": "2026-10-12" }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "code.render-controller",
+  "title": "Custom render controllers (route hijacking)",
+  "description": "A controller named after a content type, or a global default controller, intercepts page rendering to build a view model or run logic before the template renders.",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detectors": [
+    { "id": "legacy-base-type", "weight": "strong", "files": ["**/*.cs"], "regex": ":\\s*(?:[\\w\\.]+\\.)?RenderMvcController\\b", "generations": ["v7", "v8"] },
+    { "id": "legacy-default-controller", "weight": "strong", "files": ["**/*.cs"], "regex": "\\bDefaultRenderMvcControllerResolver\\b", "generations": ["v7", "v8"] },
+    { "id": "core-base-type", "weight": "strong", "files": ["**/*.cs"], "regex": ":\\s*(?:[\\w\\.]+\\.)?RenderController\\b", "generations": ["v9-v13", "v14+"] },
+    { "id": "core-interface", "weight": "strong", "files": ["**/*.cs"], "regex": "\\bIRenderController\\b", "generations": ["v9-v13", "v14+"] },
+    { "id": "core-default-controller", "weight": "strong", "files": ["**/*.cs"], "regex": "\\bUmbracoRenderingDefaultsOptions\\b", "generations": ["v9-v13", "v14+"] }
+  ],
+  "handling": [
+    { "option": "Port each controller to the target render controller base type with constructor injection", "when": "Controller logic is small and page-specific", "docs": "Custom MVC Controllers (route hijacking) for the target version" },
+    { "option": "Move page logic into view components or services and keep a thin controller", "when": "Controllers hold shared or heavy logic", "docs": "Custom MVC Controllers (route hijacking) for the target version" }
+  ],
+  "sources": [
+    { "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Reference/Routing/Custom-Controllers/index-v7.md", "appliesTo": "7", "fetchedAt": "2026-10-12" },
+    { "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/custom-controllers.md", "appliesTo": "13", "fetchedAt": "2026-10-12" }
+  ]
+}

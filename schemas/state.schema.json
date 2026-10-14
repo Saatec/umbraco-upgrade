@@ -1,0 +1,267 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/progproger/umbraco-upgrade/schemas/state.schema.json",
+  "title": "umbraco-upgrade state",
+  "description": "Machine-readable state of one upgrade, stored at .umbraco-upgrade/state.json in the target project. Schema version 1.0.0. Readers accept the same major version. The state module (scripts/lib/State.psm1) validates against this file using a subset of JSON Schema: type, properties, required, additionalProperties, items, enum, const, pattern, minLength, format date-time, and local $ref.",
+  "type": "object",
+  "required": ["schemaVersion", "plugin", "mode", "createdAt", "updatedAt", "project", "source", "target", "path", "gitBaseline", "gates", "phases", "approvals", "decisions", "unresolved", "knowledge", "history"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" },
+    "plugin": {
+      "type": "object",
+      "required": ["name", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "const": "umbraco-upgrade" },
+        "version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "mode": { "enum": ["upgrade", "plan"] },
+    "createdAt": { "$ref": "#/$defs/timestamp" },
+    "updatedAt": { "$ref": "#/$defs/timestamp" },
+    "project": {
+      "type": "object",
+      "required": ["root", "stateFolderPolicy"],
+      "additionalProperties": false,
+      "properties": {
+        "root": { "type": "string", "minLength": 1 },
+        "solution": { "type": ["string", "null"] },
+        "webProject": { "type": ["string", "null"] },
+        "stateFolderPolicy": { "enum": ["undecided", "commit", "exclude-local", "gitignore"] }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["umbraco", "confidence", "verified"],
+      "additionalProperties": false,
+      "properties": {
+        "umbraco": { "type": ["string", "null"] },
+        "major": { "type": ["integer", "null"] },
+        "generation": { "type": ["string", "null"] },
+        "dotnet": { "type": "array", "items": { "type": "string" } },
+        "database": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "engine": { "enum": ["unknown", "sqlserver", "localdb", "sqlce", "sqlite", "other"] },
+            "localCopyDeclared": { "type": "boolean" },
+            "target": { "enum": ["unknown", "local", "non-local"] }
+          }
+        },
+        "evidence": { "type": "array", "items": { "type": "string" } },
+        "confidence": { "enum": ["none", "low", "medium", "high", "conflict", "confirmed-by-user"] },
+        "verified": { "type": "boolean" }
+      }
+    },
+    "target": {
+      "type": "object",
+      "required": ["requested", "verified"],
+      "additionalProperties": false,
+      "properties": {
+        "requested": { "type": "string", "pattern": "^\\d+(\\.\\d+){0,2}$" },
+        "resolved": { "type": ["string", "null"] },
+        "dotnet": { "type": ["string", "null"] },
+        "lts": { "$ref": "#/$defs/sourcedFact" },
+        "supportEnds": { "$ref": "#/$defs/sourcedFact" },
+        "verified": { "type": "boolean" }
+      }
+    },
+    "path": {
+      "type": "object",
+      "required": ["selection", "strategy"],
+      "additionalProperties": false,
+      "properties": {
+        "selection": { "enum": ["pending", "selected"] },
+        "strategy": { "enum": ["pending", "in-place", "staged", "rebuild-with-database-migration", "new-install-with-content-transfer"] },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "from", "to"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^S\\d+$" },
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "kind": { "type": "array", "items": { "enum": ["code", "database", "content"] } }
+            }
+          }
+        },
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["strategy", "rejectedBecause"],
+            "additionalProperties": false,
+            "properties": {
+              "strategy": { "type": "string" },
+              "rejectedBecause": { "type": "string" }
+            }
+          }
+        },
+        "decision": { "type": ["string", "null"] }
+      }
+    },
+    "gitBaseline": {
+      "type": "object",
+      "required": ["isRepo", "statusAtStart"],
+      "additionalProperties": false,
+      "properties": {
+        "isRepo": { "type": "boolean" },
+        "repoRoot": { "type": ["string", "null"] },
+        "baseBranch": { "type": ["string", "null"] },
+        "baseCommit": { "type": ["string", "null"] },
+        "statusAtStart": { "enum": ["clean", "dirty", "not-a-repo"] },
+        "statusEvidence": { "type": ["string", "null"] },
+        "upgradeBranch": { "type": ["string", "null"] }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "required": ["discovery", "versionPath", "safety", "planApproval", "final"],
+      "additionalProperties": false,
+      "properties": {
+        "discovery": { "$ref": "#/$defs/gate" },
+        "versionPath": { "$ref": "#/$defs/gate" },
+        "safety": { "$ref": "#/$defs/gate" },
+        "planApproval": { "$ref": "#/$defs/gate" },
+        "final": { "$ref": "#/$defs/gate" }
+      }
+    },
+    "phases": { "type": "array", "items": { "$ref": "#/$defs/phase" } },
+    "approvals": { "type": "array", "items": { "$ref": "#/$defs/approval" } },
+    "decisions": { "type": "array", "items": { "type": "string", "pattern": "^D-\\d{3,}$" } },
+    "unresolved": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "item", "proposal", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^U-\\d{3,}$" },
+          "pattern": { "type": ["string", "null"] },
+          "item": { "type": "string", "minLength": 1 },
+          "proposal": { "enum": ["undecided", "port", "replace", "redesign"] },
+          "status": { "enum": ["awaiting-user", "decided", "resolved", "deferred"] }
+        }
+      }
+    },
+    "knowledge": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "baselineVersion": { "type": ["string", "null"] },
+        "refreshedAt": { "type": ["string", "null"] }
+      }
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["at", "event"],
+        "additionalProperties": false,
+        "properties": {
+          "at": { "$ref": "#/$defs/timestamp" },
+          "event": { "type": "string", "minLength": 1 },
+          "detail": { "type": ["string", "null"] }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "timestamp": { "type": "string", "format": "date-time" },
+    "sourcedFact": {
+      "type": "object",
+      "required": ["value", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "value": { "type": ["string", "boolean", "null"] },
+        "source": { "type": ["string", "null"] },
+        "verified": { "type": "boolean" }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "required": ["status"],
+      "additionalProperties": false,
+      "properties": {
+        "status": { "enum": ["pending", "in-progress", "passed", "failed", "skipped", "awaiting-approval", "approved", "rejected", "invalidated"] },
+        "at": { "type": ["string", "null"] },
+        "evidence": { "type": "array", "items": { "type": "string" } },
+        "decisions": { "type": "array", "items": { "type": "string" } },
+        "notes": { "type": ["string", "null"] },
+        "pathSelection": { "enum": ["pending", "selected"] },
+        "factsVerified": { "type": "boolean" },
+        "guardSelfTest": { "enum": ["not-run", "issued", "passed", "failed"] },
+        "canaryNonce": { "type": ["string", "null"] },
+        "rollbackDoc": { "type": ["string", "null"] },
+        "planSha256": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$" },
+        "approval": { "type": ["string", "null"] }
+      }
+    },
+    "phase": {
+      "type": "object",
+      "required": ["id", "title", "area", "status", "acceptanceCriteria"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^P\\d+$" },
+        "title": { "type": "string", "minLength": 1 },
+        "area": { "enum": ["content-database", "application-framework", "custom-code", "packages-backoffice", "config-auth-integrations", "build-tests", "functional-verification", "deployment-rehearsal"] },
+        "patterns": { "type": "array", "items": { "type": "string" } },
+        "status": { "enum": ["pending", "in-progress", "blocked", "done", "failed", "deferred"] },
+        "acceptanceCriteria": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "text", "verification", "status"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^P\\d+-AC\\d+$" },
+              "text": { "type": "string", "minLength": 1 },
+              "verification": { "enum": ["automated", "manual"] },
+              "status": { "enum": ["pending", "met", "not-met", "waived"] },
+              "evidence": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "startedAt": { "type": ["string", "null"] },
+        "completedAt": { "type": ["string", "null"] },
+        "checkpoint": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": { "commit": { "type": ["string", "null"] } }
+        },
+        "failures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["at", "summary", "recovery"],
+            "additionalProperties": false,
+            "properties": {
+              "at": { "type": "string" },
+              "summary": { "type": "string" },
+              "recovery": { "type": "string" },
+              "evidence": { "type": ["string", "null"] }
+            }
+          }
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "required": ["id", "action", "scope", "requestedAt", "decision", "consumed"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^A-\\d{3,}$" },
+        "action": { "enum": ["start-plan-execution", "db-migration-local", "db-snapshot-local", "package-removal", "ci-deploy-config-change", "outside-project-path", "remove-custom-feature"] },
+        "scope": { "type": "string", "minLength": 1 },
+        "requestedAt": { "$ref": "#/$defs/timestamp" },
+        "decision": { "enum": ["pending", "approved", "rejected"] },
+        "decidedAt": { "type": ["string", "null"] },
+        "consumed": { "type": "boolean" },
+        "note": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

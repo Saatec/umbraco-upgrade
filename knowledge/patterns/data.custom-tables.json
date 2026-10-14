@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "data.custom-tables",
+  "title": "Custom database tables via ORM attributes and migrations",
+  "description": "Project tables in the CMS database, defined by attributed classes and created by migrations or schema helpers at startup.",
+  "area": "content-database",
+  "owner": "migrate-content-database",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detectors": [
+    { "id": "table-attribute", "weight": "strong", "files": ["**/*.cs"], "regex": "\\[\\s*TableName\\s*\\(", "generations": ["v7", "v8", "v9-v13", "v14+"] },
+    { "id": "schema-helper", "weight": "strong", "files": ["**/*.cs"], "regex": "\\bDatabaseSchemaHelper\\b", "generations": ["v7"] },
+    { "id": "migration-base", "weight": "strong", "files": ["**/*.cs"], "regex": ":\\s*(?:[\\w\\.]+\\.)?(?:MigrationBase|PackageMigrationPlan|AsyncMigrationBase)\\b", "generations": ["v7", "v8", "v9-v13", "v14+"] },
+    { "id": "migration-plan", "weight": "strong", "files": ["**/*.cs"], "regex": "new\\s+(?:[\\w\\.]+\\.)?MigrationPlan\\s*\\(", "generations": ["v8", "v9-v13", "v14+"] },
+    { "id": "create-table", "weight": "supporting", "files": ["**/*.cs"], "regex": "(?:\\.CreateTable\\s*<|Create\\.Table\\s*<)", "generations": ["v7", "v8", "v9-v13", "v14+"] }
+  ],
+  "handling": [
+    { "option": "Port data access and migrations to the target scoping and migration APIs", "when": "The database is preserved through the upgrade", "docs": "Creating a Custom Database Table for the target version" },
+    { "option": "Compare expected tables with the real schema on a declared local copy before relying on the code", "when": "A local database copy is available", "docs": "Creating a Custom Database Table for the target version" }
+  ],
+  "sources": [
+    { "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Tutorials/Creating-Tables-for-Umbraco-with-PetaPoco/index.md", "appliesTo": "7", "fetchedAt": "2026-10-12" },
+    { "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Extending/Database/index.md", "appliesTo": "8", "fetchedAt": "2026-10-12" },
+    { "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/database.md", "appliesTo": "13", "fetchedAt": "2026-10-12" }
+  ]
+}

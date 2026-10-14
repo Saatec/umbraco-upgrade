@@ -1,0 +1,21 @@
+{
+  "$schema": "../../umbraco-package-schema.json",
+  "id": "SampleSite.SampleExtension",
+  "name": "Sample Extension",
+  "version": "1.0.0",
+  "extensions": [
+    {
+      "type": "dashboard",
+      "alias": "SampleSite.Dashboard.Welcome",
+      "name": "Sample Welcome Dashboard",
+      "element": "/App_Plugins/SampleExtension/welcome-dashboard.js",
+      "meta": {
+        "label": "Welcome",
+        "pathname": "welcome"
+      },
+      "conditions": [
+        { "alias": "Umb.Condition.SectionAlias", "match": "Umb.Section.Content" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "id": "p.code.render-controller.v13",
+  "baseline": "gen.v13",
+  "expects": ["code.render-controller"],
+  "description": "An ASP.NET Core render controller for one content type, with constructor injection."
+}

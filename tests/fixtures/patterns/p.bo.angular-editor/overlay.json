@@ -1,0 +1,6 @@
+{
+  "id": "p.bo.angular-editor",
+  "baseline": "gen.v13",
+  "expects": ["backoffice.angular-property-editor"],
+  "description": "A project-authored AngularJS property editor registered in a package.manifest, with its controller and view."
+}

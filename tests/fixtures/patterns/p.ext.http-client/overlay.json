@@ -1,0 +1,6 @@
+{
+  "id": "p.ext.http-client",
+  "baseline": "gen.v13",
+  "expects": ["ext.http-client"],
+  "description": "A service that calls an external weather API through a static HTTP client, with base URL and key in configuration (fake values)."
+}

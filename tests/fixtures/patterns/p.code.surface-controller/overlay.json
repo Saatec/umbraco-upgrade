@@ -1,0 +1,6 @@
+{
+  "id": "p.code.surface-controller",
+  "baseline": "gen.v8",
+  "expects": ["code.surface-controller"],
+  "description": "A legacy surface controller handling an enquiry form post, with the form rendered through the CMS form helper."
+}

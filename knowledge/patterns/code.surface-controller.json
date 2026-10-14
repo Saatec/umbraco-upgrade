@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "code.surface-controller",
+  "title": "Surface controllers",
+  "description": "Controllers that handle form posts from rendered pages. Some projects also use them as JSON endpoints for front-end scripts.",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detectors": [
+    { "id": "base-type", "weight": "strong", "files": ["**/*.cs"], "regex": ":\\s*(?:[\\w\\.]+\\.)?SurfaceController\\b", "generations": ["v7", "v8", "v9-v13", "v14+"] },
+    { "id": "form-helper", "weight": "strong", "files": ["**/*.cshtml"], "regex": "\\bBeginUmbracoForm\\b", "generations": ["v7", "v8", "v9-v13", "v14+"] },
+    { "id": "surface-url", "weight": "supporting", "files": ["**/*.js", "**/*.ts", "**/*.cshtml"], "regex": "/umbraco/surface/", "generations": ["v7", "v8", "v9-v13", "v14+"] }
+  ],
+  "handling": [
+    { "option": "Port to the target surface controller base type and its constructor dependencies", "when": "The controller handles form posts", "docs": "Surface Controllers for the target version" },
+    { "option": "Move JSON endpoints to API controllers with explicit routes", "when": "Front-end scripts consume JSON from the controller", "docs": "Umbraco API Controllers for the target version" }
+  ],
+  "sources": [
+    { "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Reference/Routing/Surface-Controllers/index.md", "appliesTo": "8", "fetchedAt": "2026-10-12" },
+    { "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/surface-controllers.md", "appliesTo": "13", "fetchedAt": "2026-10-12" }
+  ]
+}

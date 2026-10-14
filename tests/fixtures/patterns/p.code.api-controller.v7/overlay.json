@@ -1,0 +1,6 @@
+{
+  "id": "p.code.api-controller.v7",
+  "baseline": "gen.v7",
+  "expects": ["code.frontend-api-controller"],
+  "description": "A legacy auto-routed API controller, an attribute-routed Web API controller, and a script that calls the auto-routed endpoint."
+}

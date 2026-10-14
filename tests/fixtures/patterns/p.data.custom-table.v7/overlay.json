@@ -1,0 +1,6 @@
+{
+  "id": "p.data.custom-table.v7",
+  "baseline": "gen.v7",
+  "expects": ["data.custom-tables"],
+  "description": "A legacy attributed table class created at application start through the schema helper."
+}

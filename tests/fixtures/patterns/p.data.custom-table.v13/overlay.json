@@ -1,0 +1,6 @@
+{
+  "id": "p.data.custom-table.v13",
+  "baseline": "gen.v13",
+  "expects": ["data.custom-tables"],
+  "description": "A custom table created by a migration plan executed from an application-starting notification handler."
+}

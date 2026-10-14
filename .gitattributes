@@ -1,0 +1,10 @@
+# Normalize line endings in the repository
+* text=auto
+
+# Shell scripts must keep LF endings to run under bash
+*.sh text eol=lf
+
+# Binary files
+*.png binary
+*.dll binary
+*.zip binary

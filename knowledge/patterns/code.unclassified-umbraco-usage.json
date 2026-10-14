@@ -1,0 +1,16 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "code.unclassified-umbraco-usage",
+  "title": "Umbraco usage not matched by any pattern",
+  "description": "Catch-all. Lists source files that use CMS namespaces or base types but matched no other detector. These need classification by the inventory analyst or a human.",
+  "area": "custom-code",
+  "owner": "discovery",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detectors": [],
+  "catchAll": { "files": ["**/*.cs", "**/*.vb"], "regex": "(?:\\busing\\s+Umbraco\\b|\\bImports\\s+Umbraco\\b|\\bUmbraco\\.(?:Core|Web|Cms|Extensions)\\b)" },
+  "handling": [
+    { "option": "Classify each file and add it to the inventory, or flag it for a human decision", "when": "Always", "docs": "None" }
+  ],
+  "sources": []
+}

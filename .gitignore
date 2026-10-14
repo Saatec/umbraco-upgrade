@@ -1,0 +1,20 @@
+# Eval results (claude plugin eval) are never committed
+evals/results/
+
+# Test output
+tests/.results/
+TestResults/
+*.trx
+
+# Editors and OS files
+.vs/
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# Local scratch
+.scratch/
+*.tmp

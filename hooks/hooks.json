@@ -1,0 +1,68 @@
+{
+  "description": "umbraco-upgrade safety hooks. Active only in projects that contain .umbraco-upgrade/state.json; elsewhere each script exits 0 with no output.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell",
+            "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/guard.ps1"],
+            "timeout": 30,
+            "onFailure": "block"
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell",
+            "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/guard.ps1"],
+            "timeout": 30,
+            "onFailure": "block"
+          }
+        ]
+      },
+      {
+        "matcher": "^mcp__.*([Ss][Qq][Ll]|[Dd]atabase|DATABASE|_db_|__db|_db$|[Pp]ostgres|[Mm]y[Ss]ql|[Mm]ongo)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell",
+            "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/guard.ps1"],
+            "timeout": 30,
+            "onFailure": "block"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          { "type": "command", "if": "Read(//**/appsettings*.json)", "command": "powershell", "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/redact-output.ps1"], "timeout": 30 },
+          { "type": "command", "if": "Read(//**/*.config)", "command": "powershell", "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/redact-output.ps1"], "timeout": 30 },
+          { "type": "command", "if": "Read(//**/secrets.json)", "command": "powershell", "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/redact-output.ps1"], "timeout": 30 },
+          { "type": "command", "if": "Read(//**/.env*)", "command": "powershell", "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/redact-output.ps1"], "timeout": 30 },
+          { "type": "command", "if": "Read(//**/*.pubxml*)", "command": "powershell", "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/redact-output.ps1"], "timeout": 30 },
+          { "type": "command", "if": "Read(//**/*.publishsettings)", "command": "powershell", "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/redact-output.ps1"], "timeout": 30 }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell",
+            "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/session-context.ps1"],
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

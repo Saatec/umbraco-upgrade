@@ -1,0 +1,8 @@
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<SampleSite.Web.Controllers.EnquiryFormModel>
+@using (Html.BeginUmbracoForm("Submit", "EnquirySurface"))
+{
+    @Html.AntiForgeryToken()
+    @Html.TextBoxFor(m => m.Name)
+    @Html.TextAreaFor(m => m.Message)
+    <button type="submit">Send</button>
+}
