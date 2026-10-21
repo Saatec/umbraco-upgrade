@@ -13,9 +13,9 @@ Templates (minimal in this plugin version): `${CLAUDE_PLUGIN_ROOT}/skills/upgrad
 Phases come from discovery, not from a fixed list.
 
 1. **Include an area** only when a detector in that area fired, or the upgrade has a step that applies to every project (the core packages and target framework always change in a major upgrade). Areas: `application-framework`, `content-database`, `custom-code`, `packages-backoffice`, `config-auth-integrations`, `build-tests`, `functional-verification`, `deployment-rehearsal`.
-2. **Order** by dependency: application and framework, then packages, then custom code, then backoffice, then configuration and integrations, then build and tests, then functional verification, then deployment rehearsal. Database steps go where the selected path puts them; while path selection is pending, place one provisional database phase after the framework phase and say so.
+2. **Order** by dependency: application and framework, then packages, then custom code, then backoffice, then configuration and integrations, then build and tests, then functional verification, then deployment rehearsal. Database steps go where the selected path puts them: every path step that changes the database (see `path.steps` in state and `evidence/version-path/path-selection.json`) gets a database phase right after the framework work for that step. A staged path repeats the framework and database phases per stop.
 3. **Split** an area when it contains a high-difficulty pattern (AngularJS backoffice code going to v14 or later gets its own phase) or when its hits exceed 25 occurrences or 15 files.
-4. **Acceptance criteria** for each phase: from the pattern handling, from generic build and runtime checks, and (later) from the documented steps for the versions involved. Mark each criterion `automated` or `manual` and name the evidence it needs. A successful build alone never satisfies a phase.
+4. **Acceptance criteria** for each phase: from the pattern handling, from generic build and runtime checks, and from the documented steps for the versions involved (the path steps' data migrations, removals, preparation items, and the extra documented steps in `compatibility.md`, each cited). Mark each criterion `automated` or `manual` and name the evidence it needs. A successful build alone never satisfies a phase.
 5. **Unresolved items.** Anything that cannot be migrated directly gets `state.ps1 unresolved -Item "<text>" -Pattern <id> -Proposal port|replace|redesign` and a question in the plan. Never plan to remove, stub, or disable custom functionality.
 
 A near-default project (no customization detectors fired) gets few phases. A heavily customized project gets more.
@@ -24,8 +24,8 @@ Write the phases as JSON to `.umbraco-upgrade/tmp/phases.json` (an array of obje
 
 ## 2. Write the plan files
 
-- `plan.md`: summary, source and target (unverified), **"Path selection: pending (not available in this plugin version)"**, phases with acceptance criteria, gate 3 summary (upgrade mode) or what gate 3 will do (plan mode), rollback reference (`rollback.md`), unresolved items with questions, and what happens on approval.
-- `risks.md`: one row per risk with likelihood, impact, mitigation, and owner phase. Always include: unverified version facts, path selection pending, patterns this version does not detect.
+- `plan.md`: summary, source and exact target with the status of each version fact, the selected path (strategy, steps, alternatives rejected and why, decision id), mandatory work from the path selection, phases with acceptance criteria, gate 3 summary (upgrade mode) or what gate 3 will do (plan mode), rollback reference (`rollback.md`), unresolved items with questions, and what happens on approval.
+- `risks.md`: one row per risk with likelihood, impact, mitigation, and owner phase. Always include: every version fact the plan relies on that is not verified (secondary or unverified, named one by one), the documented risks of the selected path (for example a long data migration), and patterns this version does not detect.
 - Update `inventory.md`, `compatibility.md`, and `decisions.md` if anything changed.
 
 Keep every file free of secrets and of code copied from the project.

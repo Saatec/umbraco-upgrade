@@ -1,0 +1,533 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "paths",
+  "knowledgeVersion": "2026.10.14",
+  "verifiedAt": "2026-10-14",
+  "verifiedBy": "maintainer",
+  "notes": [
+    "rules are documented facts and carry sources. strategies and scoring are this plugin's heuristics for ranking candidates, not facts.",
+    "A candidate path is built from: generation boundaries (7 and 8), documented hops, the closest-LTS rule, and minimum-from constraints in versions.json."
+  ],
+  "strategies": [
+    {
+      "id": "in-place",
+      "baseRisk": 1,
+      "preservesDatabase": true,
+      "preservesCode": true,
+      "description": "Upgrade the existing project and database in place in one major step."
+    },
+    {
+      "id": "staged",
+      "baseRisk": 2,
+      "preservesDatabase": true,
+      "preservesCode": true,
+      "description": "Upgrade the existing project and database in place through intermediate majors."
+    },
+    {
+      "id": "rebuild-with-database-migration",
+      "baseRisk": 4,
+      "preservesDatabase": true,
+      "preservesCode": false,
+      "description": "New codebase on a modern version; the existing database is carried and migrated through intermediate versions. Code and templates are reimplemented."
+    },
+    {
+      "id": "new-install-with-content-transfer",
+      "baseRisk": 6,
+      "preservesDatabase": false,
+      "preservesCode": false,
+      "description": "New installation of the target; content moved by a transfer tool or by hand; code ported. Tool support is verified per project."
+    }
+  ],
+  "rules": [
+    {
+      "id": "lts.closest-first",
+      "kind": "lts-stop",
+      "strength": "must",
+      "minSourceMajor": 10,
+      "description": "Upgrade to the closest LTS major before upgrading to a later major.",
+      "fact": {
+        "value": "closest-lts-first",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/upgrade-details.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "10 and later",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "You must upgrade to the closest",
+        "note": "The 17 docs state the same rule for 10 (stop at 13 before 14). For 10 to 13 the closest LTS is the target, so the upgrade is direct."
+      }
+    },
+    {
+      "id": "inplace.major",
+      "kind": "in-place-major",
+      "minSourceMajor": 10,
+      "description": "Upgrade to a new major in place by updating the NuGet packages and the target framework.",
+      "fact": {
+        "value": "in-place-major",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/upgrade-details.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "10 and later",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "You can upgrade to a new major version of Umbraco CMS directly by using NuGet"
+      }
+    },
+    {
+      "id": "inplace.minor.7",
+      "kind": "in-place-minor",
+      "fromMajor": 7,
+      "corePackage": "UmbracoCms",
+      "description": "Minor upgrades within Umbraco 7 in place through NuGet (UmbracoCms package).",
+      "fact": {
+        "value": "in-place-minor",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/minor-upgrades-for-umbraco-7.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "7",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "how to upgrade to the next minor version when using Umbraco 7"
+      }
+    },
+    {
+      "id": "inplace.minor.8",
+      "kind": "in-place-minor",
+      "fromMajor": 8,
+      "corePackage": "UmbracoCms",
+      "description": "Minor upgrades within Umbraco 8 in place through NuGet (UmbracoCms package).",
+      "fact": {
+        "value": "in-place-minor",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/minor-upgrades-for-umbraco-8.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "8",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "how to upgrade to the next minor version when using Umbraco 8"
+      }
+    },
+    {
+      "id": "inplace.minor.modern",
+      "kind": "in-place-minor",
+      "minSourceMajor": 9,
+      "corePackage": "Umbraco.Cms",
+      "description": "Minor upgrades within one major from 9 on, in place through NuGet (Umbraco.Cms package).",
+      "fact": {
+        "value": "in-place-minor",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/upgrade-details.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "9 and later",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "NuGet installs the latest version of the package when you use the dotnet add package command unless you specify a package version"
+      }
+    },
+    {
+      "id": "hop.9-10",
+      "kind": "documented-hop",
+      "fromMajor": 9,
+      "toMajor": 10,
+      "description": "Umbraco 9 upgrades to 10 in place; SQL CE is not supported from 10.",
+      "fact": {
+        "value": "hop-9-10",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "9 to 10",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "The upgrade path between Umbraco 9 and Umbraco 10 can be done directly by upgrading your project using NuGet"
+      }
+    },
+    {
+      "id": "boundary.7-8",
+      "kind": "generation-boundary",
+      "fromMajor": 7,
+      "toMajor": 8,
+      "inPlace": false,
+      "codeRewrite": true,
+      "database": "content-migration-new-install",
+      "description": "No in-place upgrade from 7 to 8: migrate the content into a new Umbraco 8 installation and rewrite the code.",
+      "landingMinor": "8.5",
+      "landingFact": {
+        "value": "8.5",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-8.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "7 to 8",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "Migrate to version 8.5 as a first step",
+        "note": "Documented workaround for a migration introduced in 8.6 that can break the content migration: migrate to 8.5, then upgrade within 8. The other documented workaround is a community package (verify before use)."
+      },
+      "fact": {
+        "value": "boundary-7-8",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "7 to 8",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "There is no direct upgrade path from Umbraco 7 to Umbraco 8"
+      }
+    },
+    {
+      "id": "boundary.8-9",
+      "kind": "generation-boundary",
+      "fromMajor": 8,
+      "toMajor": 9,
+      "inPlace": false,
+      "codeRewrite": true,
+      "database": "reuse-in-new-project",
+      "description": "No in-place upgrade from 8 to 9: reuse the 8 database in a new Umbraco 9 project and reimplement code and templates.",
+      "fact": {
+        "value": "boundary-8-9",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "8 to 9",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "You can reuse your content by restoring your Umbraco 8 database into a new database used for an Umbraco 9 site"
+      }
+    },
+    {
+      "id": "boundary.8-10",
+      "kind": "generation-boundary",
+      "fromMajor": 8,
+      "toMajor": 10,
+      "inPlace": false,
+      "codeRewrite": true,
+      "database": "reuse-in-new-project",
+      "description": "Recommended route from 8: reuse the 8 database in a new Umbraco 10 project (10 carries the 8 migrations), reimplement code and templates, then upgrade majors.",
+      "requiresLatestSourceMinor": true,
+      "prerequisiteFact": {
+        "value": "latest-8",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/upgrade-from-8-to-latest.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "8 to 10",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "A Umbraco 8 project running the latest version of Umbraco 8"
+      },
+      "prerequisites": [
+        {
+          "id": "forms-in-database",
+          "text": "If Umbraco Forms is used, store form definitions in the database before the database step.",
+          "fact": {
+            "value": "forms-in-database",
+            "status": "verified",
+            "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/upgrade-from-8-to-latest.md",
+            "sourceType": "official-docs",
+            "sourceVersion": "18 (latest docs)",
+            "appliesTo": "8 to 10",
+            "verifiedAt": "2026-10-14",
+            "verifiedBy": "maintainer",
+            "evidence": "If you use Umbraco Forms, make sure to have"
+          }
+        }
+      ],
+      "fact": {
+        "value": "boundary-8-10",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/upgrade-from-8-to-latest.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "8 to 10",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "use this guide to upgrade from Umbraco 8 to Umbraco 10",
+        "note": "All templates and custom code are reimplemented on the new project."
+      }
+    },
+    {
+      "id": "boundary.13-14",
+      "kind": "generation-boundary",
+      "fromMajor": 13,
+      "toMajor": 14,
+      "inPlace": true,
+      "codeRewrite": false,
+      "description": "Umbraco 14 replaced the AngularJS backoffice and removed several editors and features. The upgrade stays in place, but affected extensions and content need migration.",
+      "removals": [
+        {
+          "id": "angularjs-backoffice",
+          "text": "AngularJS backoffice extensions must be rewritten for the new backoffice.",
+          "fact": {
+            "value": "angularjs-backoffice",
+            "status": "verified",
+            "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+            "sourceType": "official-docs",
+            "sourceVersion": "18 (latest docs)",
+            "appliesTo": "14 and later",
+            "verifiedAt": "2026-10-14",
+            "verifiedBy": "maintainer",
+            "evidence": "Angular JS has been removed in Umbraco 14"
+          }
+        },
+        {
+          "id": "nested-content-and-grid",
+          "text": "Nested Content and Grid Layout were removed: rebuild with Block List or Block Grid.",
+          "fact": {
+            "value": "nested-content-and-grid",
+            "status": "verified",
+            "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+            "sourceType": "official-docs",
+            "sourceVersion": "18 (latest docs)",
+            "appliesTo": "14 and later",
+            "verifiedAt": "2026-10-14",
+            "verifiedBy": "maintainer",
+            "evidence": "Nested Content and Grid Layout have been removed"
+          }
+        },
+        {
+          "id": "legacy-media-picker",
+          "text": "The legacy Media Picker was removed: use the default Media Picker.",
+          "fact": {
+            "value": "legacy-media-picker",
+            "status": "verified",
+            "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+            "sourceType": "official-docs",
+            "sourceVersion": "18 (latest docs)",
+            "appliesTo": "14 and later",
+            "verifiedAt": "2026-10-14",
+            "verifiedBy": "maintainer",
+            "evidence": "The legacy Media Picker has been removed"
+          }
+        },
+        {
+          "id": "macros",
+          "text": "Macros and partial view macros were removed: use partial views or blocks in the rich text editor.",
+          "fact": {
+            "value": "macros",
+            "status": "verified",
+            "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+            "sourceType": "official-docs",
+            "sourceVersion": "18 (latest docs)",
+            "appliesTo": "14 and later",
+            "verifiedAt": "2026-10-14",
+            "verifiedBy": "maintainer",
+            "evidence": "Macros and partial views macros have been removed in Umbraco 14"
+          }
+        },
+        {
+          "id": "smidge",
+          "text": "Smidge was removed: remove its tag helper and injection from _ViewImports.cshtml.",
+          "fact": {
+            "value": "smidge",
+            "status": "verified",
+            "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+            "sourceType": "official-docs",
+            "sourceVersion": "18 (latest docs)",
+            "appliesTo": "14 and later",
+            "verifiedAt": "2026-10-14",
+            "verifiedBy": "maintainer",
+            "evidence": "In Umbraco 14, Smidge has been removed from the CMS"
+          }
+        },
+        {
+          "id": "installer-endpoints",
+          "text": "Remove the UseInstallerEndpoints call from Program.cs.",
+          "fact": {
+            "value": "installer-endpoints",
+            "status": "verified",
+            "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+            "sourceType": "official-docs",
+            "sourceVersion": "18 (latest docs)",
+            "appliesTo": "14 and later",
+            "verifiedAt": "2026-10-14",
+            "verifiedBy": "maintainer",
+            "evidence": "Remove u.UseInstallerEndpoints(); from the program.cs file"
+          }
+        }
+      ],
+      "fact": {
+        "value": "boundary-13-14",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "13 to 14 and later",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "Angular JS has been removed in Umbraco 14"
+      }
+    },
+    {
+      "id": "engine.sqlce",
+      "kind": "engine-constraint",
+      "engine": "sqlce",
+      "unsupportedFromMajor": 10,
+      "description": "SQL CE is not supported from Umbraco 10, and there is no official migration path to another engine.",
+      "options": [
+        "convert the SQL CE database to SQL Server with a community guide",
+        "create a new database and transfer document types and content with uSync",
+        "create a new database and copy the data with a data-compare tool",
+        "create a new database and transfer document types and content with Umbraco Deploy"
+      ],
+      "fact": {
+        "value": "sqlce-unsupported-from-10",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "10 and later",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "There is no official migration path from SQL CE to another database engine"
+      }
+    },
+    {
+      "id": "engine.content-migration-8",
+      "kind": "engine-constraint",
+      "toMajor": 8,
+      "allowedEngines": [
+        "sqlserver",
+        "localdb",
+        "sqlce"
+      ],
+      "description": "The content migration from 7 to 8 supports only SQL Server and SQL CE databases.",
+      "fact": {
+        "value": "content-migration-engines",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-8.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "7 to 8",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "The database types that are supported are SQL Server and SQL CE",
+        "note": "Umbraco 8 does not support MySQL. LocalDB is SQL Server."
+      }
+    }
+  ],
+  "scoring": [
+    {
+      "id": "db.hardcoded-ids",
+      "when": {
+        "pattern": "code.hardcoded-ids"
+      },
+      "adjust": [
+        {
+          "strategy": "new-install-with-content-transfer",
+          "risk": 2
+        }
+      ],
+      "reason": "Integer IDs in code and configuration survive only when the database is preserved."
+    },
+    {
+      "id": "db.core-table-sql",
+      "when": {
+        "pattern": "data.raw-sql-core-tables"
+      },
+      "adjust": [
+        {
+          "strategy": "new-install-with-content-transfer",
+          "risk": 2
+        }
+      ],
+      "reason": "SQL against core tables depends on the existing schema and IDs."
+    },
+    {
+      "id": "db.custom-tables",
+      "when": {
+        "pattern": "data.custom-tables"
+      },
+      "adjust": [
+        {
+          "strategy": "new-install-with-content-transfer",
+          "risk": 1
+        }
+      ],
+      "reason": "Custom tables live in the CMS database and need a separate transfer when the database is not preserved."
+    },
+    {
+      "id": "transfer.content-model-files",
+      "when": {
+        "pattern": "content.model-source-of-truth"
+      },
+      "adjust": [
+        {
+          "strategy": "new-install-with-content-transfer",
+          "risk": -1
+        }
+      ],
+      "reason": "Content-model files (for example uSync or Deploy) make content-transfer tools viable."
+    },
+    {
+      "id": "engine.sqlce-conversion",
+      "when": {
+        "engine": "sqlce",
+        "minTargetMajor": 10
+      },
+      "adjust": [
+        {
+          "strategy": "in-place",
+          "risk": 2
+        },
+        {
+          "strategy": "staged",
+          "risk": 2
+        },
+        {
+          "strategy": "rebuild-with-database-migration",
+          "risk": 2
+        }
+      ],
+      "reason": "A SQL CE database must be converted, with no official tooling, before Umbraco 10."
+    },
+    {
+      "id": "work.angularjs-backoffice",
+      "when": {
+        "pattern": "backoffice.angular-property-editor",
+        "minTargetMajor": 14
+      },
+      "adjust": [],
+      "mandatoryWork": "Rewrite AngularJS backoffice extensions as extensions of the new backoffice. This applies to every strategy.",
+      "reason": "AngularJS was removed in Umbraco 14 (rule boundary.13-14)."
+    },
+    {
+      "id": "work.legacy-structured-editors",
+      "when": {
+        "pattern": "content.legacy-structured-editors",
+        "minTargetMajor": 14
+      },
+      "adjust": [],
+      "mandatoryWork": "Convert Nested Content data to Block List or Block Grid.",
+      "reason": "Nested Content was removed in Umbraco 14 (rule boundary.13-14)."
+    },
+    {
+      "id": "work.legacy-grid",
+      "when": {
+        "pattern": "content.legacy-grid",
+        "minTargetMajor": 14
+      },
+      "adjust": [],
+      "mandatoryWork": "Convert Grid Layout content to Block Grid.",
+      "reason": "Grid Layout was removed in Umbraco 14 (rule boundary.13-14)."
+    },
+    {
+      "id": "work.macros",
+      "when": {
+        "pattern": "content.macros",
+        "minTargetMajor": 14
+      },
+      "adjust": [],
+      "mandatoryWork": "Replace macros with partial views or rich text blocks; check rich text content for macro markup first.",
+      "reason": "Macros were removed in Umbraco 14 (rule boundary.13-14)."
+    }
+  ],
+  "closeThreshold": 1
+}

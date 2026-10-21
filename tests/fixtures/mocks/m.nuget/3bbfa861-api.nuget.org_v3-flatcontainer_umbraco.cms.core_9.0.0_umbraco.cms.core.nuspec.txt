@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Umbraco.Cms.Core</id>
+    <version>9.0.0</version>
+    <title>Umbraco CMS Core</title>
+    <authors>Umbraco HQ</authors>
+    <licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://umbraco.com/</projectUrl>
+    <iconUrl>https://umbraco.com/dist/nuget/logo-small.png</iconUrl>
+    <description>Contains the core assembly needed to run Umbraco Cms. This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</description>
+    <copyright>Copyright © Umbraco 2021</copyright>
+    <tags>umbraco</tags>
+    <repository type="git" url="https://github.com/umbraco/umbraco-cms" commit="5bfab13dc5a268714aad2426a2b68ab5561a6407" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Microsoft.Extensions.Configuration.Abstractions" version="5.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.FileProviders.Embedded" version="5.0.10" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Hosting.Abstractions" version="5.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging" version="5.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Options" version="5.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Options.ConfigurationExtensions" version="5.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Options.DataAnnotations" version="5.0.0" exclude="Build,Analyzers" />
+        <dependency id="System.ComponentModel.Annotations" version="5.0.0" exclude="Build,Analyzers" />
+        <dependency id="System.Reflection.Emit.Lightweight" version="4.7.0" exclude="Build,Analyzers" />
+        <dependency id="System.Runtime.Caching" version="5.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

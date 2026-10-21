@@ -1,0 +1,152 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "packages",
+  "knowledgeVersion": "2026.10.14",
+  "verifiedAt": "2026-10-14",
+  "verifiedBy": "maintainer",
+  "notes": [
+    "Mappings come only from public package metadata (NuGet). Third-party package compatibility is checked live with Get-NuGetPackageInfo.ps1, never assumed."
+  ],
+  "corePackages": [
+    {
+      "id": "UmbracoCms",
+      "minMajor": 7,
+      "maxMajor": 8,
+      "fact": {
+        "value": "UmbracoCms",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbracocms/8.18.15/umbracocms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "UmbracoCms 8.18.15",
+        "appliesTo": "7 to 8",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "Installs Umbraco Cms in your Visual Studio ASP.NET project",
+        "note": "Core package of the .NET Framework generations; last release 8.18.15."
+      }
+    },
+    {
+      "id": "Umbraco.Cms",
+      "minMajor": 9,
+      "maxMajor": null,
+      "fact": {
+        "value": "Umbraco.Cms",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/9.0.0/umbraco.cms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 9.0.0",
+        "appliesTo": "9 and later",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "Installs Umbraco Cms in your Visual Studio ASP.NET Core project",
+        "note": "Core package from 9 on; first release 9.0.0."
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "from": "UmbracoCms",
+      "to": "Umbraco.Cms",
+      "fromMaxMajor": 8,
+      "toMinMajor": 9,
+      "kind": "renamed",
+      "fact": {
+        "value": "Umbraco.Cms",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/9.0.0/umbraco.cms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 9.0.0",
+        "appliesTo": "8 to 9 and later",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "url=\"https://github.com/umbraco/umbraco-cms\"",
+        "note": "Same authors (Umbraco HQ) and repository as UmbracoCms. UmbracoCms ends at 8.18.15 (.NETFramework4.7.2); Umbraco.Cms starts at 9.0.0 (net5.0)."
+      }
+    },
+    {
+      "from": "UmbracoCms.Core",
+      "to": "Umbraco.Cms.Core",
+      "fromMaxMajor": 8,
+      "toMinMajor": 9,
+      "kind": "renamed",
+      "fact": {
+        "value": "Umbraco.Cms.Core",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms.core/9.0.0/umbraco.cms.core.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms.Core 9.0.0",
+        "appliesTo": "8 to 9 and later",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "Contains the core assembly needed to run Umbraco Cms",
+        "note": "Same authors and repository as UmbracoCms.Core, which ends at 8.18.15; Umbraco.Cms.Core starts at 9.0.0."
+      }
+    },
+    {
+      "from": "UmbracoForms",
+      "to": "Umbraco.Forms",
+      "fromMaxMajor": 8,
+      "toMinMajor": 9,
+      "kind": "renamed",
+      "fact": {
+        "value": "Umbraco.Forms",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbracoforms/8.13.16/umbracoforms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "UmbracoForms 8.13.16",
+        "appliesTo": "8 to 9 and later",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "For Umbraco CMS version 9, please use the feed available at https://www.nuget.org/packages/Umbraco.Forms/",
+        "note": "Stated in the UmbracoForms package description."
+      }
+    }
+  ],
+  "noSuccessor": [
+    {
+      "id": "Umbraco.Cms.SqlCe",
+      "lastMajor": 9,
+      "fact": {
+        "value": "no-release-after-9",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms.sqlce/index.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": "10 and later",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "No release for 10 or later. SQL CE is not supported from 10 (rule engine.sqlce). Versions on NuGet on 2026-10-14: 9.0.0-rc001 to 9.5.4."
+      }
+    },
+    {
+      "id": "Umbraco.Cms.Web.BackOffice",
+      "lastMajor": 13,
+      "fact": {
+        "value": "no-release-after-13",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms.web.backoffice/index.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": "14 and later",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "No release for 14 or later. The backoffice changed in 14 (rule boundary.13-14); no successor package is stated in its metadata. Versions on NuGet on 2026-10-14: 9.0.0-rc001 to 13.16.2."
+      }
+    },
+    {
+      "id": "Umbraco.ModelsBuilder",
+      "lastMajor": 8,
+      "fact": {
+        "value": "no-release-after-8",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.modelsbuilder/index.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": "9 and later",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "No release for 9 or later. Check the target version's documentation for models builder support. Versions on NuGet on 2026-10-14: 2.2.0-beta002 to 8.1.6."
+      }
+    }
+  ]
+}

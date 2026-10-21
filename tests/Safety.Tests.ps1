@@ -90,6 +90,8 @@ Describe 'New-UpgradeBranch and state folder policy' -Tag 'fixture-based' {
     It 'creates the branch from a clean tree and records it; refuses a dirty tree' {
         (Invoke-State $script:d @('gate', '-Gate', 'discovery', '-Status', 'passed', '-Evidence', 'evidence/discovery/git-status-at-start.json')).ExitCode | Should -Be 0
         (Invoke-State $script:d @('set', '-Section', 'source', '-Set', 'umbraco=13.10.1;major=13;confidence=high')).ExitCode | Should -Be 0
+        (Invoke-State $script:d @('set', '-Section', 'target', '-Set', 'resolved=17.7.1;dotnet=net10.0;lts.value=true;lts.source=D-001')).ExitCode | Should -Be 0
+        (Invoke-State $script:d @('set', '-Section', 'path', '-Set', 'selection=selected;strategy=in-place;decision=D-001')).ExitCode | Should -Be 0
         (Invoke-State $script:d @('gate', '-Gate', 'versionPath', '-Status', 'passed')).ExitCode | Should -Be 0
         Add-Content -LiteralPath (Join-Path $script:d 'Program.cs') -Value '// local change'
         $r0 = Invoke-PluginScript -Script 'scripts/New-UpgradeBranch.ps1' -Arguments @('-ProjectRoot', $script:d)

@@ -1,0 +1,216 @@
+{
+  "description": "Real NuGet v3 responses recorded on 2026-10-14 (flat container indexes, nuspec files, registration). Bodies are unchanged (gzip-decoded).",
+  "recordedAt": "2026-10-14",
+  "entries": [
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "bf6f2e69-api.nuget.org_v3-flatcontainer_umbraco.cms_index.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbracocms/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "fb3c3543-api.nuget.org_v3-flatcontainer_umbracocms_index.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms.sqlce/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "10d5b3ea-api.nuget.org_v3-flatcontainer_umbraco.cms.sqlce_index.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms.web.backoffice/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "8a290fba-api.nuget.org_v3-flatcontainer_umbraco.cms.web.backoffice_index.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.modelsbuilder/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "bccfd809-api.nuget.org_v3-flatcontainer_umbraco.modelsbuilder_index.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/does.not.exist.sample/index.json",
+      "status": 404,
+      "contentType": "application/xml",
+      "file": "af9c359e-api.nuget.org_v3-flatcontainer_does.not.exist.sample_index.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/9.5.4/umbraco.cms.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "64f5a9f8-api.nuget.org_v3-flatcontainer_umbraco.cms_9.5.4_umbraco.cms.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/10.8.11/umbraco.cms.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "23fb0552-api.nuget.org_v3-flatcontainer_umbraco.cms_10.8.11_umbraco.cms.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/11.5.0/umbraco.cms.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "294037a5-api.nuget.org_v3-flatcontainer_umbraco.cms_11.5.0_umbraco.cms.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/12.3.10/umbraco.cms.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "e5619b6b-api.nuget.org_v3-flatcontainer_umbraco.cms_12.3.10_umbraco.cms.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/13.16.2/umbraco.cms.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "e75b8561-api.nuget.org_v3-flatcontainer_umbraco.cms_13.16.2_umbraco.cms.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/14.3.4/umbraco.cms.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "608dff09-api.nuget.org_v3-flatcontainer_umbraco.cms_14.3.4_umbraco.cms.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/15.4.4/umbraco.cms.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "c2bc3c31-api.nuget.org_v3-flatcontainer_umbraco.cms_15.4.4_umbraco.cms.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/16.5.1/umbraco.cms.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "989c2867-api.nuget.org_v3-flatcontainer_umbraco.cms_16.5.1_umbraco.cms.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/17.7.1/umbraco.cms.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "84e76d81-api.nuget.org_v3-flatcontainer_umbraco.cms_17.7.1_umbraco.cms.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/18.2.1/umbraco.cms.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "ac3ef469-api.nuget.org_v3-flatcontainer_umbraco.cms_18.2.1_umbraco.cms.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/9.0.0/umbraco.cms.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "e77af58e-api.nuget.org_v3-flatcontainer_umbraco.cms_9.0.0_umbraco.cms.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbracocms/7.15.11/umbracocms.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "c6806879-api.nuget.org_v3-flatcontainer_umbracocms_7.15.11_umbracocms.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbracocms/8.18.15/umbracocms.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "0cbbd703-api.nuget.org_v3-flatcontainer_umbracocms_8.18.15_umbracocms.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms.core/9.0.0/umbraco.cms.core.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "3bbfa861-api.nuget.org_v3-flatcontainer_umbraco.cms.core_9.0.0_umbraco.cms.core.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbracoforms/8.13.16/umbracoforms.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "173fc10d-api.nuget.org_v3-flatcontainer_umbracoforms_8.13.16_umbracoforms.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.modelsbuilder/8.1.6/umbraco.modelsbuilder.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "7069fe43-et.org_v3-flatcontainer_umbraco.modelsbuilder_8.1.6_umbraco.modelsbuilder.nuspec.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3/registration5-gz-semver2/umbracocms/7.0.0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "90e72d7e-api.nuget.org_v3_registration5-gz-semver2_umbracocms_7.0.0.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3/registration5-gz-semver2/umbracocms/8.0.0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "cfddd391-api.nuget.org_v3_registration5-gz-semver2_umbracocms_8.0.0.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/9.0.0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "160cd8fd-api.nuget.org_v3_registration5-gz-semver2_umbraco.cms_9.0.0.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/10.0.0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "558fee7a-api.nuget.org_v3_registration5-gz-semver2_umbraco.cms_10.0.0.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/11.0.0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "44bc8fb0-api.nuget.org_v3_registration5-gz-semver2_umbraco.cms_11.0.0.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/12.0.0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "ea34e3d3-api.nuget.org_v3_registration5-gz-semver2_umbraco.cms_12.0.0.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/13.0.0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "28463c8d-api.nuget.org_v3_registration5-gz-semver2_umbraco.cms_13.0.0.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/14.0.0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "52061e62-api.nuget.org_v3_registration5-gz-semver2_umbraco.cms_14.0.0.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/15.0.0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "bd53c9eb-api.nuget.org_v3_registration5-gz-semver2_umbraco.cms_15.0.0.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/16.0.0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "851b836b-api.nuget.org_v3_registration5-gz-semver2_umbraco.cms_16.0.0.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/17.0.0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "7c0dd85e-api.nuget.org_v3_registration5-gz-semver2_umbraco.cms_17.0.0.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/18.0.0.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "778dab6d-api.nuget.org_v3_registration5-gz-semver2_umbraco.cms_18.0.0.json.txt"
+    },
+    {
+      "url": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.modelsbuilder/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "d3414309-api.nuget.org_v3_registration5-gz-semver2_umbraco.modelsbuilder_index.json.txt"
+    }
+  ]
+}

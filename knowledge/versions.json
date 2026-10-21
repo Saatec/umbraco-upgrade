@@ -1,0 +1,1355 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "versions",
+  "knowledgeVersion": "2026.10.14",
+  "verifiedAt": "2026-10-14",
+  "verifiedBy": "maintainer",
+  "product": "umbraco-cms",
+  "notes": [
+    "Each fact carries its source URL, the documentation or package version the source belongs to (sourceVersion), the Umbraco versions it applies to (appliesTo), and the date it was verified.",
+    "status verified: confirmed from a primary source on verifiedAt. secondary: from a secondary aggregator, never authoritative. unverified: not confirmed. needs-review: the evidence phrase was not found when last re-checked.",
+    "LTS status of 7, 8, 9, and 10 and all end-of-support and end-of-life dates are secondary: the official LTS page blocks automated requests."
+  ],
+  "majors": [
+    {
+      "major": 7,
+      "generation": "v7",
+      "corePackage": "UmbracoCms",
+      "releaseDate": {
+        "value": "2013-11-21",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3/registration5-gz-semver2/umbracocms/7.0.0.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "UmbracoCms 7.0.0",
+        "appliesTo": "7",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "\"published\":\"2013-11-21",
+        "note": "Publication date (UTC) of UmbracoCms 7.0.0 on NuGet."
+      },
+      "lts": {
+        "value": true,
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "7",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: lts."
+      },
+      "endOfSupport": {
+        "value": "2021-07-31",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "7",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: support (end of active support)."
+      },
+      "endOfLife": {
+        "value": "2023-09-30",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "7",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: eol (end of security support)."
+      },
+      "dotnet": {
+        "value": ".NETFramework4.5.2",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbracocms/7.15.11/umbracocms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "UmbracoCms 7.15.11",
+        "appliesTo": "7",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "targetFramework=\".NETFramework4.5.2\"",
+        "note": "Target framework of the latest 7 release in its NuGet package metadata."
+      },
+      "latestKnown": {
+        "value": "7.15.11",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbracocms/index.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": "7",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Latest stable 7.x release on NuGet on 2026-10-14. Resolve the current latest from NuGet at run time."
+      },
+      "docsSpace": {
+        "value": "legacy",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/understand-umbraco-cms/product-and-releases/legacy-documentation.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "7",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "The documentation for Umbraco versions 7 and 8 is available on"
+      },
+      "dataMigrations": [],
+      "preparation": []
+    },
+    {
+      "major": 8,
+      "generation": "v8",
+      "corePackage": "UmbracoCms",
+      "releaseDate": {
+        "value": "2019-02-26",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3/registration5-gz-semver2/umbracocms/8.0.0.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "UmbracoCms 8.0.0",
+        "appliesTo": "8",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "\"published\":\"2019-02-26",
+        "note": "Publication date (UTC) of UmbracoCms 8.0.0 on NuGet."
+      },
+      "lts": {
+        "value": true,
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "8",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: lts."
+      },
+      "endOfSupport": {
+        "value": "2024-02-24",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "8",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: support (end of active support)."
+      },
+      "endOfLife": {
+        "value": "2025-02-24",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "8",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: eol (end of security support)."
+      },
+      "dotnet": {
+        "value": ".NETFramework4.7.2",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbracocms/8.18.15/umbracocms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "UmbracoCms 8.18.15",
+        "appliesTo": "8",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "targetFramework=\".NETFramework4.7.2\"",
+        "note": "Target framework of the latest 8 release in its NuGet package metadata."
+      },
+      "latestKnown": {
+        "value": "8.18.15",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbracocms/index.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": "8",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Latest stable 8.x release on NuGet on 2026-10-14. Resolve the current latest from NuGet at run time."
+      },
+      "docsSpace": {
+        "value": "legacy",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/understand-umbraco-cms/product-and-releases/legacy-documentation.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "8",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "The documentation for Umbraco versions 7 and 8 is available on"
+      },
+      "minUpgradeFrom": {
+        "value": "7.14.0",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-8.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "8",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "you need to ensure your Umbraco 7 site is running at least Umbraco 7.14",
+        "note": "Minimum Umbraco 7 version for the content migration to 8."
+      },
+      "dataMigrations": [
+        {
+          "id": "content-migration-from-7",
+          "title": "Content migration from an Umbraco 7 database",
+          "runsWhen": "A v7 database (7.14 or later) is upgraded by a new Umbraco 8 installation.",
+          "whenFromMajor": 7,
+          "fact": {
+            "value": "content-migration-from-7",
+            "status": "verified",
+            "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-8.md",
+            "sourceType": "official-docs",
+            "sourceVersion": "18 (latest docs)",
+            "appliesTo": "8",
+            "verifiedAt": "2026-10-14",
+            "verifiedBy": "maintainer",
+            "evidence": "A content migration tool has been implemented in Umbraco 8.1.0",
+            "note": "Custom property editor configuration may need custom pre-value migrators; data of third-party editors is kept as stored in 7."
+          }
+        }
+      ],
+      "preparation": []
+    },
+    {
+      "major": 9,
+      "generation": "v9-v13",
+      "corePackage": "Umbraco.Cms",
+      "releaseDate": {
+        "value": "2021-09-27",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/9.0.0.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 9.0.0",
+        "appliesTo": "9",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "\"published\":\"2021-09-27",
+        "note": "Publication date (UTC) of Umbraco.Cms 9.0.0 on NuGet."
+      },
+      "lts": {
+        "value": false,
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "9",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: lts."
+      },
+      "endOfSupport": {
+        "value": "2022-09-16",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "9",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: support (end of active support)."
+      },
+      "endOfLife": {
+        "value": "2022-12-16",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "9",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: eol (end of security support)."
+      },
+      "dotnet": {
+        "value": "net5.0",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/9.5.4/umbraco.cms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 9.5.4",
+        "appliesTo": "9",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "targetFramework=\"net5.0\"",
+        "note": "Target framework of the latest 9 release in its NuGet package metadata."
+      },
+      "latestKnown": {
+        "value": "9.5.4",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/index.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": "9",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Latest stable 9.x release on NuGet on 2026-10-14. Resolve the current latest from NuGet at run time."
+      },
+      "docsSpace": {
+        "value": "unavailable",
+        "status": "verified",
+        "source": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/9/umbraco-cms/SUMMARY.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "9",
+        "appliesTo": "9",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "No Umbraco 9 folder on the UmbracoDocs main, umbraco-eol-versions, or legacy-docs branches (HTTP 404 on 2026-10-14). The 9 to 10 upgrade notes are in the current find-your-upgrade-path page."
+      },
+      "dataMigrations": [],
+      "preparation": []
+    },
+    {
+      "major": 10,
+      "generation": "v9-v13",
+      "corePackage": "Umbraco.Cms",
+      "releaseDate": {
+        "value": "2022-06-15",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/10.0.0.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 10.0.0",
+        "appliesTo": "10",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "\"published\":\"2022-06-15",
+        "note": "Publication date (UTC) of Umbraco.Cms 10.0.0 on NuGet."
+      },
+      "lts": {
+        "value": true,
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "10",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: lts."
+      },
+      "endOfSupport": {
+        "value": "2024-06-16",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "10",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: support (end of active support)."
+      },
+      "endOfLife": {
+        "value": "2025-06-16",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "10",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: eol (end of security support)."
+      },
+      "dotnet": {
+        "value": "net6.0",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/10.8.11/umbraco.cms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 10.8.11",
+        "appliesTo": "10",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "targetFramework=\"net6.0\"",
+        "note": "Target framework of the latest 10 release in its NuGet package metadata. Matches the CMS to .NET table in the upgrade-details page (latest docs). The 9 to 10 notes state .NET 6.0.5 as the minimum runtime for Umbraco 10."
+      },
+      "latestKnown": {
+        "value": "10.8.11",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/index.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": "10",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Latest stable 10.x release on NuGet on 2026-10-14. Resolve the current latest from NuGet at run time."
+      },
+      "docsSpace": {
+        "value": "eol",
+        "status": "verified",
+        "source": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/10/umbraco-cms/SUMMARY.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "10",
+        "appliesTo": "10",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "Version Specific Upgrades",
+        "note": "End-of-life documentation is unpublished from the docs site and kept on the umbraco-eol-versions branch."
+      },
+      "minUpgradeFrom": {
+        "value": "8.18.0",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "10",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "To upgrade to Umbraco 10, your database needs to be at least on Umbraco 8.18",
+        "note": "Applies to the database: an 8 database must be at 8.18 or later before a 10 installation upgrades it."
+      },
+      "dataMigrations": [
+        {
+          "id": "database-migrations-from-8",
+          "title": "Database migrations from Umbraco 8",
+          "runsWhen": "An Umbraco 8 database is attached to a new Umbraco 10 project.",
+          "whenFromMajor": 8,
+          "fact": {
+            "value": "database-migrations-from-8",
+            "status": "verified",
+            "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/upgrade-from-8-to-latest.md",
+            "sourceType": "official-docs",
+            "sourceVersion": "18 (latest docs)",
+            "appliesTo": "10",
+            "verifiedAt": "2026-10-14",
+            "verifiedBy": "maintainer",
+            "evidence": "use this guide to upgrade from Umbraco 8 to Umbraco 10",
+            "note": "Umbraco 10 contains the database migrations from 8; templates and custom code are reimplemented."
+          }
+        }
+      ],
+      "preparation": []
+    },
+    {
+      "major": 11,
+      "generation": "v9-v13",
+      "corePackage": "Umbraco.Cms",
+      "releaseDate": {
+        "value": "2022-12-01",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/11.0.0.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 11.0.0",
+        "appliesTo": "11",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "\"published\":\"2022-12-01",
+        "note": "Publication date (UTC) of Umbraco.Cms 11.0.0 on NuGet."
+      },
+      "lts": {
+        "value": false,
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "11",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "For Umbraco 10, the closest long-term support version is Umbraco 13 so a direct upgrade is possible",
+        "note": "Implied: the closest LTS version after 10 is 13, so 11 is not LTS."
+      },
+      "endOfSupport": {
+        "value": "2023-09-01",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "11",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: support (end of active support)."
+      },
+      "endOfLife": {
+        "value": "2023-12-01",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "11",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: eol (end of security support)."
+      },
+      "dotnet": {
+        "value": "net7.0",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/11.5.0/umbraco.cms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 11.5.0",
+        "appliesTo": "11",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "targetFramework=\"net7.0\"",
+        "note": "Target framework of the latest 11 release in its NuGet package metadata. Matches the CMS to .NET table in the upgrade-details page (latest docs)."
+      },
+      "latestKnown": {
+        "value": "11.5.0",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/index.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": "11",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Latest stable 11.x release on NuGet on 2026-10-14. Resolve the current latest from NuGet at run time."
+      },
+      "docsSpace": {
+        "value": "eol",
+        "status": "verified",
+        "source": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/11/umbraco-cms/SUMMARY.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "11",
+        "appliesTo": "11",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "Version Specific Upgrades",
+        "note": "End-of-life documentation is unpublished from the docs site and kept on the umbraco-eol-versions branch."
+      },
+      "dataMigrations": [],
+      "preparation": []
+    },
+    {
+      "major": 12,
+      "generation": "v9-v13",
+      "corePackage": "Umbraco.Cms",
+      "releaseDate": {
+        "value": "2023-06-29",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/12.0.0.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 12.0.0",
+        "appliesTo": "12",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "\"published\":\"2023-06-29",
+        "note": "Publication date (UTC) of Umbraco.Cms 12.0.0 on NuGet."
+      },
+      "lts": {
+        "value": false,
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "12",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "For Umbraco 10, the closest long-term support version is Umbraco 13 so a direct upgrade is possible",
+        "note": "Implied: the closest LTS version after 10 is 13, so 12 is not LTS."
+      },
+      "endOfSupport": {
+        "value": "2024-03-29",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "12",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: support (end of active support)."
+      },
+      "endOfLife": {
+        "value": "2024-06-29",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "12",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: eol (end of security support)."
+      },
+      "dotnet": {
+        "value": "net7.0",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/12.3.10/umbraco.cms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 12.3.10",
+        "appliesTo": "12",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "targetFramework=\"net7.0\"",
+        "note": "Target framework of the latest 12 release in its NuGet package metadata. Matches the CMS to .NET table in the upgrade-details page (latest docs)."
+      },
+      "latestKnown": {
+        "value": "12.3.10",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/index.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": "12",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Latest stable 12.x release on NuGet on 2026-10-14. Resolve the current latest from NuGet at run time."
+      },
+      "docsSpace": {
+        "value": "eol",
+        "status": "verified",
+        "source": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/12/umbraco-cms/SUMMARY.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "12",
+        "appliesTo": "12",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "Version Specific Upgrades",
+        "note": "End-of-life documentation is unpublished from the docs site and kept on the umbraco-eol-versions branch."
+      },
+      "dataMigrations": [],
+      "preparation": []
+    },
+    {
+      "major": 13,
+      "generation": "v9-v13",
+      "corePackage": "Umbraco.Cms",
+      "releaseDate": {
+        "value": "2023-12-14",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/13.0.0.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 13.0.0",
+        "appliesTo": "13",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "\"published\":\"2023-12-14",
+        "note": "Publication date (UTC) of Umbraco.Cms 13.0.0 on NuGet."
+      },
+      "lts": {
+        "value": true,
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "13",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "For Umbraco 10, the closest long-term support version is Umbraco 13 so a direct upgrade is possible"
+      },
+      "endOfSupport": {
+        "value": "2025-12-14",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "13",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: support (end of active support)."
+      },
+      "endOfLife": {
+        "value": "2026-12-14",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "13",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: eol (end of security support)."
+      },
+      "dotnet": {
+        "value": "net8.0",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/13.16.2/umbraco.cms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 13.16.2",
+        "appliesTo": "13",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "targetFramework=\"net8.0\"",
+        "note": "Target framework of the latest 13 release in its NuGet package metadata. Matches the CMS to .NET table in the upgrade-details page (latest docs)."
+      },
+      "latestKnown": {
+        "value": "13.16.2",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/index.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": "13",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Latest stable 13.x release on NuGet on 2026-10-14. Resolve the current latest from NuGet at run time."
+      },
+      "docsSpace": {
+        "value": "13.latest",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/llms.txt",
+        "sourceType": "official-docs",
+        "sourceVersion": "all published versions",
+        "appliesTo": "13",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "https://docs.umbraco.com/umbraco-cms/13.latest/"
+      },
+      "dataMigrations": [],
+      "preparation": []
+    },
+    {
+      "major": 14,
+      "generation": "v14+",
+      "corePackage": "Umbraco.Cms",
+      "releaseDate": {
+        "value": "2024-05-30",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/14.0.0.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 14.0.0",
+        "appliesTo": "14",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "\"published\":\"2024-05-30",
+        "note": "Publication date (UTC) of Umbraco.Cms 14.0.0 on NuGet."
+      },
+      "lts": {
+        "value": false,
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/upgrade-details.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "14",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "For Umbraco 13, the closest long-term support version is Umbraco 17",
+        "note": "Implied: the closest LTS version after 13 is 17, so 14 is not LTS."
+      },
+      "endOfSupport": {
+        "value": "2025-03-02",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "14",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: support (end of active support)."
+      },
+      "endOfLife": {
+        "value": "2025-05-30",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "14",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: eol (end of security support)."
+      },
+      "dotnet": {
+        "value": "net8.0",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/14.3.4/umbraco.cms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 14.3.4",
+        "appliesTo": "14",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "targetFramework=\"net8.0\"",
+        "note": "Target framework of the latest 14 release in its NuGet package metadata. Matches the CMS to .NET table in the upgrade-details page (latest docs)."
+      },
+      "latestKnown": {
+        "value": "14.3.4",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/index.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": "14",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Latest stable 14.x release on NuGet on 2026-10-14. Resolve the current latest from NuGet at run time."
+      },
+      "docsSpace": {
+        "value": "eol",
+        "status": "verified",
+        "source": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/14/umbraco-cms/SUMMARY.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "14",
+        "appliesTo": "14",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "Version Specific Upgrades",
+        "note": "End-of-life documentation is unpublished from the docs site and kept on the umbraco-eol-versions branch."
+      },
+      "dataMigrations": [],
+      "preparation": []
+    },
+    {
+      "major": 15,
+      "generation": "v14+",
+      "corePackage": "Umbraco.Cms",
+      "releaseDate": {
+        "value": "2024-11-14",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/15.0.0.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 15.0.0",
+        "appliesTo": "15",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "\"published\":\"2024-11-14",
+        "note": "Publication date (UTC) of Umbraco.Cms 15.0.0 on NuGet."
+      },
+      "lts": {
+        "value": false,
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/upgrade-details.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "15",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "For Umbraco 13, the closest long-term support version is Umbraco 17",
+        "note": "Implied: the closest LTS version after 13 is 17, so 15 is not LTS."
+      },
+      "endOfSupport": {
+        "value": "2025-08-14",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "15",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: support (end of active support)."
+      },
+      "endOfLife": {
+        "value": "2025-11-14",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "15",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: eol (end of security support)."
+      },
+      "dotnet": {
+        "value": "net9.0",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/15.4.4/umbraco.cms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 15.4.4",
+        "appliesTo": "15",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "targetFramework=\"net9.0\"",
+        "note": "Target framework of the latest 15 release in its NuGet package metadata. Matches the CMS to .NET table in the upgrade-details page (latest docs)."
+      },
+      "latestKnown": {
+        "value": "15.4.4",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/index.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": "15",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Latest stable 15.x release on NuGet on 2026-10-14. Resolve the current latest from NuGet at run time."
+      },
+      "docsSpace": {
+        "value": "eol",
+        "status": "verified",
+        "source": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/15/umbraco-cms/SUMMARY.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "15",
+        "appliesTo": "15",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "Version Specific Upgrades",
+        "note": "End-of-life documentation is unpublished from the docs site and kept on the umbraco-eol-versions branch."
+      },
+      "dataMigrations": [
+        {
+          "id": "block-editor-data-format",
+          "title": "Block editor data format migration",
+          "runsWhen": "Upgrading from below 15 to 15, 16, or 17. Umbraco 18 does not include it.",
+          "whenFromMajor": null,
+          "fact": {
+            "value": "block-editor-data-format",
+            "status": "verified",
+            "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+            "sourceType": "official-docs",
+            "sourceVersion": "18 (latest docs)",
+            "appliesTo": "15",
+            "verifiedAt": "2026-10-14",
+            "verifiedBy": "maintainer",
+            "evidence": "This causes a content migration to run when upgrading",
+            "note": "Can run long on large sites; cleaning old content versions first helps. Opt-out options exist for 15 to 17 only (migrate-content-to-umbraco-15)."
+          }
+        }
+      ],
+      "preparation": []
+    },
+    {
+      "major": 16,
+      "generation": "v14+",
+      "corePackage": "Umbraco.Cms",
+      "releaseDate": {
+        "value": "2025-06-12",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/16.0.0.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 16.0.0",
+        "appliesTo": "16",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "\"published\":\"2025-06-12",
+        "note": "Publication date (UTC) of Umbraco.Cms 16.0.0 on NuGet."
+      },
+      "lts": {
+        "value": false,
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/upgrade-details.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "16",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "For Umbraco 13, the closest long-term support version is Umbraco 17",
+        "note": "Implied: the closest LTS version after 13 is 17, so 16 is not LTS."
+      },
+      "endOfSupport": {
+        "value": "2026-03-12",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "16",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: support (end of active support)."
+      },
+      "endOfLife": {
+        "value": "2026-06-12",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "16",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: eol (end of security support)."
+      },
+      "dotnet": {
+        "value": "net9.0",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/16.5.1/umbraco.cms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 16.5.1",
+        "appliesTo": "16",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "targetFramework=\"net9.0\"",
+        "note": "Target framework of the latest 16 release in its NuGet package metadata. Matches the CMS to .NET table in the upgrade-details page (latest docs)."
+      },
+      "latestKnown": {
+        "value": "16.5.1",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/index.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": "16",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Latest stable 16.x release on NuGet on 2026-10-14. Resolve the current latest from NuGet at run time."
+      },
+      "docsSpace": {
+        "value": "eol",
+        "status": "verified",
+        "source": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/16/umbraco-cms/SUMMARY.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "16",
+        "appliesTo": "16",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "Version Specific Upgrades",
+        "note": "End-of-life documentation is unpublished from the docs site and kept on the umbraco-eol-versions branch."
+      },
+      "dataMigrations": [],
+      "preparation": []
+    },
+    {
+      "major": 17,
+      "generation": "v14+",
+      "corePackage": "Umbraco.Cms",
+      "releaseDate": {
+        "value": "2025-11-27",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/17.0.0.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 17.0.0",
+        "appliesTo": "17",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "\"published\":\"2025-11-27",
+        "note": "Publication date (UTC) of Umbraco.Cms 17.0.0 on NuGet."
+      },
+      "lts": {
+        "value": true,
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/upgrade-details.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "17",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "For Umbraco 13, the closest long-term support version is Umbraco 17",
+        "note": "Corroborated by releases.umbraco.com, which labels Umbraco 17 as LTS."
+      },
+      "endOfSupport": {
+        "value": "2027-11-27",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "17",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: support (end of active support)."
+      },
+      "endOfLife": {
+        "value": "2028-11-27",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "17",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: eol (end of security support)."
+      },
+      "dotnet": {
+        "value": "net10.0",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/17.7.1/umbraco.cms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 17.7.1",
+        "appliesTo": "17",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "targetFramework=\"net10.0\"",
+        "note": "Target framework of the latest 17 release in its NuGet package metadata. Matches the CMS to .NET table in the upgrade-details page (latest docs)."
+      },
+      "latestKnown": {
+        "value": "17.7.1",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/index.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": "17",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Latest stable 17.x release on NuGet on 2026-10-14. Resolve the current latest from NuGet at run time."
+      },
+      "docsSpace": {
+        "value": "17.latest",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/llms.txt",
+        "sourceType": "official-docs",
+        "sourceVersion": "all published versions",
+        "appliesTo": "17",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "https://docs.umbraco.com/umbraco-cms/17.latest/"
+      },
+      "dataMigrations": [],
+      "preparation": []
+    },
+    {
+      "major": 18,
+      "generation": "v14+",
+      "corePackage": "Umbraco.Cms",
+      "releaseDate": {
+        "value": "2026-06-25",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3/registration5-gz-semver2/umbraco.cms/18.0.0.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 18.0.0",
+        "appliesTo": "18",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "\"published\":\"2026-06-25",
+        "note": "Publication date (UTC) of Umbraco.Cms 18.0.0 on NuGet."
+      },
+      "lts": {
+        "value": false,
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "18",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "Upgrade your project to Umbraco 17, the latest Long-term Support (LTS) version, before you upgrade to Umbraco 18",
+        "note": "Implied: the Umbraco 18 documentation names 17 as the latest LTS version. releases.umbraco.com shows no LTS label for 18."
+      },
+      "endOfSupport": {
+        "value": "2027-03-25",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "18",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: support (end of active support)."
+      },
+      "endOfLife": {
+        "value": "2027-06-25",
+        "status": "secondary",
+        "source": "https://endoflife.date/api/umbraco.json",
+        "sourceType": "secondary",
+        "sourceVersion": "n/a",
+        "appliesTo": "18",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Secondary aggregator. The official LTS and end-of-life page (umbraco.com) answered automated requests with a bot challenge (HTTP 403) on 2026-10-12 and 2026-10-14. Confirm the date on the official page in a browser before relying on it. Field: eol (end of security support)."
+      },
+      "dotnet": {
+        "value": "net10.0",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/18.2.1/umbraco.cms.nuspec",
+        "sourceType": "package-metadata",
+        "sourceVersion": "Umbraco.Cms 18.2.1",
+        "appliesTo": "18",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "targetFramework=\"net10.0\"",
+        "note": "Target framework of the latest 18 release in its NuGet package metadata. Matches the CMS to .NET table in the upgrade-details page (latest docs)."
+      },
+      "latestKnown": {
+        "value": "18.2.1",
+        "status": "verified",
+        "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/index.json",
+        "sourceType": "package-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": "18",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "Latest stable 18.x release on NuGet on 2026-10-14. Resolve the current latest from NuGet at run time."
+      },
+      "docsSpace": {
+        "value": "latest",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "18",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "Upgrade from Umbraco 17 to Umbraco 18 with the steps in the",
+        "note": "The unversioned documentation site covers the latest major. Every page links to the llms.txt index."
+      },
+      "minUpgradeFrom": {
+        "value": "16.4.0",
+        "status": "verified",
+        "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/upgrade-details.md",
+        "sourceType": "official-docs",
+        "sourceVersion": "18 (latest docs)",
+        "appliesTo": "18",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "evidence": "Umbraco 18 can't upgrade from versions older than 16.4",
+        "note": "The 18 breaking-changes page says the same: 18 no longer includes the migrations from 13 to 17."
+      },
+      "dataMigrations": [
+        {
+          "id": "single-block-list-migration",
+          "title": "Single-mode block list migration",
+          "runsWhen": "Upgrading to 18. Added in 17, disabled by default there.",
+          "whenFromMajor": null,
+          "fact": {
+            "value": "single-block-list-migration",
+            "status": "verified",
+            "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+            "sourceType": "official-docs",
+            "sourceVersion": "18 (latest docs)",
+            "appliesTo": "18",
+            "verifiedAt": "2026-10-14",
+            "verifiedBy": "maintainer",
+            "evidence": "The single-mode block list migration was added in Umbraco 17 but disabled by default. It now runs automatically during the upgrade to Umbraco 18"
+          }
+        }
+      ],
+      "preparation": [
+        {
+          "id": "empty-media-recycle-bin",
+          "text": "Empty the media recycle bin before upgrading (media recycle bin protection is on by default in 18).",
+          "fact": {
+            "value": "empty-media-recycle-bin",
+            "status": "verified",
+            "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+            "sourceType": "official-docs",
+            "sourceVersion": "18 (latest docs)",
+            "appliesTo": "18",
+            "verifiedAt": "2026-10-14",
+            "verifiedBy": "maintainer",
+            "evidence": "Emptying the media recycle bin before upgrading avoids any uncertainty"
+          }
+        },
+        {
+          "id": "single-block-list-processor",
+          "text": "Custom property editors that nest block list values need an ITypedSingleBlockListProcessor registered before upgrading.",
+          "fact": {
+            "value": "single-block-list-processor",
+            "status": "verified",
+            "source": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+            "sourceType": "official-docs",
+            "sourceVersion": "18 (latest docs)",
+            "appliesTo": "18",
+            "verifiedAt": "2026-10-14",
+            "verifiedBy": "maintainer",
+            "evidence": "you must implement and register an ITypedSingleBlockListProcessor before upgrading"
+          }
+        }
+      ]
+    }
+  ],
+  "dotnetChannels": [
+    {
+      "channel": "5.0",
+      "releaseType": {
+        "value": "sts",
+        "status": "verified",
+        "source": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json",
+        "sourceType": "dotnet-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": ".NET 5.0",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "release-type in the official .NET release metadata."
+      },
+      "endOfLife": {
+        "value": "2022-05-10",
+        "status": "verified",
+        "source": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json",
+        "sourceType": "dotnet-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": ".NET 5.0",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "eol-date in the official .NET release metadata."
+      }
+    },
+    {
+      "channel": "6.0",
+      "releaseType": {
+        "value": "lts",
+        "status": "verified",
+        "source": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json",
+        "sourceType": "dotnet-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": ".NET 6.0",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "release-type in the official .NET release metadata."
+      },
+      "endOfLife": {
+        "value": "2024-11-12",
+        "status": "verified",
+        "source": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json",
+        "sourceType": "dotnet-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": ".NET 6.0",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "eol-date in the official .NET release metadata."
+      }
+    },
+    {
+      "channel": "7.0",
+      "releaseType": {
+        "value": "sts",
+        "status": "verified",
+        "source": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json",
+        "sourceType": "dotnet-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": ".NET 7.0",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "release-type in the official .NET release metadata."
+      },
+      "endOfLife": {
+        "value": "2024-05-14",
+        "status": "verified",
+        "source": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json",
+        "sourceType": "dotnet-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": ".NET 7.0",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "eol-date in the official .NET release metadata."
+      }
+    },
+    {
+      "channel": "8.0",
+      "releaseType": {
+        "value": "lts",
+        "status": "verified",
+        "source": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json",
+        "sourceType": "dotnet-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": ".NET 8.0",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "release-type in the official .NET release metadata."
+      },
+      "endOfLife": {
+        "value": "2026-11-10",
+        "status": "verified",
+        "source": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json",
+        "sourceType": "dotnet-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": ".NET 8.0",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "eol-date in the official .NET release metadata."
+      }
+    },
+    {
+      "channel": "9.0",
+      "releaseType": {
+        "value": "sts",
+        "status": "verified",
+        "source": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json",
+        "sourceType": "dotnet-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": ".NET 9.0",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "release-type in the official .NET release metadata."
+      },
+      "endOfLife": {
+        "value": "2026-11-10",
+        "status": "verified",
+        "source": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json",
+        "sourceType": "dotnet-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": ".NET 9.0",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "eol-date in the official .NET release metadata."
+      }
+    },
+    {
+      "channel": "10.0",
+      "releaseType": {
+        "value": "lts",
+        "status": "verified",
+        "source": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json",
+        "sourceType": "dotnet-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": ".NET 10.0",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "release-type in the official .NET release metadata."
+      },
+      "endOfLife": {
+        "value": "2028-11-14",
+        "status": "verified",
+        "source": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json",
+        "sourceType": "dotnet-metadata",
+        "sourceVersion": "n/a",
+        "appliesTo": ".NET 10.0",
+        "verifiedAt": "2026-10-14",
+        "verifiedBy": "maintainer",
+        "note": "eol-date in the official .NET release metadata."
+      }
+    }
+  ]
+}

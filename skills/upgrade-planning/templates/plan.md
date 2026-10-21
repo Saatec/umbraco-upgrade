@@ -6,15 +6,29 @@ Created: <UTC date> by umbraco-upgrade <plugin version>
 
 ## Summary
 
-- Source: Umbraco <version> (<how determined>; unverified)
-- Target requested: <target> (exact version not resolved; unverified)
-- Path selection: **pending** (not available in this plugin version)
+- Source: Umbraco <version> (<how determined>)
+- Target: Umbraco <exact version> (requested: <target>; resolved from <NuGet or knowledge>)
+- Upgrade path: <strategy> (decision <D-xxx>)
 - Phases: <count>
 - Unresolved items: <count>
 
 ## Version facts
 
-All version facts in this plan are **unverified**. See `compatibility.md` and `decisions.md`.
+| Fact | Value | Status | Source |
+|---|---|---|---|
+| LTS status of target | <true or false> | <verified, secondary, unverified> | <URL, version, date> |
+| .NET version of target | <tfm> | <status> | <source> |
+| End of support of target | <date> | <status> | <source> |
+
+Secondary and unverified facts are not relied on without confirmation. Details: `compatibility.md` and `decisions.md`.
+
+## Upgrade path
+
+| Step | From | To | Type | Rules and sources |
+|---|---|---|---|---|
+| S1 | <version> | <version> | <type> | <rule ids, URLs> |
+
+Alternatives considered: <strategy: reason rejected>.
 
 ## Gate 3: safety setup
 

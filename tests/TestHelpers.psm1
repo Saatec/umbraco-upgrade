@@ -37,6 +37,12 @@ function Copy-Fixture {
     return $Destination
 }
 
+function Get-MockSet {
+    # Value for UMBRACO_UPGRADE_HTTP_MOCK: recorded responses from tests/fixtures/mocks/<name>, first match wins.
+    param([Parameter(Mandatory)][string[]]$Name)
+    return (($Name | ForEach-Object { Join-Path (Join-Path $script:FixtureRoot 'mocks') $_ }) -join ';')
+}
+
 function Get-OverlayIds {
     return @(Get-ChildItem -LiteralPath (Join-Path $script:FixtureRoot 'patterns') -Directory | Sort-Object Name | ForEach-Object { $_.Name })
 }
@@ -81,7 +87,7 @@ function Invoke-PluginScript {
     $psi.StandardOutputEncoding = New-Object System.Text.UTF8Encoding($false)
     $psi.StandardErrorEncoding = New-Object System.Text.UTF8Encoding($false)
     if ($WorkingDirectory) { $psi.WorkingDirectory = $WorkingDirectory }
-    foreach ($name in @('CLAUDE_PROJECT_DIR', 'CLAUDE_PLUGIN_DATA', 'CLAUDE_PLUGIN_ROOT', 'PSExecutionPolicyPreference', 'ASPNETCORE_ENVIRONMENT', 'DOTNET_ENVIRONMENT', 'ConnectionStrings__umbracoDbDSN')) {
+    foreach ($name in @('CLAUDE_PROJECT_DIR', 'CLAUDE_PLUGIN_DATA', 'CLAUDE_PLUGIN_ROOT', 'PSExecutionPolicyPreference', 'ASPNETCORE_ENVIRONMENT', 'DOTNET_ENVIRONMENT', 'ConnectionStrings__umbracoDbDSN', 'UMBRACO_UPGRADE_HTTP_MOCK')) {
         if ($psi.EnvironmentVariables.ContainsKey($name)) { $psi.EnvironmentVariables.Remove($name) }
     }
     foreach ($k in $Environment.Keys) { $psi.EnvironmentVariables[$k] = [string]$Environment[$k] }

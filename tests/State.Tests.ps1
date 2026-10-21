@@ -18,8 +18,14 @@ BeforeAll {
     function Pass-Discovery([string]$Dir) {
         [void](Set-UpgradeGate -ProjectRoot $Dir -Gate discovery -Status passed -Evidence @('evidence/discovery/version.json'))
     }
+    function Set-PathSelected([string]$Dir) {
+        # What the version-path skill records before gate 2 can pass (target facts and the selected path).
+        [void](Update-StateSection -ProjectRoot $Dir -Section target -Values @{ resolved = '17.7.1'; dotnet = 'net10.0'; lts = @{ value = $true; source = 'D-001'; verified = $true } })
+        [void](Update-StateSection -ProjectRoot $Dir -Section path -Values @{ selection = 'selected'; strategy = 'in-place'; decision = 'D-001' })
+    }
     function Pass-VersionPath([string]$Dir) {
         [void](Update-StateSection -ProjectRoot $Dir -Section source -Values @{ umbraco = '13.10.1'; major = 13; confidence = 'high' })
+        Set-PathSelected $Dir
         [void](Set-UpgradeGate -ProjectRoot $Dir -Gate versionPath -Status passed)
     }
 }
@@ -159,6 +165,22 @@ Describe 'Gate transitions' -Tag 'fixture-based' {
         [void](Update-StateSection -ProjectRoot $script:d -Section source -Values @{ umbraco = '13.10.1'; confidence = 'conflict' })
         { Set-UpgradeGate -ProjectRoot $script:d -Gate versionPath -Status passed } | Should -Throw '*conflict*'
         [void](Update-StateSection -ProjectRoot $script:d -Section source -Values @{ confidence = 'confirmed-by-user' })
+        Set-PathSelected $script:d
+        (Set-UpgradeGate -ProjectRoot $script:d -Gate versionPath -Status passed).gates.versionPath.status | Should -Be 'passed'
+    }
+
+    It 'refuses versionPath without a resolved target, the target LTS status and .NET version, and a selected path' {
+        $script:d = New-Project
+        Pass-Discovery $script:d
+        [void](Update-StateSection -ProjectRoot $script:d -Section source -Values @{ umbraco = '13.10.1'; major = 13; confidence = 'high' })
+        { Set-UpgradeGate -ProjectRoot $script:d -Gate versionPath -Status passed } | Should -Throw '*resolved target*'
+        [void](Update-StateSection -ProjectRoot $script:d -Section target -Values @{ resolved = '17.7.1' })
+        { Set-UpgradeGate -ProjectRoot $script:d -Gate versionPath -Status passed } | Should -Throw '*LTS status and the .NET requirement*'
+        [void](Update-StateSection -ProjectRoot $script:d -Section target -Values @{ dotnet = 'net10.0'; lts = @{ value = $false; source = 'D-002'; verified = $true } })
+        { Set-UpgradeGate -ProjectRoot $script:d -Gate versionPath -Status passed } | Should -Throw '*selected upgrade path*'
+        [void](Update-StateSection -ProjectRoot $script:d -Section path -Values @{ selection = 'selected'; strategy = 'staged' })
+        { Set-UpgradeGate -ProjectRoot $script:d -Gate versionPath -Status passed } | Should -Throw '*decision id*'
+        [void](Update-StateSection -ProjectRoot $script:d -Section path -Values @{ decision = 'D-003' })
         (Set-UpgradeGate -ProjectRoot $script:d -Gate versionPath -Status passed).gates.versionPath.status | Should -Be 'passed'
     }
 

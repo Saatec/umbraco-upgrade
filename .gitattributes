@@ -8,3 +8,6 @@
 *.png binary
 *.dll binary
 *.zip binary
+
+# Recorded HTTP responses used as test mocks: keep the bytes exactly as recorded
+tests/fixtures/mocks/** -text

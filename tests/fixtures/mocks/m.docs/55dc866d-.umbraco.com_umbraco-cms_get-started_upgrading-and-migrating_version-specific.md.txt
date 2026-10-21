@@ -1,0 +1,40 @@
+> For the complete documentation index, see [llms.txt](https://docs.umbraco.com/llms.txt). Markdown versions of documentation pages are available by appending `.md` to page URLs; this page is available as [Markdown](https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md).
+
+# Breaking Changes Overview
+
+Breaking changes introduced in each major version of Umbraco CMS, with notes on what to update when upgrading.
+
+Use the information below to learn about any potential breaking changes and common pitfalls when upgrading your Umbraco CMS project.
+
+If any specific steps are involved with upgrading to a specific version they will be listed below.
+
+Use the [general upgrade guide](/umbraco-cms/get-started/upgrading-and-migrating/upgrade-details.md) to complete the upgrade of your project.
+
+## Preparation for Upgrade
+
+Before running the upgrade, consider the following:
+
+### Upgrade to Umbraco 17 first
+
+Umbraco 18 can only upgrade from Umbraco 16.4 or later, because it no longer includes the migrations from Umbraco 13 to 17. Upgrade your project to Umbraco 17, the latest Long-term Support (LTS) version, before you upgrade to Umbraco 18.
+
+### Empty the media recycle bin
+
+In Umbraco 18, the `EnableMediaRecycleBinProtection` setting defaults to `true`. With this enabled, media files moved to the recycle bin are renamed with a `.deleted` suffix (and renamed back on restore). Emptying the media recycle bin before upgrading avoids any uncertainty around the state of files already in the bin from prior versions.
+
+For details, see the entry on `EnableMediaRecycleBinProtection` further down.
+
+### Implement `ITypedSingleBlockListProcessor` for custom block-list nesting property editors
+
+The single-mode block list migration was added in Umbraco 17 but disabled by default. It now runs automatically during the upgrade to Umbraco 18.
+
+If your site has custom property editors that nest block list values, you must implement and register an `ITypedSingleBlockListProcessor` before upgrading. Without this, nested data in those property values will not be migrated and will remain in the old format.
+
+For details, see the [Single block migration](/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/single-block-migration.md) article.
+
+## Breaking changes
+
+<details>
+
+<summary>Umbraco 18</summary>
+

@@ -13,7 +13,7 @@ You run a fixed sequence of gates for one project. The caller gives you: the pro
 - **Gates are never skipped, merged, or reordered.** Gate 1 Discovery, gate 2 Version and path, gate 3 Safety (upgrade mode only), gate 4 Plan approval. Gate 5 (final verification) belongs to a later plugin version.
 - **State changes only through the state script.** Never write `.umbraco-upgrade/state.json` with Write or Edit; the safety hook blocks it. Load the `umbraco-upgrade:upgrade-state` skill for the commands.
 - **Ask only what inspection cannot determine.** Run the scripts first; ask the user only about conflicts, missing facts, and decisions that are theirs.
-- **Version facts are unverified in this plugin version.** Do not state LTS status, .NET requirements, support dates, or upgrade paths as facts. Write them as "unverified" or leave them out.
+- **Version facts come from the version knowledge and live official documentation**, through the `version-path` and `doc-retrieval` skills, each with its source URL, the version the source applies to, and a date. Never state an LTS status, .NET requirement, support date, minimum upgrade-from version, or upgrade path from memory. A fact without a primary source is written as "unverified" (or "secondary") and cannot satisfy a gate criterion on its own.
 - **Never print secrets.** View configuration only through `Read-RedactedConfig.ps1`. Never quote connection strings, keys, or passwords, even partly.
 - **Never remove, stub, or disable custom functionality.** Record anything that cannot be migrated directly as unresolved, with a proposed approach (port, replace, or redesign), and ask.
 - **Follow the execution policy** in [references/execution-policy.md](references/execution-policy.md).

@@ -1,0 +1,20 @@
+{
+  "description": "Derived from the real Umbraco.Cms flat container index of 2026-10-14 by appending versions 25.0.0 and 25.1.0, and from the real 18.2.1 nuspec with the version and target framework replaced. Synthetic: Umbraco 25 does not exist; net99.0 is a placeholder.",
+  "recordedAt": "2026-10-14",
+  "entries": [
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "bf6f2e69-api.nuget.org_v3-flatcontainer_umbraco.cms_index.json.txt",
+      "derived": "appended 25.0.0 and 25.1.0"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/25.1.0/umbraco.cms.nuspec",
+      "status": 200,
+      "contentType": "text/xml",
+      "file": "a54db9ab-api.nuget.org_v3-flatcontainer_umbraco.cms_25.1.0_umbraco.cms.nuspec.txt",
+      "derived": "18.2.1 nuspec with version 25.1.0 and target framework net99.0"
+    }
+  ]
+}

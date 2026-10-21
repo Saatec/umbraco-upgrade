@@ -18,7 +18,7 @@ Readers accept the same major version. `state.ps1 migrate` upgrades older minors
 | `approvals` | `id` (`A-001`...), `action`, `scope`, `requestedAt`, `decision` (pending, approved, rejected), `decidedAt`, `consumed`, `note` |
 | `decisions` | Decision ids; the text and sources are in `decisions.md` |
 | `unresolved` | `id` (`U-001`...), `pattern`, `item`, `proposal` (undecided, port, replace, redesign), `status` (awaiting-user, decided, resolved, deferred) |
-| `knowledge` | `baselineVersion`, `refreshedAt` (version knowledge arrives in a later plugin version) |
+| `knowledge` | `baselineVersion` (knowledgeVersion of the versions file used), `refreshedAt` (its verifiedAt when the refreshed copy from the plugin data directory was used, else null) |
 | `history` | Append-only list of `at`, `event`, `detail` |
 
 ## Gate statuses
@@ -28,6 +28,6 @@ Readers accept the same major version. `state.ps1 migrate` upgrades older minors
 ## Transition rules enforced by the state module
 
 - A gate can start or pass only when every earlier gate has passed (safety may be `skipped` in plan mode; plan approval counts when `approved`).
-- `discovery` passes only with evidence files; `versionPath` only with a requested target and a source version or user confirmation, and never while source signals conflict; `safety` only in upgrade mode, with `guardSelfTest = passed`, a recorded upgrade branch, and a rollback document.
+- `discovery` passes only with evidence files; `versionPath` only with a requested target, a source version or user confirmation (never while source signals conflict), a resolved target version, the target's LTS status and .NET version, and a selected path with its decision id; `safety` only in upgrade mode, with `guardSelfTest = passed`, a recorded upgrade branch, and a rollback document.
 - `planApproval` moves to `awaiting-approval` through `request-plan-approval` (binds the plan hash) and to `approved` or `rejected` through `approve`.
 - Phases are frozen once the plan is approved. A phase is `done` only when every acceptance criterion is met or waived and a checkpoint commit is recorded.

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata minClientVersion="2.8.1">
+    <id>Umbraco.ModelsBuilder</id>
+    <version>8.1.6</version>
+    <title>Umbraco ModelsBuilder</title>
+    <authors>Umbraco HQ</authors>
+    <owners>Umbraco HQ</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <projectUrl>https://github.com/zpqrtbnk/Zbu.ModelsBuilder</projectUrl>
+    <iconUrl>https://umbraco.com/dist/nuget/logo-small.png</iconUrl>
+    <description>Umbraco ModelsBuilder.</description>
+    <copyright>Copyright (C) Umbraco 2020</copyright>
+    <language>en-US</language>
+    <tags>umbraco</tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.7.2">
+        <dependency id="Microsoft.CodeAnalysis.CSharp" version="2.10.0" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

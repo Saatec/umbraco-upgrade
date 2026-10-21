@@ -2,6 +2,6 @@
 
 | ID | Risk | Likelihood | Impact | Mitigation | Phase |
 |---|---|---|---|---|---|
-| R1 | Version facts (LTS, .NET, upgrade path) are unverified in this plugin version | certain | high | Verify against current official documentation before execution | all |
-| R2 | Upgrade path selection is pending | certain | high | Select and record the path before approval of execution | all |
+| R1 | <each version fact the plan relies on that is secondary or unverified> | <likelihood> | <impact> | Confirm on the official page before execution | all |
+| R2 | <documented risks of the selected path, for example a long-running data migration> | <likelihood> | <impact> | <mitigation from the documentation> | <phase> |
 | R3 | Customizations outside the detected patterns may exist | medium | medium | Review the "needs classification" list in inventory.md | discovery |

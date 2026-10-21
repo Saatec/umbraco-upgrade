@@ -1,0 +1,14 @@
+{
+  "description": "Derived from the real upgrade-details page of 2026-10-14 with the sentence about the minimum version for Umbraco 18 removed. Synthetic.",
+  "recordedAt": "2026-10-14",
+  "entries": [
+    {
+      "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/upgrade-details.md",
+      "status": 200,
+      "contentType": "text/markdown; charset=utf-8",
+      "file": "fefe0dde-s.umbraco.com_umbraco-cms_get-started_upgrading-and-migrating_upgrade-details.md.txt",
+      "derived": "removed the 16.4 minimum-version sentence",
+      "edited": "example connection string line removed (it contains a password placeholder)"
+    }
+  ]
+}

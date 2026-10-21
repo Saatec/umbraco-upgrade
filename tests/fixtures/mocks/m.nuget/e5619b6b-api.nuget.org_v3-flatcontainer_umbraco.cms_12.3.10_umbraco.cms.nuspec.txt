@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Umbraco.Cms</id>
+    <version>12.3.10</version>
+    <title>Umbraco CMS</title>
+    <authors>Umbraco</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>icon.png</icon>
+    <projectUrl>https://umbraco.com/</projectUrl>
+    <iconUrl>https://umbraco.com/dist/nuget/logo-small.png</iconUrl>
+    <description>Installs Umbraco CMS with all default dependencies in your ASP.NET Core project.</description>
+    <copyright>Copyright © Umbraco 2024</copyright>
+    <tags>umbraco</tags>
+    <repository type="git" url="https://github.com/umbraco/Umbraco-CMS" commit="d8df405db4ea884bb4b96f088d10d9a2070cf024" />
+    <dependencies>
+      <group targetFramework="net7.0">
+        <dependency id="Umbraco.Cms.Imaging.ImageSharp" version="12.3.10" exclude="Build,Analyzers" />
+        <dependency id="Umbraco.Cms.Persistence.EFCore.SqlServer" version="12.3.10" exclude="Build,Analyzers" />
+        <dependency id="Umbraco.Cms.Persistence.EFCore.Sqlite" version="12.3.10" exclude="Build,Analyzers" />
+        <dependency id="Umbraco.Cms.Persistence.SqlServer" version="12.3.10" exclude="Build,Analyzers" />
+        <dependency id="Umbraco.Cms.Persistence.Sqlite" version="12.3.10" exclude="Build,Analyzers" />
+        <dependency id="Umbraco.Cms.Targets" version="12.3.10" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>

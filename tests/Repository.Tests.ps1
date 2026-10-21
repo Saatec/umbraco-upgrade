@@ -34,11 +34,17 @@ Describe 'Repository files' -Tag 'fixture-based' {
             $text | Should -Match '(?m)^arguments: \[target, path\]$'
         }
     }
+    It 'update-knowledge is a command that only the user can start' {
+        $text = Get-Content -Raw (Join-Path $script:root 'skills/update-knowledge/SKILL.md')
+        $text | Should -Match '(?m)^disable-model-invocation: true$'
+        $text | Should -Not -Match '(?m)^user-invocable: false$'
+        $text | Should -Match 'Update-Knowledge\.ps1" -DataDir "\$\{CLAUDE_PLUGIN_DATA\}"'
+    }
     It 'shared skills are not user-invocable and every skill stays under 500 lines' {
         foreach ($dir in (Get-ChildItem -LiteralPath (Join-Path $script:root 'skills') -Directory)) {
             $text = Get-Content -Raw (Join-Path $dir.FullName 'SKILL.md')
             ($text -split "`n").Count | Should -BeLessThan 500
-            if ($dir.Name -notin @('start', 'plan')) { $text | Should -Match '(?m)^user-invocable: false$' }
+            if ($dir.Name -notin @('start', 'plan', 'update-knowledge')) { $text | Should -Match '(?m)^user-invocable: false$' }
         }
     }
     It 'every script a skill references exists' {

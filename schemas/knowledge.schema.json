@@ -1,0 +1,437 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/progproger/umbraco-upgrade/schemas/knowledge.schema.json",
+  "title": "umbraco-upgrade version knowledge",
+  "description": "Schema version 1.0.0 for knowledge/versions.json, paths.json, packages.json, and sources.json (and their refreshed copies in the plugin data directory). Each file is validated against the $defs entry named <kind>File. The plugin validates with the same JSON Schema subset as the state file. Readers accept the same major schema version.",
+  "$defs": {
+    "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "header": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "knowledgeVersion": { "type": "string", "pattern": "^\\d{4}\\.\\d{2}\\.\\d{2}$" },
+        "verifiedAt": { "$ref": "#/$defs/date" },
+        "verifiedBy": { "enum": ["maintainer", "update-knowledge"] }
+      }
+    },
+    "fact": {
+      "type": "object",
+      "description": "One version fact. source is the URL it was verified against; sourceVersion is the documentation or package version that source belongs to; appliesTo is the Umbraco version or range the fact is about.",
+      "required": ["value", "status", "source", "sourceType", "sourceVersion", "appliesTo", "verifiedAt", "verifiedBy"],
+      "additionalProperties": false,
+      "properties": {
+        "value": { "type": ["string", "boolean", "integer", "null"] },
+        "status": { "enum": ["verified", "secondary", "unverified", "needs-review"] },
+        "source": { "type": ["string", "null"], "pattern": "^https://" },
+        "sourceType": { "enum": ["official-docs", "official-release-notes", "package-metadata", "dotnet-metadata", "secondary", "user-confirmed", "none"] },
+        "sourceVersion": { "type": "string", "minLength": 1 },
+        "appliesTo": { "type": "string", "minLength": 1 },
+        "verifiedAt": { "type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "verifiedBy": { "enum": ["maintainer", "update-knowledge", "user", "none"] },
+        "evidence": { "type": "string", "minLength": 1 },
+        "note": { "type": "string", "minLength": 1 }
+      }
+    },
+    "notes": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "versionsFile": {
+      "type": "object",
+      "required": ["schemaVersion", "kind", "knowledgeVersion", "verifiedAt", "verifiedBy", "product", "majors", "dotnetChannels"],
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "kind": { "const": "versions" },
+        "knowledgeVersion": { "type": "string", "pattern": "^\\d{4}\\.\\d{2}\\.\\d{2}$" },
+        "verifiedAt": { "$ref": "#/$defs/date" },
+        "verifiedBy": { "enum": ["maintainer", "update-knowledge"] },
+        "product": { "const": "umbraco-cms" },
+        "notes": { "$ref": "#/$defs/notes" },
+        "majors": { "type": "array", "items": { "$ref": "#/$defs/major" } },
+        "dotnetChannels": { "type": "array", "items": { "$ref": "#/$defs/dotnetChannel" } }
+      }
+    },
+    "major": {
+      "type": "object",
+      "required": ["major", "corePackage", "releaseDate", "lts", "endOfSupport", "endOfLife", "dotnet", "latestKnown", "docsSpace"],
+      "additionalProperties": false,
+      "properties": {
+        "major": { "type": "integer" },
+        "generation": { "type": ["string", "null"] },
+        "corePackage": { "type": "string", "minLength": 1 },
+        "releaseDate": { "$ref": "#/$defs/fact" },
+        "lts": { "$ref": "#/$defs/fact" },
+        "endOfSupport": { "$ref": "#/$defs/fact" },
+        "endOfLife": { "$ref": "#/$defs/fact" },
+        "dotnet": { "$ref": "#/$defs/fact" },
+        "latestKnown": { "$ref": "#/$defs/fact" },
+        "docsSpace": { "$ref": "#/$defs/fact" },
+        "minUpgradeFrom": { "$ref": "#/$defs/fact" },
+        "dataMigrations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "runsWhen", "fact"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9\\-]+$" },
+              "title": { "type": "string", "minLength": 1 },
+              "runsWhen": { "type": "string", "minLength": 1 },
+              "whenFromMajor": { "type": ["integer", "null"] },
+              "fact": { "$ref": "#/$defs/fact" }
+            }
+          }
+        },
+        "preparation": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "text", "fact"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9\\-]+$" },
+              "text": { "type": "string", "minLength": 1 },
+              "fact": { "$ref": "#/$defs/fact" }
+            }
+          }
+        },
+        "notes": { "$ref": "#/$defs/notes" }
+      }
+    },
+    "dotnetChannel": {
+      "type": "object",
+      "required": ["channel", "releaseType", "endOfLife"],
+      "additionalProperties": false,
+      "properties": {
+        "channel": { "type": "string", "pattern": "^\\d+\\.\\d+$" },
+        "releaseType": { "$ref": "#/$defs/fact" },
+        "endOfLife": { "$ref": "#/$defs/fact" }
+      }
+    },
+    "pathsFile": {
+      "type": "object",
+      "required": ["schemaVersion", "kind", "knowledgeVersion", "verifiedAt", "verifiedBy", "strategies", "rules", "scoring", "closeThreshold"],
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "kind": { "const": "paths" },
+        "knowledgeVersion": { "type": "string", "pattern": "^\\d{4}\\.\\d{2}\\.\\d{2}$" },
+        "verifiedAt": { "$ref": "#/$defs/date" },
+        "verifiedBy": { "enum": ["maintainer", "update-knowledge"] },
+        "notes": { "$ref": "#/$defs/notes" },
+        "strategies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "baseRisk", "preservesDatabase", "preservesCode", "description"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "enum": ["in-place", "staged", "rebuild-with-database-migration", "new-install-with-content-transfer"] },
+              "baseRisk": { "type": "integer" },
+              "preservesDatabase": { "type": "boolean" },
+              "preservesCode": { "type": "boolean" },
+              "description": { "type": "string", "minLength": 1 }
+            }
+          }
+        },
+        "rules": { "type": "array", "items": { "$ref": "#/$defs/rule" } },
+        "scoring": { "type": "array", "items": { "$ref": "#/$defs/scoringRule" } },
+        "closeThreshold": { "type": "integer" }
+      }
+    },
+    "rule": {
+      "type": "object",
+      "required": ["id", "kind", "description", "fact"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9.\\-]+$" },
+        "kind": { "enum": ["lts-stop", "in-place-major", "in-place-minor", "documented-hop", "generation-boundary", "engine-constraint"] },
+        "strength": { "enum": ["must", "recommended", "documented"] },
+        "description": { "type": "string", "minLength": 1 },
+        "fromMajor": { "type": ["integer", "null"] },
+        "toMajor": { "type": ["integer", "null"] },
+        "minSourceMajor": { "type": ["integer", "null"] },
+        "corePackage": { "type": "string" },
+        "inPlace": { "type": "boolean" },
+        "codeRewrite": { "type": "boolean" },
+        "database": { "enum": ["in-place", "content-migration-new-install", "reuse-in-new-project"] },
+        "landingMinor": { "type": "string", "pattern": "^\\d+\\.\\d+$" },
+        "landingFact": { "$ref": "#/$defs/fact" },
+        "requiresLatestSourceMinor": { "type": "boolean" },
+        "prerequisiteFact": { "$ref": "#/$defs/fact" },
+        "prerequisites": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "text", "fact"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9\\-]+$" },
+              "text": { "type": "string", "minLength": 1 },
+              "fact": { "$ref": "#/$defs/fact" }
+            }
+          }
+        },
+        "removals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "text", "fact"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9\\-]+$" },
+              "text": { "type": "string", "minLength": 1 },
+              "fact": { "$ref": "#/$defs/fact" }
+            }
+          }
+        },
+        "engine": { "type": "string" },
+        "unsupportedFromMajor": { "type": "integer" },
+        "allowedEngines": { "type": "array", "items": { "enum": ["unknown", "sqlserver", "localdb", "sqlce", "sqlite", "other"] } },
+        "options": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "fact": { "$ref": "#/$defs/fact" }
+      }
+    },
+    "scoringRule": {
+      "type": "object",
+      "description": "A plugin heuristic, not a version fact.",
+      "required": ["id", "when", "adjust", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9.\\-]+$" },
+        "when": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "pattern": { "type": "string" },
+            "engine": { "type": "string" },
+            "minTargetMajor": { "type": "integer" },
+            "maxSourceMajor": { "type": "integer" },
+            "maxSourceMajorBelowTarget": { "type": "boolean" }
+          }
+        },
+        "adjust": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["strategy", "risk"],
+            "additionalProperties": false,
+            "properties": {
+              "strategy": { "enum": ["in-place", "staged", "rebuild-with-database-migration", "new-install-with-content-transfer"] },
+              "risk": { "type": "integer" }
+            }
+          }
+        },
+        "mandatoryWork": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "packagesFile": {
+      "type": "object",
+      "required": ["schemaVersion", "kind", "knowledgeVersion", "verifiedAt", "verifiedBy", "corePackages", "mappings", "noSuccessor"],
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "kind": { "const": "packages" },
+        "knowledgeVersion": { "type": "string", "pattern": "^\\d{4}\\.\\d{2}\\.\\d{2}$" },
+        "verifiedAt": { "$ref": "#/$defs/date" },
+        "verifiedBy": { "enum": ["maintainer", "update-knowledge"] },
+        "notes": { "$ref": "#/$defs/notes" },
+        "corePackages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "minMajor", "maxMajor", "fact"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "minMajor": { "type": "integer" },
+              "maxMajor": { "type": ["integer", "null"] },
+              "fact": { "$ref": "#/$defs/fact" }
+            }
+          }
+        },
+        "mappings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from", "to", "fromMaxMajor", "toMinMajor", "kind", "fact"],
+            "additionalProperties": false,
+            "properties": {
+              "from": { "type": "string", "minLength": 1 },
+              "to": { "type": "string", "minLength": 1 },
+              "fromMaxMajor": { "type": "integer" },
+              "toMinMajor": { "type": "integer" },
+              "kind": { "enum": ["renamed", "split", "merged"] },
+              "fact": { "$ref": "#/$defs/fact" }
+            }
+          }
+        },
+        "noSuccessor": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "lastMajor", "fact"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "lastMajor": { "type": "integer" },
+              "fact": { "$ref": "#/$defs/fact" }
+            }
+          }
+        }
+      }
+    },
+    "sourcesFile": {
+      "type": "object",
+      "required": ["schemaVersion", "kind", "knowledgeVersion", "verifiedAt", "verifiedBy", "priority", "hosts", "docs", "nuget", "dotnet", "releases", "lts", "secondary"],
+      "additionalProperties": false,
+      "properties": {
+        "schemaVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "kind": { "const": "sources" },
+        "knowledgeVersion": { "type": "string", "pattern": "^\\d{4}\\.\\d{2}\\.\\d{2}$" },
+        "verifiedAt": { "$ref": "#/$defs/date" },
+        "verifiedBy": { "enum": ["maintainer", "update-knowledge"] },
+        "notes": { "$ref": "#/$defs/notes" },
+        "priority": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "hosts": { "type": "array", "items": { "type": "string", "pattern": "^[a-z0-9.\\-]+$" } },
+        "docs": {
+          "type": "object",
+          "required": ["defaultProduct", "products", "spaces", "layouts", "pages", "validation"],
+          "additionalProperties": false,
+          "properties": {
+            "defaultProduct": { "type": "string" },
+            "products": { "type": "array", "items": { "type": "string" } },
+            "spaces": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["id", "urlTemplate", "indexTemplate", "fact"],
+                "additionalProperties": false,
+                "properties": {
+                  "id": { "enum": ["latest", "versioned", "eol", "legacy", "github-main"] },
+                  "urlTemplate": { "type": "string", "pattern": "^https://" },
+                  "indexTemplate": { "type": "string", "pattern": "^https://" },
+                  "fact": { "$ref": "#/$defs/fact" }
+                }
+              }
+            },
+            "layouts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["id", "minMajor", "maxMajor", "fact"],
+                "additionalProperties": false,
+                "properties": {
+                  "id": { "type": "string" },
+                  "minMajor": { "type": ["integer", "null"] },
+                  "maxMajor": { "type": ["integer", "null"] },
+                  "fact": { "$ref": "#/$defs/fact" }
+                }
+              }
+            },
+            "pages": {
+              "type": "object",
+              "required": ["fact", "entries"],
+              "additionalProperties": false,
+              "properties": {
+                "fact": { "$ref": "#/$defs/fact" },
+                "entries": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["key", "title", "paths"],
+                    "additionalProperties": false,
+                    "properties": {
+                      "key": { "type": "string", "pattern": "^[a-z0-9\\-]+$" },
+                      "title": { "type": "string" },
+                      "paths": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "required": ["layout", "path"],
+                          "additionalProperties": false,
+                          "properties": {
+                            "layout": { "type": "string" },
+                            "path": { "type": "string", "minLength": 1 },
+                            "githubPath": { "type": "string", "minLength": 1 },
+                            "minMajor": { "type": "integer" },
+                            "maxMajor": { "type": "integer" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "validation": {
+              "type": "object",
+              "required": ["softNotFoundMarker", "selfLinkPattern", "fact"],
+              "additionalProperties": false,
+              "properties": {
+                "softNotFoundMarker": { "type": "string", "minLength": 1 },
+                "selfLinkPattern": { "type": "string", "minLength": 1 },
+                "fact": { "$ref": "#/$defs/fact" }
+              }
+            }
+          }
+        },
+        "nuget": {
+          "type": "object",
+          "required": ["serviceIndex", "flatContainer", "registration", "fact"],
+          "additionalProperties": false,
+          "properties": {
+            "serviceIndex": { "type": "string", "pattern": "^https://" },
+            "flatContainer": { "type": "string", "pattern": "^https://" },
+            "registration": { "type": "string", "pattern": "^https://" },
+            "fact": { "$ref": "#/$defs/fact" }
+          }
+        },
+        "dotnet": {
+          "type": "object",
+          "required": ["releasesIndex", "alternates", "docs", "fact"],
+          "additionalProperties": false,
+          "properties": {
+            "releasesIndex": { "type": "string", "pattern": "^https://" },
+            "alternates": { "type": "array", "items": { "type": "string", "pattern": "^https://" } },
+            "docs": { "type": "string", "pattern": "^https://" },
+            "fact": { "$ref": "#/$defs/fact" }
+          }
+        },
+        "releases": {
+          "type": "object",
+          "required": ["home", "all", "fact"],
+          "additionalProperties": false,
+          "properties": {
+            "home": { "type": "string", "pattern": "^https://" },
+            "all": { "type": "string", "pattern": "^https://" },
+            "fact": { "$ref": "#/$defs/fact" }
+          }
+        },
+        "lts": {
+          "type": "object",
+          "required": ["official", "secondary", "secondaryLabel", "fact"],
+          "additionalProperties": false,
+          "properties": {
+            "official": { "type": "string", "pattern": "^https://" },
+            "secondary": { "type": "string", "pattern": "^https://" },
+            "secondaryLabel": { "type": "string", "minLength": 1 },
+            "fact": { "$ref": "#/$defs/fact" }
+          }
+        },
+        "secondary": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "url", "label"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string" },
+              "url": { "type": "string", "pattern": "^https://" },
+              "label": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  }
+}
