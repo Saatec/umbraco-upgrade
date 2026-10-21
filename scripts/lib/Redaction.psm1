@@ -69,6 +69,8 @@ function Protect-Value {
     if ([string]::IsNullOrEmpty($Value)) { return $Value }
     if ($Value -eq $script:Mask) { return $Value }
     if (Test-ConnectionStringLike $Value) { return (Protect-ConnectionString $Value) }
+    # The fetch() request option credentials takes only these keywords; they are never secrets.
+    if ($Key -ieq 'credentials' -and $Value -cmatch '^(include|same-origin|omit)$') { return $Value }
     if ((Test-SensitiveKey $Key) -and $Value -notmatch '^(?i)(true|false|null|-?\d+)$') { return $script:Mask }
     if (Test-HighEntropySecret $Value) { return $script:Mask }
     return $Value

@@ -18,6 +18,7 @@ Describe 'Protect-Text' -Tag 'mocked' {
         @{ name = 'an SMTP password attribute'; text = '<network host="smtp.example.invalid" userName="u" password="FAKE-SECRET-FOR-TESTS-8" />' }
         @{ name = 'an env file line'; text = "SMTP_PASSWORD=FAKE-SECRET-FOR-TESTS-9`nOTHER=1" }
         @{ name = 'a code assignment'; text = 'private const string ApiToken = "FAKE-SECRET-FOR-TESTS-10";' }
+        @{ name = 'a credentials value that is not a fetch keyword'; text = '"Credentials": "FAKE-SECRET-FOR-TESTS-14"' }
         @{ name = 'a bearer header'; text = 'Authorization: Bearer FAKE-SECRET-FOR-TESTS-11abcdefgh' }
         @{ name = 'a SAS signature'; text = 'https://acct.blob.example.invalid/c?sv=2020&sig=FAKE-SECRET-FOR-TESTS-12' }
         @{ name = 'an account key'; text = 'DefaultEndpointsProtocol=https;AccountName=a;AccountKey=FAKE-SECRET-FOR-TESTS-13;EndpointSuffix=core.example.invalid' }
@@ -44,6 +45,7 @@ Describe 'Protect-Text' -Tag 'mocked' {
         @{ name = 'a GUID'; text = '"Id": "00000000-0000-0000-0000-000000000013"' }
         @{ name = 'a file path'; text = '"view": "/App_Plugins/BadgeEditor2/badge.controller.js"' }
         @{ name = 'a package id'; text = '<package id="Umbraco.Cms.Web.BackOffice" version="13.10.1" />' }
+        @{ name = 'the fetch credentials option'; text = "fetch(url, { credentials: 'include' }); fetch(u, { credentials: 'same-origin' })" }
     ) {
         (Protect-Text $text) | Should -Be $text
     }
