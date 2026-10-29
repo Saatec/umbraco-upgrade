@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.legacy-picker-values",
+  "title": "Obsolete editors and integer picker values",
+  "description": "Data types that still use obsolete or legacy core editors, and picker values stored as integer IDs.",
+  "kind": "customization",
+  "area": "content-database",
+  "owner": "migrate-content-database",
+  "involves": [
+    "migrate-build-tests"
+  ],
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "legacy-media-picker-alias",
+      "weight": "strong",
+      "files": [
+        "**/*.config",
+        "**/*.json",
+        "**/*.xml",
+        "**/*.config.js",
+        "**/*.uda"
+      ],
+      "regex": "\"Umbraco\\.MediaPicker\"|>Umbraco\\.MediaPicker<|'Umbraco\\.MediaPicker'",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "obsolete-v7-alias",
+      "weight": "strong",
+      "files": [
+        "**/*.config",
+        "**/*.json",
+        "**/*.xml",
+        "**/*.config.js",
+        "**/*.uda"
+      ],
+      "regex": "\\bUmbraco\\.(?:ContentPickerAlias|MultipleMediaPicker|RelatedLinks|FolderBrowser)\\b",
+      "generations": [
+        "v7"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 8,
+      "difficulty": "medium",
+      "summary": "The 7 to 8 content migration fails while obsolete pickers, folder browser, or related links are still in use.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-8.md",
+          "docsVersion": "18",
+          "appliesTo": "8",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The migration will fail if you are still using obsolete properties"
+        }
+      ]
+    },
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "The legacy media picker is removed; data types use the default media picker.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "and now it's fully removed. You should use the default Media Picker instead."
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/fundamentals/backoffice/property-editors/built-in-umbraco-property-editors/media-picker.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "We highly recommend that you use the"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "switch-before-migration",
+      "option": "Switch obsolete data types to their updated editors before the database step, on the local copy",
+      "when": "The path crosses 8 or 14",
+      "targets": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-8.md",
+          "docsVersion": "18",
+          "appliesTo": "8",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The migration will fail if you are still using obsolete properties"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "and now it's fully removed. You should use the default Media Picker instead."
+        }
+      ]
+    },
+    {
+      "id": "verify-no-integer-values",
+      "option": "Treat remaining integer picker values after each database step as a verification failure",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "No obsolete editor aliases remain in data types on the migrated local copy",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

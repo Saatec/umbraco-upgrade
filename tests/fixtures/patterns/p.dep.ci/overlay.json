@@ -1,0 +1,8 @@
+{
+  "id": "p.dep.ci",
+  "baseline": "gen.v13",
+  "expects": [
+    "deploy.ci-pipelines"
+  ],
+  "description": "A pipeline definition pinned to an SDK version."
+}

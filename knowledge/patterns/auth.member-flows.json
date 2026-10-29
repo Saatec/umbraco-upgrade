@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "auth.member-flows",
+  "title": "Member registration, login, and password flows",
+  "description": "Front-end member registration, login, profile, and password reset built on the legacy membership API or on the member managers of later generations.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "membership-helper",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\bMembershipHelper\\b|\\bMembers\\.Login\\s*\\(|\\bUmbracoMembershipProvider\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "membership-api",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\bMembership\\.(?:Provider|GetUser|ValidateUser|CreateUser)\\b|\\bFormsAuthentication\\.",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "membership-config",
+      "weight": "strong",
+      "files": [
+        "**/web.config",
+        "**/Web.config"
+      ],
+      "regex": "<membership\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "member-managers",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\bIMemberSignInManager\\b|\\bIMemberManager\\b",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "high",
+      "summary": "From 9 custom code is reimplemented; member data is reached through the member manager of the ASP.NET Core generation.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/querying/imembermanager.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "IMemberManager is an user manager interface for accessing member data"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/upgrade-from-8-to-latest.md",
+          "docsVersion": "18",
+          "appliesTo": "9+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "All templates and custom code will need to be reimplemented"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "member-managers",
+      "option": "Rebuild on the member manager and sign-in manager, with proper reset tokens",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/querying/imembermanager.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "IMemberManager is an user manager interface for accessing member data"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/tutorials/members-registration-and-login.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "you can create a frontend-based registration and login functions"
+        }
+      ]
+    },
+    {
+      "id": "flag-insecure-flows",
+      "option": "Flag flows that skip tokens or expose member data, and ask before changing behavior",
+      "when": "An insecure flow is found",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Register, log in, log out, and reset a password as a test member on the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

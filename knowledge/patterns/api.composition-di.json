@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "api.composition-di",
+  "title": "Startup composition and service registration",
+  "description": "How custom services and handlers are registered at startup: application event handlers in 7, composers and components in 8, composers and builder extensions from 9.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "legacy-startup-handler",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?(?:ApplicationEventHandler|IApplicationEventHandler)\\b",
+      "generations": [
+        "v7"
+      ]
+    },
+    {
+      "id": "v8-composer",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?(?:IUserComposer|ICoreComposer|ComponentComposer\\s*<)|\\bcomposition\\.Register\\w*\\s*[<(]",
+      "generations": [
+        "v8"
+      ]
+    },
+    {
+      "id": "core-composer",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?IComposer\\b",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "From 9, startup registration uses composers and the IUmbracoBuilder abstraction over the ASP.NET Core service collection.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/implementation/composing.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The code that implements these choices at start up is called a Composer"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/using-ioc.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "IUmbracoBuilder is a Umbraco-specific abstraction on top of the IServiceCollection"
+        }
+      ]
+    },
+    {
+      "crosses": 16,
+      "difficulty": "low",
+      "summary": "Search is registered by a composer; custom search registrations need an explicit order.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "16+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "As Examine is now registered in a composer, any custom code registered the same way is not guaranteed to run after the core setup"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "builder-extensions",
+      "option": "Register services in composers or builder extensions on the service collection",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/implementation/composing.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The code that implements these choices at start up is called a Composer"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/using-ioc.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco v9+ supports dependency injection out of the box"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/backend-and-custom-logic/using-ioc.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco supports dependency injection out of the box using the"
+        }
+      ]
+    },
+    {
+      "id": "compose-after",
+      "option": "Order composers that depend on core registrations explicitly",
+      "when": "A composer replaces or extends core search or other core registrations",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "16+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "As Examine is now registered in a composer, any custom code registered the same way is not guaranteed to run after the core setup"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "The site starts on the local copy with every custom service resolved (no missing registration errors in the log)",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

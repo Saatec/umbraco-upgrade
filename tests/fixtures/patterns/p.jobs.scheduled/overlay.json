@@ -1,0 +1,8 @@
+{
+  "id": "p.jobs.scheduled",
+  "baseline": "gen.v13",
+  "expects": [
+    "jobs.scheduled-work"
+  ],
+  "description": "A recurring background job that cleans up expired entries."
+}

@@ -1,0 +1,114 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "jobs.app-caching",
+  "title": "Application caching with publish-time invalidation",
+  "description": "Custom caches for rendered fragments or API results, cleared on publish.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "legacy-cache",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\bHttpContext\\.Current\\.Cache\\b|\\bHttpRuntime\\.Cache\\b|\\[\\s*(?:OutputCache|CacheOutput)\\b|\\.ApplicationCache\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "core-cache",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bAppCaches\\b|\\bIMemoryCache\\b|\\bIAppPolicyCache\\b",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "The CMS documents application caching that works on single servers and in load-balanced environments, with cache refreshers for invalidation.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/cache.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "work in both single server environments and load balanced (multi-server) environments"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/cache.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "ICacheRefresher"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "cms-app-caches",
+      "option": "Use the CMS application caches with cache refreshers for invalidation",
+      "when": "The site may be load balanced",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/cache.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "work in both single server environments and load balanced (multi-server) environments"
+        }
+      ]
+    },
+    {
+      "id": "memory-cache",
+      "option": "Use the .NET memory cache with invalidation in publish notification handlers",
+      "when": "Single server",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/aspnet/core/performance/caching/memory",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Caching can significantly improve the performance and scalability of an app by reducing the work required to generate content"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Publishing content clears the affected cache entries on the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

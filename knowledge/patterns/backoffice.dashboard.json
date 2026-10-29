@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "backoffice.dashboard",
+  "title": "Backoffice dashboards",
+  "description": "Custom dashboards in backoffice sections, registered in a package.manifest or in the legacy dashboard configuration file.",
+  "kind": "customization",
+  "area": "packages-backoffice",
+  "owner": "migrate-packages-backoffice",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "manifest-dashboard",
+      "weight": "strong",
+      "files": [
+        "**/App_Plugins/*/package.manifest"
+      ],
+      "regex": "\"dashboards\"\\s*:\\s*\\[\\s*\\{",
+      "pluginScope": "unmatched",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13"
+      ]
+    },
+    {
+      "id": "legacy-dashboard-config",
+      "weight": "strong",
+      "files": [
+        "**/config/Dashboard.config"
+      ],
+      "regex": "<control[^>]*>\\s*[^<]*(?:/App_Plugins/|~/App_Plugins/)",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "Dashboards become dashboard extensions of the new backoffice, built as web components.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-backoffice-extensions-from-angularjs.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "AngularJS code does not run in the new backoffice, so you rebuild each extension"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/backoffice-extensions/extending-overview/extension-types/dashboard.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "you can create your own custom dashboards for existing sections"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "keep-on-13",
+      "option": "Keep the manifest dashboard",
+      "when": "Target 13 or earlier",
+      "targets": [
+        "v9-v13"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/dashboards.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "There are two approaches to registering a custom dashboard to appear in the Umbraco Backoffice"
+        }
+      ]
+    },
+    {
+      "id": "dashboard-extension",
+      "option": "Rebuild as a dashboard extension in umbraco-package.json",
+      "when": "Target 14 or later",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/backoffice-extensions/extending-overview/extension-types/dashboard.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "you can create your own custom dashboards for existing sections"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-backoffice-extensions-from-angularjs.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "AngularJS code does not run in the new backoffice, so you rebuild each extension"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each dashboard appears in its section and its actions work on the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

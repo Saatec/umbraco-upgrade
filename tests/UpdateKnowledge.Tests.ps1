@@ -49,7 +49,8 @@ Describe 'Refresh from the recorded sources' -Tag 'mocked' {
         $script:r.Json.reverified.unreachable | Should -Be 0
         @($script:r.Json.needsReview).Count | Should -Be 0
         @($script:r.Json.unreachable).Count | Should -Be 0
-        @($script:r.Json.valueChanges).Count | Should -Be 0
+        # latestKnown follows NuGet releases: a baseline updated after the 2026-10-14 recording differs only there.
+        @($script:r.Json.valueChanges | Where-Object { $_.fact -notmatch '\.latestKnown$' }).Count | Should -Be 0
         @($script:r.Json.newMajors).Count | Should -Be 0
     }
 
@@ -88,7 +89,8 @@ Describe 'Refresh from the recorded sources' -Tag 'mocked' {
 
     It 'is used by the lookup order only once it is newer than the baseline' {
         $k = Invoke-PluginScript -Script 'scripts/Get-VersionKnowledge.ps1' -Arguments @('-DataDir', $script:dd)
-        $expected = $(if ($script:today -gt '2026-10-14') { 'refreshed' } else { 'baseline' })
+        $baselineDate = [string](Read-JsonFile (Join-Path (Get-RepoRoot) 'knowledge/versions.json')).verifiedAt
+        $expected = $(if ($script:today -gt $baselineDate) { 'refreshed' } else { 'baseline' })
         $k.Json.files.versions.origin | Should -Be $expected
         $script:r.Json.refreshedDataInUse | Should -Be ($expected -eq 'refreshed')
     }

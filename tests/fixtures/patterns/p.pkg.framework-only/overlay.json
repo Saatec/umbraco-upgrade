@@ -1,0 +1,6 @@
+{
+  "id": "p.pkg.framework-only",
+  "baseline": "gen.v13",
+  "expects": [],
+  "description": "A library whose only release targets .NET Framework (classified from package metadata)."
+}

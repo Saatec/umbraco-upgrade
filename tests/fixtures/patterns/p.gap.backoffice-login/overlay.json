@@ -1,0 +1,8 @@
+{
+  "id": "p.gap.backoffice-login",
+  "baseline": "gen.v13",
+  "expects": [
+    "auth.backoffice-external-login"
+  ],
+  "description": "An external login provider for editors."
+}

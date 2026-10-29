@@ -1,0 +1,8 @@
+{
+  "id": "p.content.datatype-config",
+  "baseline": "gen.v13",
+  "expects": [
+    "content.datatype-config-reads"
+  ],
+  "description": "Code that reads a data type configuration at runtime to build a list of options."
+}

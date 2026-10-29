@@ -1,6 +1,6 @@
 # Inventory: <project name>
 
-Generated from `evidence/discovery/*.json` on <UTC date>. Detection coverage: this plugin version detects a minimum set of patterns. "Not detected" means "not detected by this plugin version", not "absent".
+Generated from `evidence/discovery/*.json` on <UTC date>. "Not detected" means "not detected by the plugin's detectors", not "absent".
 
 ## Project
 
@@ -12,7 +12,7 @@ Generated from `evidence/discovery/*.json` on <UTC date>. Detection coverage: th
 | Central package management | |
 | Web project | |
 | Views | |
-| App_Plugins folders (with package.manifest / umbraco-package.json) | |
+| App_Plugins folders (with package.manifest / umbraco-package.json; matching a package reference or not) | |
 | Loose assemblies | |
 | CI files / publish profiles / IIS config | |
 
@@ -28,13 +28,25 @@ Conflicts: <none, or list and the user's answer>
 | Project | Configuration | Engine | Local |
 |---|---|---|---|
 
-## Detected patterns
+## Detected customization patterns
 
-| Pattern | Files | Occurrences | Owner area | Notes |
-|---|---|---|---|---|
+| Pattern | Title | Files | Occurrences | Owner skill | Notes |
+|---|---|---|---|---|---|
+
+## Baseline signals
+
+Present in default installations of some generation; they add mandatory work and are not counted as customizations.
+
+| Signal | Files | What it means for this upgrade |
+|---|---|---|
+
+## Packages
+
+Classified at gate 4 from NuGet metadata: see `compatibility.md` and `evidence/planning/package-compatibility.json`.
 
 ## Needs classification
 
-Files that use CMS namespaces but matched no pattern:
+Files that use CMS namespaces but matched no pattern (classified by: <you, or the inventory-analyst summary>):
 
-- <file>
+| File | Classification | Notes |
+|---|---|---|

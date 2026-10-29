@@ -1,0 +1,8 @@
+{
+  "id": "p.jobs.caching",
+  "baseline": "gen.v13",
+  "expects": [
+    "jobs.app-caching"
+  ],
+  "description": "A cached menu built through the CMS application caches."
+}

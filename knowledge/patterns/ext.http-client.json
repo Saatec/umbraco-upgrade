@@ -1,25 +1,176 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "id": "ext.http-client",
   "title": "HTTP clients to external services",
   "description": "Code that calls external REST or HTTP services, including static client instances and legacy web clients, often with base URLs and keys in configuration.",
+  "kind": "customization",
   "area": "config-auth-integrations",
   "owner": "migrate-config-auth-integrations",
   "prevalence": "common",
-  "status": "hypothesis",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
   "detectors": [
-    { "id": "new-httpclient", "weight": "strong", "files": ["**/*.cs"], "regex": "new\\s+(?:System\\.Net\\.Http\\.)?HttpClient\\s*\\(", "generations": ["v7", "v8", "v9-v13", "v14+"] },
-    { "id": "static-httpclient", "weight": "strong", "files": ["**/*.cs"], "regex": "\\bstatic\\s+(?:readonly\\s+)?(?:System\\.Net\\.Http\\.)?HttpClient\\b", "generations": ["v7", "v8", "v9-v13", "v14+"] },
-    { "id": "legacy-webclient", "weight": "strong", "files": ["**/*.cs"], "regex": "(?:new\\s+(?:System\\.Net\\.)?WebClient\\s*\\(|\\bHttpWebRequest\\b|WebRequest\\.Create\\s*\\()", "generations": ["v7", "v8", "v9-v13", "v14+"] },
-    { "id": "client-factory", "weight": "strong", "files": ["**/*.cs"], "regex": "(?:\\bIHttpClientFactory\\b|\\.AddHttpClient\\s*[<(])", "generations": ["v9-v13", "v14+"] },
-    { "id": "rest-library", "weight": "strong", "files": ["**/*.cs"], "regex": "new\\s+RestClient\\s*\\(", "generations": ["v7", "v8", "v9-v13", "v14+"] },
-    { "id": "endpoint-config", "weight": "supporting", "files": ["**/web.config", "**/appsettings*.json"], "regex": "(?i)(?:base_?url|base_?address|api_?url|service_?url|endpoint)", "generations": ["v7", "v8", "v9-v13", "v14+"] }
+    {
+      "id": "new-httpclient",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "new\\s+(?:System\\.Net\\.Http\\.)?HttpClient\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "static-httpclient",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bstatic\\s+(?:readonly\\s+)?(?:System\\.Net\\.Http\\.)?HttpClient\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "legacy-webclient",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "(?:new\\s+(?:System\\.Net\\.)?WebClient\\s*\\(|\\bHttpWebRequest\\b|WebRequest\\.Create\\s*\\()",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "client-factory",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "(?:\\bIHttpClientFactory\\b|\\.AddHttpClient\\s*[<(])",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "rest-library",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "new\\s+RestClient\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "endpoint-config",
+      "weight": "supporting",
+      "files": [
+        "**/web.config",
+        "**/appsettings*.json"
+      ],
+      "regex": "(?i)(?:base_?url|base_?address|api_?url|service_?url|endpoint)",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "low",
+      "summary": ".NET provides IHttpClientFactory to create configured HttpClient instances.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/core/extensions/httpclient-factory",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The factory creates HttpClient instances with custom configurations"
+        }
+      ]
+    }
   ],
   "handling": [
-    { "option": "Register typed or named clients through the HTTP client factory and bind endpoints through options", "when": "The target is ASP.NET Core based", "docs": "Microsoft documentation for IHttpClientFactory" },
-    { "option": "Keep the client and move only its configuration", "when": "The client already uses the factory", "docs": "Microsoft documentation for options binding" }
+    {
+      "id": "client-factory",
+      "option": "Register typed or named clients through the HTTP client factory and bind endpoints through options",
+      "when": "The target is ASP.NET Core based",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/core/extensions/httpclient-factory",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The factory creates HttpClient instances with custom configurations"
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/core/extensions/options",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The options pattern uses classes to provide strongly typed access to groups of related settings"
+        }
+      ]
+    },
+    {
+      "id": "move-configuration",
+      "option": "Keep the client and move only its configuration",
+      "when": "The client already uses the factory",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/core/extensions/options",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The options pattern uses classes to provide strongly typed access to groups of related settings"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each external call succeeds against a test or sandbox endpoint from the local site, with keys from a secret store",
+      "verification": "manual"
+    }
   ],
   "sources": [
-    { "url": "https://learn.microsoft.com/en-us/dotnet/core/extensions/httpclient-factory", "appliesTo": "dotnet", "fetchedAt": "2026-10-12" }
+    {
+      "url": "https://learn.microsoft.com/en-us/dotnet/core/extensions/httpclient-factory",
+      "appliesTo": "dotnet",
+      "fetchedAt": "2026-10-12"
+    }
   ]
 }

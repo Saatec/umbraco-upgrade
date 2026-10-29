@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "config.static-readers",
+  "title": "Static configuration readers",
+  "description": "Static classes that build configuration directly, bypassing dependency injection and environment-specific files.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "configuration-builder",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "new\\s+ConfigurationBuilder\\s*\\(\\s*\\)[\\s\\S]{0,300}?\\.AddJsonFile\\s*\\(",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "static-settings-class",
+      "weight": "supporting",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "static\\s+class\\s+\\w*(?:Settings|Config|Configuration)\\b",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "low",
+      "summary": "Static readers ignore environment overrides; options binding replaces them.",
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/core/extensions/options",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The options pattern uses classes to provide strongly typed access to groups of related settings"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "options-binding",
+      "option": "Bind settings through typed options injected where needed",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/core/extensions/options",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The options pattern uses classes to provide strongly typed access to groups of related settings"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Environment-specific values override the base settings on the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

@@ -1,0 +1,8 @@
+{
+  "id": "p.code.static-access",
+  "baseline": "gen.v7",
+  "expects": [
+    "code.static-service-access"
+  ],
+  "description": "A service that reaches CMS services and the current request through static accessors."
+}

@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "api.content-apps",
+  "title": "Content apps",
+  "description": "Backoffice content apps registered in a package.manifest or by a content app factory.",
+  "kind": "customization",
+  "area": "packages-backoffice",
+  "owner": "migrate-packages-backoffice",
+  "prevalence": "gap",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": true,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "manifest-content-app",
+      "weight": "strong",
+      "files": [
+        "**/App_Plugins/*/package.manifest"
+      ],
+      "regex": "\"contentApps\"\\s*:",
+      "pluginScope": "unmatched",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13"
+      ]
+    },
+    {
+      "id": "content-app-factory",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bIContentAppFactory\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "Content apps become workspace views with conditions.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-backoffice-extensions-from-angularjs.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "AngularJS code does not run in the new backoffice, so you rebuild each extension"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-backoffice-extensions-from-angularjs.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "| Content Apps | Workspace Views |"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-backoffice-extensions-from-angularjs.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Content App show rules"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "workspace-view",
+      "option": "Rebuild as a workspace view extension with conditions",
+      "when": "Target 14 or later",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-backoffice-extensions-from-angularjs.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "| Content Apps | Workspace Views |"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-backoffice-extensions-from-angularjs.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Content App show rules"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "The workspace view shows on the expected content types in the local backoffice",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

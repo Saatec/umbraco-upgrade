@@ -1,0 +1,200 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "deploy.iis-config",
+  "title": "IIS configuration, rewrite rules, and publish profiles",
+  "description": "IIS modules and handlers, rewrite rules, error pages, and publish profiles.",
+  "kind": "customization",
+  "area": "deployment-rehearsal",
+  "owner": "deployment-rehearsal",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "rewrite-rules",
+      "weight": "strong",
+      "files": [
+        "**/web.config",
+        "**/Web.config"
+      ],
+      "regex": "<rewrite>",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "iis-modules",
+      "weight": "strong",
+      "files": [
+        "**/web.config",
+        "**/Web.config"
+      ],
+      "regex": "<modules[^>/]*>\\s*(?:<remove[^>]*/>\\s*)*<add\\s",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "iis-handlers-errors",
+      "weight": "strong",
+      "files": [
+        "**/web.config",
+        "**/Web.config"
+      ],
+      "regex": "<handlers>\\s*(?:<remove[^>]*/>\\s*)*<add\\s|<httpErrors\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "publish-profile",
+      "weight": "strong",
+      "files": [
+        "**/*.pubxml"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "IIS hosts the ASP.NET Core site with an application pool without managed code; rewrites use the rewrite middleware or IIS rules in web.config.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/fundamentals/setup/server-setup/iis.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Create a site in IIS and ensure that the .NET Common Language Runtime (CLR) version is set to No Managed Code for the Application Pool"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/iisrewriterules.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Instead of the URL Rewriting extension in IIS you can use the"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/iisrewriterules.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "If you are running Umbraco v9+ on IIS you can still add a web.config file to configure IIS features such as URL rewrites"
+        }
+      ]
+    },
+    {
+      "crosses": 14,
+      "difficulty": "low",
+      "summary": "Hosting on IIS needs the hosting bundle for the target .NET version.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/run-in-production/infrastructure-and-ops/server-setup/iis.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Install the Hosting Bundle"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "rewrite-middleware",
+      "option": "Move rewrite rules to the URL rewriting middleware, or keep them in web.config for IIS",
+      "when": "Rewrite rules exist",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/iisrewriterules.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Instead of the URL Rewriting extension in IIS you can use the"
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/aspnet/core/fundamentals/url-rewriting",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "URL rewriting middleware in ASP.NET Core"
+        }
+      ]
+    },
+    {
+      "id": "modules-to-middleware",
+      "option": "Rebuild custom modules and handlers as middleware",
+      "when": "Custom modules or handlers exist",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/iisrewriterules.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "If you are running Umbraco v9+ on IIS you can still add a web.config file to configure IIS features such as URL rewrites"
+        }
+      ]
+    },
+    {
+      "id": "hosting-bundle",
+      "option": "Install the hosting bundle for the target .NET on each server (the user does this)",
+      "when": "IIS hosting",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/fundamentals/setup/server-setup/iis.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Create a site in IIS and ensure that the .NET Common Language Runtime (CLR) version is set to No Managed Code for the Application Pool"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/run-in-production/infrastructure-and-ops/server-setup/iis.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Install the Hosting Bundle"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Rewrite rules and error pages behave as before in the deployment rehearsal",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

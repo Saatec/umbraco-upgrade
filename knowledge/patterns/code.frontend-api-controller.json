@@ -1,24 +1,225 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "id": "code.frontend-api-controller",
   "title": "Front-end API controllers",
   "description": "Public API endpoints for front-end scripts or third parties, including auto-routed API controllers and attribute-routed Web API controllers.",
+  "kind": "customization",
   "area": "custom-code",
   "owner": "migrate-custom-code",
   "prevalence": "common",
-  "status": "hypothesis",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
   "detectors": [
-    { "id": "umbraco-api-base-type", "weight": "strong", "files": ["**/*.cs"], "regex": ":\\s*(?:[\\w\\.]+\\.)?UmbracoApiController\\b", "generations": ["v7", "v8", "v9-v13", "v14+"] },
-    { "id": "webapi-base-type", "weight": "strong", "files": ["**/*.cs"], "regex": ":\\s*(?:System\\.Web\\.Http\\.)?ApiController\\b", "generations": ["v7", "v8"] },
-    { "id": "api-url", "weight": "supporting", "files": ["**/*.js", "**/*.ts", "**/*.cshtml"], "regex": "/umbraco/api/", "generations": ["v7", "v8", "v9-v13", "v14+"] }
+    {
+      "id": "umbraco-api-base-type",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?UmbracoApiController\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "webapi-base-type",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:System\\.Web\\.Http\\.)?ApiController\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "api-url",
+      "weight": "supporting",
+      "files": [
+        "**/*.js",
+        "**/*.ts",
+        "**/*.cshtml"
+      ],
+      "regex": "/umbraco/api/",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "In 13 the CMS API controller base type lives in the ASP.NET Core web project namespace.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/umbraco-api-controllers.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This section will describe how to work with Web API in Umbraco to create REST services"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/umbraco-api-controllers.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The class to inherit from is: Umbraco.Cms.Web.Common.Controllers.UmbracoApiController"
+        }
+      ]
+    },
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "The CMS API controller base type is obsolete and its JSON output becomes camel-cased.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "the UmbracoApiController will yield camel-cased output in Umbraco 14"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/backend-and-custom-logic/routing/umbraco-api-controllers/porting-old-umbraco-apis.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The recommended approach is to base APIs on the ASP.NET Core Controller class instead"
+        }
+      ]
+    },
+    {
+      "crosses": 18,
+      "difficulty": "medium",
+      "summary": "The CMS API controller base type and front-end API auto-routing are removed. The 17 docs page states removal as of 15; the 18 breaking-changes page states removal in 18. Treat it as unavailable on any target from 15 and confirm on the target docs.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "18+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Custom APIs must be written as standard ASP.NET Core controllers using the [ApiController] and [Route] attributes"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/backend-and-custom-logic/routing/umbraco-api-controllers.md",
+          "docsVersion": "17",
+          "appliesTo": "15+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "UmbracoApiController has been removed from Umbraco CMS as of version 15"
+        }
+      ]
+    }
   ],
   "handling": [
-    { "option": "Port to the target generation's API controller base type", "when": "The target still supports it; verify in the target docs", "docs": "Umbraco API Controllers and Porting Old Umbraco API Controllers" },
-    { "option": "Convert to plain controllers with explicit routes", "when": "The target marks auto-routed API controllers obsolete", "docs": "Porting Old Umbraco API Controllers" }
+    {
+      "id": "port-to-plain-controller",
+      "option": "Convert to ASP.NET Core controllers with explicit routes, keeping each public URL (add a route that matches the old auto-routed URL where callers depend on it)",
+      "when": "Target 14 or later, or any target where callers can be updated",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/backend-and-custom-logic/routing/umbraco-api-controllers/porting-old-umbraco-apis.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The recommended approach is to base APIs on the ASP.NET Core Controller class instead"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/backend-and-custom-logic/routing/umbraco-api-controllers/porting-old-umbraco-apis.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Moving forward, you control your API routes with the [Route] annotation"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "18+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Custom APIs must be written as standard ASP.NET Core controllers using the [ApiController] and [Route] attributes"
+        }
+      ]
+    },
+    {
+      "id": "keep-api-controller",
+      "option": "Port to the target generation API controller base type",
+      "when": "Target 13 or earlier",
+      "targets": [
+        "v9-v13"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/umbraco-api-controllers.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This section will describe how to work with Web API in Umbraco to create REST services"
+        }
+      ]
+    },
+    {
+      "id": "check-json-casing",
+      "option": "Configure or test JSON casing so existing callers keep working",
+      "when": "Target 14 or later and callers read property names",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "the UmbracoApiController will yield camel-cased output in Umbraco 14"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each public API URL answers with the same status and payload shape as before (record request and response samples, secrets redacted)",
+      "verification": "manual"
+    },
+    {
+      "text": "Front-end scripts that call the APIs still work (browser check)",
+      "verification": "manual"
+    }
   ],
   "sources": [
-    { "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Reference/Routing/Umbraco-API-Controllers/index-v7.md", "appliesTo": "7", "fetchedAt": "2026-10-12" },
-    { "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/umbraco-api-controllers.md", "appliesTo": "13", "fetchedAt": "2026-10-12" },
-    { "url": "https://docs.umbraco.com/umbraco-cms/develop-with-umbraco/application-code/backend-and-custom-logic/routing/umbraco-api-controllers/porting-old-umbraco-apis.md", "appliesTo": "latest", "fetchedAt": "2026-10-12" }
+    {
+      "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Reference/Routing/Umbraco-API-Controllers/index-v7.md",
+      "appliesTo": "7",
+      "fetchedAt": "2026-10-12"
+    },
+    {
+      "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/umbraco-api-controllers.md",
+      "appliesTo": "13",
+      "fetchedAt": "2026-10-12"
+    },
+    {
+      "url": "https://docs.umbraco.com/umbraco-cms/develop-with-umbraco/application-code/backend-and-custom-logic/routing/umbraco-api-controllers/porting-old-umbraco-apis.md",
+      "appliesTo": "latest",
+      "fetchedAt": "2026-10-12"
+    }
   ]
 }

@@ -1,0 +1,158 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "jobs.search-indexing",
+  "title": "Search index customization",
+  "description": "Custom index fields, custom indexes, value set builders, indexing events, and search queries in code or views.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "legacy-index-events",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bGatheringNodeData\\b|\\bDocumentWriting\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "index-transform",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bTransformingIndexValues\\b|\\bIValueSetBuilder\\b|\\bIUmbracoIndexConfig\\b|ConfigureNamedOptions\\s*<\\s*LuceneDirectoryIndexOptions\\s*>",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "search-in-code",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\bExamineManager\\.Instance\\b|\\bIExamineManager\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "The ASP.NET Core generation documents index customization through events, field value types, and custom indexes.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/searching/examine/indexing.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Learn how to build and customize the indexes that comes with your Umbraco website"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/searching/examine/indexing.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Changing the field value types to change how values are stored in the index"
+        }
+      ]
+    },
+    {
+      "crosses": 16,
+      "difficulty": "low",
+      "summary": "Search is registered by a composer; custom registrations need an explicit order.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "16+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "As Examine is now registered in a composer, any custom code registered the same way is not guaranteed to run after the core setup"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/examine/indexing.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Learn how to build and customize the indexes that comes with your Umbraco website"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "named-index-options",
+      "option": "Port to named index options, value set builders, and custom indexes",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/searching/examine/indexing.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Learn how to build and customize the indexes that comes with your Umbraco website"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/examine/indexing.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Learn how to build and customize the indexes that comes with your Umbraco website"
+        }
+      ]
+    },
+    {
+      "id": "compose-after-search",
+      "option": "Order custom search registrations after the core search composer",
+      "when": "Target 16 or later",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "16+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "As Examine is now registered in a composer, any custom code registered the same way is not guaranteed to run after the core setup"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each search returns the expected results after a rebuild of the indexes on the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

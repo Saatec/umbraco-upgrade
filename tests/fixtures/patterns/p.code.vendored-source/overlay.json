@@ -1,0 +1,8 @@
+{
+  "id": "p.code.vendored-source",
+  "baseline": "gen.v8",
+  "expects": [
+    "code.vendored-source"
+  ],
+  "description": "A created-package record that ships the site assembly, and a package action."
+}

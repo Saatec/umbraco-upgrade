@@ -1,0 +1,8 @@
+{
+  "id": "p.conf.logging",
+  "baseline": "gen.v8",
+  "expects": [
+    "config.logging"
+  ],
+  "description": "Logging through a legacy library that the target does not configure."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "p.pkg.loose-dlls",
+  "baseline": "gen.v8",
+  "expects": [
+    "pkg.loose-binaries"
+  ],
+  "description": "A committed vendor assembly referenced by hint path (a zero-byte placeholder, never a real binary)."
+}

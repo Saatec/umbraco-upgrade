@@ -1,0 +1,8 @@
+{
+  "id": "p.content.custom-editor-data",
+  "baseline": "gen.v8",
+  "expects": [
+    "content.non-core-editor-data"
+  ],
+  "description": "A community property editor package whose data format belongs to the package."
+}

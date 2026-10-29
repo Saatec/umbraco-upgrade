@@ -1,0 +1,8 @@
+{
+  "id": "p.content.macros",
+  "baseline": "gen.v13",
+  "expects": [
+    "content.macros"
+  ],
+  "description": "A partial view macro rendered from a template and inserted in rich text."
+}

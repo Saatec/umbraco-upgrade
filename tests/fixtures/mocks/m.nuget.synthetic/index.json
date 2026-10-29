@@ -1,0 +1,95 @@
+{
+  "description": "Synthetic NuGet responses written for the package compatibility tests. Package ids, versions, and metadata are invented (Sample.* names); nothing here was recorded from nuget.org.",
+  "recordedAt": "2026-10-23",
+  "entries": [
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.community.editor/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "sample.community.editor.index.json"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.community.editor/2.1.0/sample.community.editor.nuspec",
+      "status": 200,
+      "contentType": "application/xml",
+      "file": "sample.community.editor.2.1.0.nuspec"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.community.editor/1.0.0/sample.community.editor.nuspec",
+      "status": 200,
+      "contentType": "application/xml",
+      "file": "sample.community.editor.1.0.0.nuspec"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.pdf.legacy/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "sample.pdf.legacy.index.json"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.pdf.legacy/4.5.0/sample.pdf.legacy.nuspec",
+      "status": 200,
+      "contentType": "application/xml",
+      "file": "sample.pdf.legacy.4.5.0.nuspec"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.old.widgets/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "sample.old.widgets.index.json"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.old.widgets/3.0.0/sample.old.widgets.nuspec",
+      "status": 200,
+      "contentType": "application/xml",
+      "file": "sample.old.widgets.3.0.0.nuspec"
+    },
+    {
+      "url": "https://api.nuget.org/v3/registration5-gz-semver2/sample.old.widgets/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "sample.old.widgets.registration.json"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.modern.grid/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "sample.modern.grid.index.json"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.modern.grid/17.0.2/sample.modern.grid.nuspec",
+      "status": 200,
+      "contentType": "application/xml",
+      "file": "sample.modern.grid.17.0.2.nuspec"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.open.range/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "sample.open.range.index.json"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.open.range/1.2.0/sample.open.range.nuspec",
+      "status": 200,
+      "contentType": "application/xml",
+      "file": "sample.open.range.1.2.0.nuspec"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.utility/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "sample.utility.index.json"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.utility/5.0.0/sample.utility.nuspec",
+      "status": 200,
+      "contentType": "application/xml",
+      "file": "sample.utility.5.0.0.nuspec"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.private.toolkit/index.json",
+      "status": 404,
+      "contentType": "application/xml"
+    }
+  ]
+}

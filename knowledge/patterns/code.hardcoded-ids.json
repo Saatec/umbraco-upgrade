@@ -1,0 +1,105 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "code.hardcoded-ids",
+  "title": "Hard-coded integer content and property IDs",
+  "description": "Integer node IDs or property type IDs kept in configuration or code. They survive only when the database is preserved.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "involves": [
+    "discovery"
+  ],
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "id-in-call",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\b(?:GetById|TypedContent|TypedMedia|Content|Media|GetContentById|GetMediaById)\\s*\\(\\s*\\d{3,}\\s*\\)",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "id-in-appsettings",
+      "weight": "strong",
+      "files": [
+        "**/appsettings*.json"
+      ],
+      "regex": "\"\\w*(?:NodeId|PageId|ContentId|FolderId|RootId|NodeIds|PageIds)\"\\s*:\\s*\\[?\\s*\\d+",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "id-in-appsetting-key",
+      "weight": "strong",
+      "files": [
+        "**/web.config",
+        "**/Web.config"
+      ],
+      "regex": "<add\\s+key=\"[^\"]*(?:Id|Ids|NodeId)\"\\s+value=\"\\d[\\d,\\s]*\"",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "Integer IDs stay valid only on a path that preserves the database; a new install with content transfer changes them.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "keep-with-database",
+      "option": "Keep the IDs and choose a database-preserving path",
+      "when": "The selected path preserves the database",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    },
+    {
+      "id": "key-based-lookups",
+      "option": "Replace integer IDs with GUID keys or content-type lookups",
+      "when": "The path does not preserve the database, or the code is being rewritten anyway",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Every configured ID resolves to an existing node on the migrated local copy",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

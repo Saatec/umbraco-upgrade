@@ -1,0 +1,8 @@
+{
+  "id": "p.content.nested-content",
+  "baseline": "gen.v8",
+  "expects": [
+    "content.legacy-structured-editors"
+  ],
+  "description": "A serialized data type that uses Nested Content with an item type."
+}

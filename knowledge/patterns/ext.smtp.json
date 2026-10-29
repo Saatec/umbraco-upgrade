@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "ext.smtp",
+  "title": "SMTP email sending",
+  "description": "Transactional email through SMTP clients, mail libraries, or CMS mail settings.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "smtp-client",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "new\\s+(?:System\\.Net\\.Mail\\.)?SmtpClient\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "mail-settings",
+      "weight": "strong",
+      "files": [
+        "**/web.config",
+        "**/Web.config"
+      ],
+      "regex": "<mailSettings>",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "email-sender",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bIEmailSender\\b|\\busing\\s+MailKit\\b",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "low",
+      "summary": "From 9 the CMS SMTP settings live in the global settings section of the configuration.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/configuration/globalsettings.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Global settings contains at set of global settings for the CMS"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/configuration/globalsettings.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "except for SMTP settings contains default values"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "cms-smtp-settings",
+      "option": "Use the CMS SMTP settings and the email sender",
+      "when": "Mail is sent through the CMS",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/configuration/globalsettings.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Global settings contains at set of global settings for the CMS"
+        }
+      ]
+    },
+    {
+      "id": "mail-library",
+      "option": "Keep a mail library, configured through options",
+      "when": "Mail needs features the CMS sender lacks",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/core/extensions/options",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The options pattern uses classes to provide strongly typed access to groups of related settings"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each mail is sent to a test inbox or a local pickup folder from the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

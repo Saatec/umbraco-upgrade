@@ -1,6 +1,8 @@
 # Compatibility: <project name>
 
-Every fact below gives its status (verified, secondary, unverified, needs-review) and its source: URL, the version the source applies to, and the verification or fetch date. A fact without a primary source is **unverified**.
+Every fact below gives its status (verified, secondary, unverified, needs-review, hypothesis) and its source: URL, the version the source applies to, and the verification or fetch date. A fact without a primary source is **unverified**.
+
+## Versions
 
 | Item | Source (current) | Target | Status | Source of fact |
 |---|---|---|---|---|
@@ -19,11 +21,26 @@ Every fact below gives its status (verified, secondary, unverified, needs-review
 
 ## Documented steps not covered above
 
-| Version | Step | Source |
-|---|---|---|
+| Version | Step | Phase that covers it | Source |
+|---|---|---|---|
+
+## Packages
+
+From `evidence/planning/package-compatibility.json` (NuGet metadata, fetched <date>).
+
+| Package | Current version | Class | Version for the target, or decision | Notes and source |
+|---|---|---|---|---|
+| <id> | <version> | compatible, no-target-version, framework-only, not-cms-specific, not-found, platform, cms-dependency | <version or "decision U-xxx"> | <dependency range, deprecation, NuGet URL> |
 
 ## Detected customizations and target impact
 
-| Pattern | Impact at target | Status |
+From `Get-PatternGuidance.ps1` for each detected pattern.
+
+| Pattern | Impact at target (crossings) | Difficulty | Status | Sources | Phase |
+|---|---|---|---|---|---|
+| <id> | <crosses N: summary> | <low, medium, high> | <verified or hypothesis> | <URLs with versions and dates> | <P...> |
+
+## Baseline signals
+
+| Signal | What it adds to the plan | Source |
 |---|---|---|
-| <id> | <handling options from the registry> | hypothesis |

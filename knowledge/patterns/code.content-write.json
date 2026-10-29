@@ -1,0 +1,136 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "code.content-write",
+  "title": "Writing content and media from code",
+  "description": "Requests, handlers, or tools create, update, or publish content and media through the content and media services.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "save-and-publish",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\.SaveAndPublish(?:WithStatus)?\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "create-entity",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\.Create(?:Content|Media)(?:WithIdentity)?\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "service-save",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\b(?:_?contentService|_?mediaService|ContentService|MediaService)\\.(?:Save|Publish|Unpublish|Delete|MoveToRecycleBin)\\w*\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "low",
+      "summary": "The content and media services remain the gateway for content writes and publishing.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/management/services/contentservice.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The ContentService acts as a \"gateway\" to Umbraco data for operations which are related to Content"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/management/services/contentservice/publish-content-programmatically.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The ContentService is also used for publishing operations"
+        }
+      ]
+    },
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "Publishing from code takes cultures explicitly; invariant content needs a check that it still publishes.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "port-service-calls",
+      "option": "Port each call to the target service API, checking the culture arguments of publish calls",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/management/services/contentservice/publish-content-programmatically.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The ContentService is also used for publishing operations"
+        }
+      ]
+    },
+    {
+      "id": "verify-invariant-publish",
+      "option": "Add a check that invariant content still publishes after each ported write",
+      "when": "Target 14 or later",
+      "targets": [
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each write path creates or publishes content on the local copy as before",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

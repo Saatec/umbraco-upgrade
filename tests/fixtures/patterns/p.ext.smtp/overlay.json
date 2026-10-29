@@ -1,0 +1,8 @@
+{
+  "id": "p.ext.smtp",
+  "baseline": "gen.v13",
+  "expects": [
+    "ext.smtp"
+  ],
+  "description": "Mail sent with an SMTP client."
+}

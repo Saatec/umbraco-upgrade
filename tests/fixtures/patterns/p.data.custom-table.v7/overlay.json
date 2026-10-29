@@ -1,6 +1,10 @@
 {
   "id": "p.data.custom-table.v7",
   "baseline": "gen.v7",
-  "expects": ["data.custom-tables"],
-  "description": "A legacy attributed table class created at application start through the schema helper."
+  "expects": [
+    "data.custom-tables",
+    "api.composition-di"
+  ],
+  "description": "A legacy attributed table class created at application start through the schema helper.",
+  "note": "A legacy startup event handler creates the table, so the startup composition pattern (api.composition-di) fires too."
 }

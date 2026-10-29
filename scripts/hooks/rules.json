@@ -22,6 +22,7 @@
     { "id": "approval.site-start", "decision": "ask", "reason": "Starting the site runs database migrations against its configured database. Confirm the database is the declared local copy." },
     { "id": "approval.db-migration", "decision": "ask", "reason": "Running database migrations on the local copy needs your approval." },
     { "id": "approval.package-removal", "decision": "ask", "reason": "Removing a package needs your approval during an Umbraco upgrade." },
+    { "id": "approval.project-file-delete", "decision": "ask", "reason": "This deletes tracked project files that no recorded remove-custom-feature approval names. Never remove custom functionality to make the project compile: keep the code, record an unresolved item, and ask. Retiring a feature is the user's decision, recorded with the paths as its scope." },
     { "id": "approval.ci-deploy-file", "decision": "ask", "reason": "Changing CI or deployment configuration needs your approval." },
     { "id": "approval.outside-project", "decision": "ask", "reason": "This writes outside the project being upgraded." },
     { "id": "approval.mcp-database", "decision": "ask", "reason": "Confirm this database MCP tool targets the declared local database copy." }
@@ -34,6 +35,7 @@
     "sqlCommands": ["sqlcmd", "osql", "isql", "bcp", "invoke-sqlcmd", "sqlpackage"],
     "siteStartCommands": ["iisexpress"],
     "packageRemoval": ["uninstall-package"],
+    "deleteCommands": ["rm", "rmdir", "unlink", "del", "erase", "rd", "ri", "remove-item"],
     "deployCommands": ["msdeploy", "publish-azwebapp", "publish-azurewebsiteproject", "new-azresourcegroupdeployment", "new-azdeployment", "new-azsubscriptiondeployment", "ftp", "sftp", "lftp", "scp", "winscp", "terraform:apply", "terraform:destroy", "pulumi:up", "pulumi:destroy", "cdk:deploy", "serverless:deploy", "sls:deploy", "vercel", "netlify:deploy", "firebase:deploy", "docker:push", "kubectl:apply", "kubectl:create", "kubectl:replace", "kubectl:patch", "kubectl:delete", "kubectl:set", "kubectl:rollout", "kubectl:scale", "kubectl:edit", "helm:install", "helm:upgrade", "helm:uninstall", "helm:rollback", "helm:delete"],
     "azDeployPrefixes": ["webapp deploy", "webapp up", "webapp deployment source", "webapp deployment slot swap", "webapp config container set", "functionapp deploy", "functionapp deployment source", "staticwebapp", "containerapp up", "containerapp update", "containerapp create", "acr build", "deployment group create", "deployment sub create", "storage blob upload", "storage blob upload-batch", "storage blob sync", "spring app deploy"],
     "azSecretPrefixes": ["webapp config appsettings list", "webapp config connection-string list", "functionapp config appsettings list", "keyvault secret show", "keyvault secret download", "storage account keys list", "storage account show-connection-string", "sql db show-connection-string", "cosmosdb keys list", "redis list-keys", "servicebus namespace authorization-rule keys list", "eventhubs namespace authorization-rule keys list", "webapp deployment list-publishing-profiles", "webapp deployment list-publishing-credentials", "acr credential show"],

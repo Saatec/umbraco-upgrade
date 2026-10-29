@@ -1,0 +1,9 @@
+{
+  "id": "p.api.events.v8",
+  "baseline": "gen.v8",
+  "expects": [
+    "api.event-handlers",
+    "api.composition-di"
+  ],
+  "description": "A content publishing subscription made in a component registered by a composer."
+}

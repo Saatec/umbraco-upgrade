@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "auth.backoffice-external-login",
+  "title": "Backoffice external login providers",
+  "description": "Editors sign in to the backoffice through an external identity provider.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "gap",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": true,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "backoffice-external-login",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bAddBackOfficeExternalLogins\\b|\\bBackOfficeExternalLoginProviderOptions\\b",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "External login buttons need a client-side auth provider registration.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "To show a button in the Backoffice to sign in with an external provider, you need to register this through the extension type called"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/run-in-production/security/external-login-providers.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Both the Umbraco backoffice users and website members support external login providers (OAuth) for performing authentication"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "auth-provider-extension",
+      "option": "Register an auth provider extension for each provider",
+      "when": "Target 14 or later",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "To show a button in the Backoffice to sign in with an external provider, you need to register this through the extension type called"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "An editor signs in through each provider against a test tenant",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

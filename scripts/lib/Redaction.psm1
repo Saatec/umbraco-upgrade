@@ -37,8 +37,9 @@ function Test-HighEntropySecret {
     if ($Value -notmatch '^[A-Za-z0-9+/=_\-\.~]+$') { return $false }
     if ($Value -notmatch '[A-Za-z]' -or $Value -notmatch '[0-9]') { return $false }
     if ($Value -match '^[0-9a-fA-F\-]+$') { return $false }
-    # File paths with an extension are not tokens.
+    # File paths with an extension are not tokens, and neither are POSIX-style absolute or relative paths.
     if ($Value -match '[\\/]' -and $Value -match '\.[A-Za-z][A-Za-z0-9]{0,7}$') { return $false }
+    if ($Value -match '^(?:/|~/|\.{1,2}/)(?:[\w\.\-~]+/)*[\w\.\-~]+/?$') { return $false }
     if ($Value -match '^[A-Za-z]+([._\-][A-Za-z]+)*$') { return $false }
     return ((Get-ShannonEntropy $Value) -ge 4.2)
 }
@@ -99,7 +100,11 @@ $script:TextRules = @(
     @{ Pattern = '(?i)(\b([A-Za-z_][\w\.\-]*)\s*=\s*")([^"]*)(")'; Kind = 'attr' },
     # JSON or code assignments: "ApiKey": "...", ApiKey = "...", API_KEY=...
     @{ Pattern = '(?i)(["'']?([A-Za-z_][\w\.\-]*)["'']?\s*[:=]\s*)("([^"\\]|\\.)*"|''[^'']*'')'; Kind = 'assign' },
-    @{ Pattern = '(?im)^(\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*)([^\s#"''][^\r\n#]*)'; Kind = 'envline' }
+    @{ Pattern = '(?im)^(\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*)([^\s#"''][^\r\n#]*)'; Kind = 'envline' },
+    # Configuration paths, as dotnet user-secrets list prints them: Section:ApiKey = ...
+    @{ Pattern = '(?im)^(\s*([A-Za-z_][\w\.\-]*(?::[\w\.\-]+)+)\s*=\s*)([^\s#"''][^\r\n#]*)'; Kind = 'envline' },
+    # YAML lines with an unquoted single-token value: password: ... (variable references such as ${{ }} and $(x) are kept)
+    @{ Pattern = '(?im)^(\s*([A-Za-z_][\w\.\-]*)\s*:[ \t]+)([^\s#"''\[\{\|>\$%&\*!@`][^\s#]*)(?=[ \t]*(?:#[^\r\n]*)?\r?$)'; Kind = 'envline' }
 )
 
 function Protect-Text {

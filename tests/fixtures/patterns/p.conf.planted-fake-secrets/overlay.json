@@ -1,0 +1,9 @@
+{
+  "id": "p.conf.planted-fake-secrets",
+  "baseline": "gen.v13",
+  "expects": [],
+  "expectsBaseline": [
+    "config.committed-secrets"
+  ],
+  "description": "Fake secrets planted in configuration (a baseline signal); every one must be redacted in output and evidence."
+}

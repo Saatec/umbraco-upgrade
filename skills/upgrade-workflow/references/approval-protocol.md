@@ -21,7 +21,18 @@ state.ps1 approve -ProjectRoot "<root>" -Action <action> -Decision approved|reje
 ```
 
 - `start-plan-execution`: the scope is bound automatically to the SHA-256 of `plan.md`. If `plan.md` changes afterwards, the approval no longer matches (`state.ps1 check-plan` reports it) and a new approval is needed.
-- Other approval-tier actions (later plugin versions): `db-migration-local`, `db-snapshot-local`, `package-removal`, `ci-deploy-config-change`, `outside-project-path`, `remove-custom-feature`. Scripts that perform them check `state.ps1 require-approval` first and refuse without one.
+- Other approval-tier actions are asked for when the step comes up during execution, each with a scope that names what it covers:
+
+  | Action | Scope to record | Checked by |
+  |---|---|---|
+  | `db-snapshot-local` | the destination folder (outside the project) | `Invoke-DatabaseSnapshot.ps1` (consumes it) |
+  | `db-migration-local` | the version that runs the migration, and the local copy | the safety hook before a site start or a database command |
+  | `package-removal` | the package ids, separated by `;` | the safety hook for `dotnet remove package` |
+  | `ci-deploy-config-change` | the files | the safety hook for the edits |
+  | `outside-project-path` | what is written where (for example the user secrets of a project) | `Copy-ConfigValue.ps1 -ToUserSecrets` (consumes it); the safety hook for file writes |
+  | `remove-custom-feature` | the removed paths, separated by `;` | `New-Checkpoint.ps1` (consumes it when a deleted file needs it) |
+
+  `state.ps1 require-approval -Action <action>` shows whether an approved, unused approval exists.
 
 ## The safety hook asks too
 

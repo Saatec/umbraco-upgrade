@@ -19,8 +19,12 @@ Scripts are run as `powershell -NoProfile -ExecutionPolicy Bypass -File "${CLAUD
 5. **Review the version signals** in `evidence/discovery/version.json`:
    - If `version.needsConfirmation` is true or `conflicts` is not empty, show the user each signal (kind, file, version) and ask which version is installed. Record the answer in gate 2.
    - A configuration status key that differs from the package version can mean the database was not upgraded with the code. Point this out.
-6. **Review the patterns** in `evidence/discovery/patterns.json`. Each detector ID and its handling options are described in [references/pattern-registry.md](references/pattern-registry.md). This plugin version detects only a minimum set of patterns. List the files under `unclassified` as "needs classification".
-7. **Write `.umbraco-upgrade/inventory.md`** from `${CLAUDE_PLUGIN_ROOT}/skills/upgrade-planning/templates/inventory.md`. Fill it only from the evidence. Mark anything not detected as "not detected by this plugin version", not as "absent".
+6. **Review the patterns** in `evidence/discovery/patterns.json` ([references/pattern-registry.md](references/pattern-registry.md) explains the registry):
+   - `patterns`: customizations found. They drive the phases of the plan.
+   - `baselineSignals`: signals that default installations also have (startup shape, view compilation settings, database engine, secrets in configuration, extensions of the web components backoffice). They add mandatory work, never count as customizations, and secrets among them are always flagged.
+   - `requiresPackageMetadata`: patterns classified at gate 4 from NuGet metadata.
+   - `unclassified`: files that use CMS namespaces but matched no pattern. List them as "needs classification". When there are more than about 30 of them, or a pattern has more than about 100 hits, delegate the classification to the `umbraco-upgrade:inventory-analyst` agent (give it the project root and the list) and use its summary.
+7. **Write `.umbraco-upgrade/inventory.md`** from `${CLAUDE_PLUGIN_ROOT}/skills/upgrade-planning/templates/inventory.md`. Fill it only from the evidence. Mark anything not detected as "not detected", not as "absent": a detector that did not fire proves nothing.
 8. **Pass the gate.** `state.ps1 gate -ProjectRoot "<root>" -Gate discovery -Status passed -Evidence "inventory.md"`.
 
 ## Never

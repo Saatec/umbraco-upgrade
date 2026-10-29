@@ -1,0 +1,8 @@
+{
+  "id": "p.api.composers.v13",
+  "baseline": "gen.v13",
+  "expects": [
+    "api.composition-di"
+  ],
+  "description": "A composer that registers a custom service on the service collection."
+}

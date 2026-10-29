@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "jobs.cdn-purge",
+  "title": "CDN purge on publish",
+  "description": "Purging CDN caches when content changes, through a package or custom code.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "involves": [
+    "migrate-packages-backoffice"
+  ],
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "cdn-purge-code",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "(?i)\\b\\w*cdn\\w*(?:purge|invalidat)\\w*\\b|\\b(?:purge|invalidat)\\w*cdn\\w*\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "Purge code needs handlers for every relevant notification; packages need a release for the target.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "target-package",
+      "option": "Use a target-compatible release of the purge package",
+      "when": "Package metadata shows a release for the target",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    },
+    {
+      "id": "all-notifications",
+      "option": "Purge from handlers for publish, unpublish, move, delete, and media changes, plus an entity action if editors purge by hand",
+      "when": "Custom code",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Publish, unpublish, delete, and media changes each trigger a purge (logged against a test zone)",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

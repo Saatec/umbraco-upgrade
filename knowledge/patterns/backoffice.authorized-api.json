@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "backoffice.authorized-api",
+  "title": "Authorized backoffice API controllers and server variables",
+  "description": "Server endpoints called by backoffice scripts, and configuration values injected into the backoffice as server variables.",
+  "kind": "customization",
+  "area": "packages-backoffice",
+  "owner": "migrate-packages-backoffice",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "authorized-base-type",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?(?:UmbracoAuthorizedApiController|UmbracoAuthorizedJsonController)\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13"
+      ]
+    },
+    {
+      "id": "server-variables",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bServerVariablesParser\\.Parsing\\b|\\bServerVariablesParsingNotification\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13"
+      ]
+    },
+    {
+      "id": "plugin-controller",
+      "weight": "supporting",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\[\\s*PluginController\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13"
+      ]
+    },
+    {
+      "id": "backoffice-url",
+      "weight": "supporting",
+      "files": [
+        "**/*.js",
+        "**/*.ts"
+      ],
+      "regex": "/umbraco/backoffice/",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "The authorized base classes are removed (Management API controllers replace them) and server variables no longer exist.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The UmbracoAuthorizedApiController and UmbracoAuthorizedJsonController classes have been removed"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/authorized.md",
+          "docsVersion": "13",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "UmbracoAuthorizedApiController and UmbracoAuthorizedJsonController have been removed from Umbraco 14. Use ManagementApiControllerBase class instead."
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-backoffice-extensions-from-angularjs.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco 14 and later have no server variables"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "management-api-controller",
+      "option": "Rebuild as Management API controllers with backoffice authentication and an OpenAPI document",
+      "when": "Target 14 or later",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/tutorials/creating-a-backoffice-api.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "To create a custom API, you need to create a class that inherits from Umbraco.Cms.Api.Management.Controllers.ManagementApiControllerBase"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "We recommend basing your Backoffice APIs on the ManagementApiControllerBase class"
+        }
+      ]
+    },
+    {
+      "id": "config-endpoint",
+      "option": "Replace server variables with a config endpoint on the extension API controller, after checking the value is needed",
+      "when": "Server variables are read by scripts",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-backoffice-extensions-from-angularjs.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco 14 and later have no server variables"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-backoffice-extensions-from-angularjs.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "If your extension needs a value from the server, return it from a config endpoint on your API controller"
+        }
+      ]
+    },
+    {
+      "id": "keep-on-13",
+      "option": "Keep the authorized controllers",
+      "when": "Target 13 or earlier",
+      "targets": [
+        "v9-v13"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/authorized.md",
+          "docsVersion": "13",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "UmbracoAuthorizedApiController and UmbracoAuthorizedJsonController have been removed from Umbraco 14. Use ManagementApiControllerBase class instead."
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each backoffice API call from the extension succeeds for an authorized user and is refused for an anonymous request",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

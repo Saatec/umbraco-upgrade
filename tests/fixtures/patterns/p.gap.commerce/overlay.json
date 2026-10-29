@@ -1,0 +1,8 @@
+{
+  "id": "p.gap.commerce",
+  "baseline": "gen.v13",
+  "expects": [
+    "pkg.commerce-or-workflow-products"
+  ],
+  "description": "A commerce add-on product referenced by the web project."
+}

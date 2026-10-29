@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "data.db-health",
+  "title": "Database health before a major migration",
+  "description": "Database state that blocks or slows the CMS migrations: large version and log history, orphan rows, obsolete editor aliases, and constraint problems. Checked read-only on the declared local copy.",
+  "kind": "customization",
+  "area": "content-database",
+  "owner": "migrate-content-database",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "database-review",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [],
+  "appliesWhen": {
+    "pathHasDatabaseStep": true
+  },
+  "impact": [
+    {
+      "crosses": 8,
+      "difficulty": "medium",
+      "summary": "The 7 to 8 content migration fails while obsolete editors are still in use.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-8.md",
+          "docsVersion": "18",
+          "appliesTo": "8",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The migration will fail if you are still using obsolete properties"
+        }
+      ]
+    },
+    {
+      "crosses": 15,
+      "difficulty": "medium",
+      "summary": "The block editor data migration can run long on large sites; cleaning up old content versions first makes it run faster.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-15.md",
+          "docsVersion": "18",
+          "appliesTo": "15+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "might require a long-running content migration"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-15.md",
+          "docsVersion": "18",
+          "appliesTo": "15+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This will make the migration run faster"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "read-only-health-queries",
+      "option": "Run read-only counts on the declared local copy (versions, logs, orphan rows, editor aliases) and record them as evidence",
+      "when": "A local copy is declared",
+      "targets": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    },
+    {
+      "id": "version-cleanup",
+      "option": "Use the documented content version cleanup settings, or an approved cleanup on the local copy with counts before and after",
+      "when": "History is large",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/develop-with-umbraco/configuration/content-version-cleanup.md",
+          "docsVersion": "18",
+          "appliesTo": "9+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Over time this amount of data can build and swallow up the capacity of your SQL Server"
+        }
+      ],
+      "requiresApproval": "db-migration-local"
+    }
+  ],
+  "checks": [
+    {
+      "text": "Read-only health counts are recorded for the local copy before the database step",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

@@ -1,0 +1,8 @@
+{
+  "id": "p.content.blocks",
+  "baseline": "gen.v13",
+  "expects": [
+    "content.block-editors"
+  ],
+  "description": "A page rendered from a block list model with block partials."
+}

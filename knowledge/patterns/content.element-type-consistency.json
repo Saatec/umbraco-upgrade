@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.element-type-consistency",
+  "title": "Element type flags and compositions",
+  "description": "Types used only inside structured or block editors must be element types, and element types cannot inherit from non-element types. Checked in the backoffice or the management API on the local copy.",
+  "kind": "customization",
+  "area": "content-database",
+  "owner": "migrate-content-database",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "database-review",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [],
+  "appliesWhen": {
+    "anyPattern": [
+      "content.legacy-structured-editors",
+      "content.block-editors",
+      "content.legacy-grid"
+    ]
+  },
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "Conversions to block editors need element types for every item type.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "fix-through-backoffice",
+      "option": "Fix element flags and compositions through the backoffice or management API, never by raw SQL",
+      "when": "Before any block conversion",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Every item type used by a structured or block editor is an element type on the local copy",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

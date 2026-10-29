@@ -1,0 +1,8 @@
+{
+  "id": "p.gap.user-permissions",
+  "baseline": "gen.v13",
+  "expects": [
+    "auth.custom-user-permissions"
+  ],
+  "description": "Code that changes user group permissions."
+}

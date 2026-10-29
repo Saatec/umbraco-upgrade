@@ -1,0 +1,96 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "code.webforms",
+  "title": "WebForms pages and user controls",
+  "description": "Admin or import tools written as WebForms pages or user controls, often exposed as backoffice dashboards or reserved URLs.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "involves": [
+    "migrate-packages-backoffice"
+  ],
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": true,
+  "detectors": [
+    {
+      "id": "webforms-file",
+      "weight": "strong",
+      "files": [
+        "**/*.aspx",
+        "**/*.ascx"
+      ],
+      "excludeFiles": [
+        "**/umbraco/**",
+        "**/umbraco_client/**"
+      ],
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "usercontrol-dashboard",
+      "weight": "strong",
+      "files": [
+        "**/config/Dashboard.config"
+      ],
+      "regex": "<control[^>]*>[^<]*\\.ascx\\s*</control>",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "high",
+      "summary": "From 9 the web framework is ASP.NET Core and all templates and custom code are reimplemented, WebForms pages and controls included.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/upgrade-from-8-to-latest.md",
+          "docsVersion": "18",
+          "appliesTo": "9+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "All templates and custom code will need to be reimplemented"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "rebuild-as-api-and-ui",
+      "option": "Rebuild the function as an API plus a backoffice extension or a front-end page",
+      "when": "The function is still used",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    },
+    {
+      "id": "retire-after-confirmation",
+      "option": "Retire the function only after the user confirms it is no longer needed",
+      "when": "The user confirms it is unused",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [],
+      "requiresApproval": "remove-custom-feature"
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each WebForms function is either rebuilt and tested, or retired with a recorded approval",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

@@ -1,0 +1,8 @@
+{
+  "id": "p.data.raw-sql-core",
+  "baseline": "gen.v7",
+  "expects": [
+    "data.raw-sql-core-tables"
+  ],
+  "description": "SQL that reads the CMS internal property data table directly."
+}

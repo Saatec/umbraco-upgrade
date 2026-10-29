@@ -1,0 +1,178 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.legacy-grid",
+  "title": "Legacy grid layout and grid editors",
+  "description": "Pages built with the legacy grid layout, often with grid editor packages, custom grid editors, and grid rendering helpers.",
+  "kind": "customization",
+  "area": "content-database",
+  "owner": "migrate-content-database",
+  "involves": [
+    "migrate-packages-backoffice"
+  ],
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "grid-alias",
+      "weight": "strong",
+      "files": [
+        "**/*.config",
+        "**/*.json",
+        "**/*.xml",
+        "**/*.config.js",
+        "**/*.uda"
+      ],
+      "regex": "\\bUmbraco\\.Grid\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "grid-editor-config",
+      "weight": "strong",
+      "files": [
+        "**/config/grid.editors.config.js"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "grid-render",
+      "weight": "strong",
+      "files": [
+        "**/*.cshtml"
+      ],
+      "regex": "\\bGetGridHtml\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "grid-partials",
+      "weight": "supporting",
+      "files": [
+        "**/Views/Partials/Grid/**"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "high",
+      "summary": "The grid layout is removed; content moves to the block grid with a data conversion.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Nested Content and Grid Layout have been removed"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The recommended action is to use blocks instead - Block Grid for the grid layout and either Block Grid or Block List for Nested Content"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/fundamentals/backoffice/property-editors/built-in-umbraco-property-editors/grid-layout.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "It will be removed as a core property editor with the release of Umbraco 14"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "keep-grid-on-13",
+      "option": "Keep the grid on a 13 target and plan the block grid move",
+      "when": "Target 13 or earlier",
+      "targets": [
+        "v9-v13"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/fundamentals/backoffice/property-editors/built-in-umbraco-property-editors/grid-layout.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "It will be removed as a core property editor with the release of Umbraco 14"
+        }
+      ]
+    },
+    {
+      "id": "convert-to-block-grid",
+      "option": "Convert grid content to the block grid, with a data conversion tested on the local copy",
+      "when": "Target 14 or later",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The recommended action is to use blocks instead - Block Grid for the grid layout and either Block Grid or Block List for Nested Content"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/model-your-content/property-editors/built-in-umbraco-property-editors/block-editor/block-grid-editor.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The Block Grid property editor enables editors to layout their content in the Umbraco backoffice"
+        }
+      ]
+    },
+    {
+      "id": "deploy-import-migration",
+      "option": "Use an import with migrations to transform the data during transfer",
+      "when": "The project uses the vendor deployment tool",
+      "targets": [
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-deploy/17.latest/deployment-workflow/import-export/import-with-migrations.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "you can migrate from a Nested Content property in Umbraco 8 to a Block List in Umbraco 13"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Every page that used the grid renders its content from the block grid on the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

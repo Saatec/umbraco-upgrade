@@ -1,0 +1,8 @@
+{
+  "id": "p.dep.iis",
+  "baseline": "gen.v13",
+  "expects": [
+    "deploy.iis-config"
+  ],
+  "description": "IIS rewrite rules in web.config and a file system publish profile."
+}

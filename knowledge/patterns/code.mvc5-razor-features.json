@@ -1,0 +1,134 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "code.mvc5-razor-features",
+  "title": "Child actions and MVC 5 only Razor features",
+  "description": "Views that use ASP.NET MVC 5 features that do not exist in ASP.NET Core: child actions, @helper blocks, App_Code helpers, and request statics in views.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "child-action-attribute",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\[\\s*ChildActionOnly\\s*\\]",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "child-action-call",
+      "weight": "strong",
+      "files": [
+        "**/*.cshtml"
+      ],
+      "regex": "\\bHtml\\.(?:Render)?Action\\s*\\(",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "razor-helper",
+      "weight": "strong",
+      "files": [
+        "**/*.cshtml"
+      ],
+      "regex": "(?m)^\\s*@helper\\s+\\w+",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "request-static-in-view",
+      "weight": "strong",
+      "files": [
+        "**/*.cshtml"
+      ],
+      "regex": "\\bHttpContext\\.Current\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "Child actions are no longer supported in ASP.NET Core MVC; view components replace them.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/templating/mvc/viewcomponents.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "we used Child Actions to build reusable components/widgets consisting of both Razor markup and backend logic"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/templating/mvc/viewcomponents.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Child Actions are no longer supported in ASP.NET Core MVC. Instead, we will use the View Component feature."
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "view-components",
+      "option": "Rebuild child actions as view components",
+      "when": "A child action renders a reusable widget with its own logic",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/templating/mvc/viewcomponents.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "we used Child Actions to build reusable components/widgets consisting of both Razor markup and backend logic"
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/aspnet/core/mvc/views/view-components",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "View components are similar to partial views, but they're much more powerful"
+        }
+      ]
+    },
+    {
+      "id": "partials-or-tag-helpers",
+      "option": "Rebuild @helper blocks and simple child actions as partial views, tag helpers, or Razor local functions",
+      "when": "The helper has no logic of its own",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Every page that used a child action or helper renders the same markup (compare before and after on the local site)",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

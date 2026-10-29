@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "auth.access-rules",
+  "title": "Page and media access rules in code",
+  "description": "Access restrictions implemented by public access APIs, custom checks, or media protection code instead of configured public access alone.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "involves": [
+    "migrate-build-tests"
+  ],
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "public-access",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\bI?PublicAccessService\\b|\\bMemberHasAccess\\b|\\.HasAccess\\s*\\(|\\bIsProtected\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "The public access service handles public access in the ASP.NET Core generation; media protection needs an explicit check.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/management/services/publicaccessservice.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Service to handle public access"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "core-public-access",
+      "option": "Use core public access where it covers the rule",
+      "when": "The rule is role- or member-based",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/management/services/publicaccessservice.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Service to handle public access"
+        }
+      ]
+    },
+    {
+      "id": "port-custom-checks",
+      "option": "Port custom checks and verify media protection explicitly",
+      "when": "Rules are computed in code",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Protected pages and media refuse an anonymous request and allow a permitted member on the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

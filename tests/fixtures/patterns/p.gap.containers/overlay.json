@@ -1,0 +1,8 @@
+{
+  "id": "p.gap.containers",
+  "baseline": "gen.v13",
+  "expects": [
+    "deploy.containers-or-cloud"
+  ],
+  "description": "A container definition for the site."
+}

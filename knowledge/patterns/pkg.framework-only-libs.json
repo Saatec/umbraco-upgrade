@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "pkg.framework-only-libs",
+  "title": ".NET Framework-only libraries",
+  "description": "Referenced packages whose latest release targets only .NET Framework, with no .NET Standard or modern .NET target.",
+  "kind": "customization",
+  "area": "application-framework",
+  "owner": "migrate-application-framework",
+  "involves": [
+    "migrate-packages-backoffice"
+  ],
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "package-metadata",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "framework-only-tfm",
+      "weight": "strong",
+      "derived": "package-metadata",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "Framework-only libraries need a .NET edition, a replacement, or a rewrite; license terms may differ between editions.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/standard/frameworks",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "When you target a framework in an app or library"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "dotnet-edition",
+      "option": "Use the .NET edition of the library and check its license",
+      "when": "An edition exists",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/standard/frameworks",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "When you target a framework in an app or library"
+        }
+      ]
+    },
+    {
+      "id": "replace-or-rewrite",
+      "option": "Replace or rewrite the function",
+      "when": "No edition exists",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [],
+      "requiresApproval": "package-removal"
+    }
+  ],
+  "checks": [
+    {
+      "text": "No framework-only package remains referenced by the target projects",
+      "verification": "automated"
+    }
+  ],
+  "sources": []
+}

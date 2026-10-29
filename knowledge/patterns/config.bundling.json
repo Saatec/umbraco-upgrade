@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "config.bundling",
+  "title": "Server-side bundling and minification",
+  "description": "Bundling and minification of CSS and scripts at runtime, through legacy libraries or the runtime minification library.",
+  "kind": "customization",
+  "area": "application-framework",
+  "owner": "migrate-application-framework",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "legacy-bundling",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml",
+        "**/*.csproj",
+        "**/*.vbproj",
+        "**/packages.config",
+        "**/Directory.Packages.props",
+        "**/*.config"
+      ],
+      "regex": "\\bClientDependency\\b|System\\.Web\\.Optimization|\\bBundleConfig\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "smidge-in-views",
+      "weight": "strong",
+      "files": [
+        "**/*.cshtml",
+        "**/*.cs"
+      ],
+      "regex": "\\bSmidge(?:Helper)?\\b",
+      "excludeFiles": [
+        "**/_ViewImports.cshtml"
+      ],
+      "generations": [
+        "v9-v13"
+      ]
+    },
+    {
+      "id": "runtime-minification-config",
+      "weight": "strong",
+      "files": [
+        "**/appsettings*.json"
+      ],
+      "regex": "\"RuntimeMinification\"\\s*:",
+      "generations": [
+        "v9-v13"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "low",
+      "summary": "The runtime minification library is no longer a default dependency.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Smidge has been removed from the default installation"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/configuration/runtimeminificationsettings.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Smidge with RunTimeMinification setting is scheduled for removal on Umbraco 14"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "In Umbraco 14, Smidge has been removed from the CMS"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "build-time-bundling",
+      "option": "Bundle at build time",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Smidge has been removed from the default installation"
+        }
+      ]
+    },
+    {
+      "id": "install-library",
+      "option": "Install the library separately for front-end assets",
+      "when": "The site depends on runtime bundling",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Smidge has been removed from the default installation"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Front-end assets load with the same content on every page of the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

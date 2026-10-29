@@ -1,0 +1,135 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "data.non-sqlserver-engine",
+  "title": "Database engine other than SQL Server",
+  "description": "SQL CE, SQLite, or other engines configured for the CMS database. Path selection reads the engine from discovery; this signal adds the documented engine steps.",
+  "kind": "baseline",
+  "area": "content-database",
+  "owner": "migrate-content-database",
+  "prevalence": "gap",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "sqlce-provider",
+      "weight": "strong",
+      "files": [
+        "**/*.config",
+        "**/appsettings*.json"
+      ],
+      "regex": "(?i)System\\.Data\\.SqlServerCe",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "sqlite-provider",
+      "weight": "strong",
+      "files": [
+        "**/appsettings*.json",
+        "**/*.config"
+      ],
+      "regex": "(?i)Microsoft\\.Data\\.Sqlite",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "mysql-provider",
+      "weight": "strong",
+      "files": [
+        "**/*.config",
+        "**/appsettings*.json"
+      ],
+      "regex": "(?i)providerName\\s*=\\s*\"MySql\\.Data",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 10,
+      "difficulty": "high",
+      "summary": "SQL CE is not supported from 10 and has no official migration path.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+          "docsVersion": "18",
+          "appliesTo": "10+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "There is no official migration path from SQL CE to another database engine"
+        }
+      ]
+    },
+    {
+      "crosses": 14,
+      "difficulty": "low",
+      "summary": "The deprecated SQLite provider name is removed.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "has been removed and will require the value to be updated to Microsoft.Data.Sqlite for installations using an SQLite database"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "engine-decision",
+      "option": "Choose the engine conversion with the user before the database step (gate 2 records the decision)",
+      "when": "SQL CE source and target 10 or later",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+          "docsVersion": "18",
+          "appliesTo": "10+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "There is no official migration path from SQL CE to another database engine"
+        }
+      ]
+    },
+    {
+      "id": "sqlite-provider-name",
+      "option": "Use the documented SQLite provider name",
+      "when": "SQLite and target 14 or later",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "has been removed and will require the value to be updated to Microsoft.Data.Sqlite for installations using an SQLite database"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "The migrated local copy runs on the chosen engine",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "auth.backoffice-users-permissions",
+  "title": "Backoffice users, groups, and permissions after a migration",
+  "description": "Backoffice users and permissions that can come out of a major database migration wrong: groups, start nodes, section access, and administrator accounts.",
+  "kind": "customization",
+  "area": "content-database",
+  "owner": "migrate-content-database",
+  "involves": [
+    "migrate-build-tests"
+  ],
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "database-review",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [],
+  "appliesWhen": {
+    "pathHasDatabaseStep": true,
+    "maxSourceMajor": 8
+  },
+  "impact": [
+    {
+      "crosses": 8,
+      "difficulty": "medium",
+      "summary": "User and group data is converted by the database migration and needs a check per group.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "checklist-per-group",
+      "option": "Check login and a typical task for each user group after each database step; fix through the backoffice; never record passwords",
+      "when": "Always",
+      "targets": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/manage-and-publish-content/users-and-members/users.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Users are people who have access to the Umbraco backoffice"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "A user of each group logs in and completes a typical task on the local copy",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

@@ -10,12 +10,12 @@ You run a fixed sequence of gates for one project. The caller gives you: the pro
 
 ## Rules that apply at every step
 
-- **Gates are never skipped, merged, or reordered.** Gate 1 Discovery, gate 2 Version and path, gate 3 Safety (upgrade mode only), gate 4 Plan approval. Gate 5 (final verification) belongs to a later plugin version.
+- **Gates are never skipped, merged, or reordered.** Gate 1 Discovery, gate 2 Version and path, gate 3 Safety (upgrade mode only), gate 4 Plan approval, then plan execution (upgrade mode, after approval). Gate 5 (final verification and report) belongs to a later plugin version.
 - **State changes only through the state script.** Never write `.umbraco-upgrade/state.json` with Write or Edit; the safety hook blocks it. Load the `umbraco-upgrade:upgrade-state` skill for the commands.
 - **Ask only what inspection cannot determine.** Run the scripts first; ask the user only about conflicts, missing facts, and decisions that are theirs.
 - **Version facts come from the version knowledge and live official documentation**, through the `version-path` and `doc-retrieval` skills, each with its source URL, the version the source applies to, and a date. Never state an LTS status, .NET requirement, support date, minimum upgrade-from version, or upgrade path from memory. A fact without a primary source is written as "unverified" (or "secondary") and cannot satisfy a gate criterion on its own.
 - **Never print secrets.** View configuration only through `Read-RedactedConfig.ps1`. Never quote connection strings, keys, or passwords, even partly.
-- **Never remove, stub, or disable custom functionality.** Record anything that cannot be migrated directly as unresolved, with a proposed approach (port, replace, or redesign), and ask.
+- **Never remove, stub, or disable custom functionality to make the project compile.** Record anything that cannot be migrated directly as unresolved, with a proposed approach (port, replace, or redesign), and ask. Details: [references/migration-rules.md](references/migration-rules.md).
 - **Follow the execution policy** in [references/execution-policy.md](references/execution-policy.md).
 
 Every script is run the same way. `<Script>` is a file under `${CLAUDE_PLUGIN_ROOT}/scripts/`:
@@ -39,16 +39,17 @@ Details, entry and exit criteria: [references/gates.md](references/gates.md).
 
 ## After gate 4
 
-- **Upgrade mode, user approves:** record it with `state.ps1 approve -ProjectRoot "<root>" -Action start-plan-execution -Decision approved -Note "<user's words>"`. Then tell the user: the approval is recorded (give the approval id), it is bound to the current plan text, and **plan execution is not available in this plugin version yet**. Stop.
+- **Upgrade mode, user approves:** record it with `state.ps1 approve -ProjectRoot "<root>" -Action start-plan-execution -Decision approved -Note "<user's words>"`. Tell the user the approval id and that it is bound to the current plan text. Then execute the plan: follow [references/phase-execution.md](references/phase-execution.md). Each phase runs through its owning `migrate-*` skill and ends with a checkpoint commit and a state checkpoint.
 - **Upgrade mode, user asks for changes:** edit the plan files, run `state.ps1 request-plan-approval` again (the plan hash changes), and ask again.
 - **Upgrade mode, user rejects:** record `-Decision rejected` and stop.
 - **Plan mode:** report where the plan is and stop. Approval and execution happen through `/umbraco-upgrade:start`.
+- **After the last phase:** say that final verification and the report (gate 5) come in a later plugin version, and stop.
 
 ## First run
 
 When `state.ps1 init` creates `.umbraco-upgrade/`, tell the user what it contains (state, plan files, redacted evidence; see `.umbraco-upgrade/README.md`) and ask them to choose one option. Record it with `Set-StateFolderPolicy.ps1 -ProjectRoot "<root>" -Policy <choice>`:
 
-- `commit`: commit the folder on the upgrade branch (at the first checkpoint, in a later version)
+- `commit`: commit the folder on the upgrade branch (with every checkpoint commit)
 - `exclude-local`: ignore it locally through `.git/info/exclude`; no tracked file changes (applied now in upgrade mode)
 - `gitignore`: add it to `.gitignore` on the upgrade branch (applied only after gate 3)
 

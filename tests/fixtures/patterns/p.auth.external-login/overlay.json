@@ -1,0 +1,8 @@
+{
+  "id": "p.auth.external-login",
+  "baseline": "gen.v13",
+  "expects": [
+    "auth.external-member-login"
+  ],
+  "description": "Member sign-in through an external OpenID Connect provider."
+}

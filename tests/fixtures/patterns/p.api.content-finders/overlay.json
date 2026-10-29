@@ -1,0 +1,8 @@
+{
+  "id": "p.api.content-finders",
+  "baseline": "gen.v13",
+  "expects": [
+    "api.content-finders-errors"
+  ],
+  "description": "A custom content finder that resolves short URLs."
+}

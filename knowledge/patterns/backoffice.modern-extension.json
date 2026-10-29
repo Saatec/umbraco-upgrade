@@ -1,0 +1,152 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "backoffice.modern-extension",
+  "title": "Backoffice extensions for the web components backoffice",
+  "description": "Extensions registered in umbraco-package.json, with backoffice package imports or Management API controllers. They mark the 14+ generation and are checked against the target backoffice version.",
+  "kind": "baseline",
+  "area": "packages-backoffice",
+  "owner": "migrate-packages-backoffice",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "umbraco-package-json",
+      "weight": "strong",
+      "files": [
+        "**/App_Plugins/*/umbraco-package.json"
+      ],
+      "generations": [
+        "v14+"
+      ]
+    },
+    {
+      "id": "backoffice-import",
+      "weight": "strong",
+      "files": [
+        "**/*.js",
+        "**/*.ts",
+        "**/*.mjs"
+      ],
+      "regex": "@umbraco-cms/backoffice",
+      "generations": [
+        "v14+"
+      ]
+    },
+    {
+      "id": "management-api-base",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?ManagementApiControllerBase\\b",
+      "generations": [
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 16,
+      "difficulty": "low",
+      "summary": "Context consumption and the request helper signatures changed in the client.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "16+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "tryExecuteAndNotify is obsolete, and tryExecute takes the 'host' as the first argument"
+        }
+      ]
+    },
+    {
+      "crosses": 17,
+      "difficulty": "medium",
+      "summary": "Client import paths changed and Management API requests must include credentials.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "17+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The import namespace @umbraco-cms/backoffice/external/tiptap has been removed"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "17+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "All fetch requests to the Management API must include credentials by declaring credentials: 'include'"
+        }
+      ]
+    },
+    {
+      "crosses": 18,
+      "difficulty": "medium",
+      "summary": "OpenAPI documents are built with the Microsoft OpenAPI package instead of Swashbuckle.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "18+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco no longer uses Swashbuckle for OpenAPI documentation"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "check-against-target",
+      "option": "Check each extension against the client and server breaking changes of every major crossed, and rebuild it for the target",
+      "when": "Source 14 or later",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "16+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "tryExecuteAndNotify is obsolete, and tryExecute takes the 'host' as the first argument"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "17+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The import namespace @umbraco-cms/backoffice/external/tiptap has been removed"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "17+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "All fetch requests to the Management API must include credentials by declaring credentials: 'include'"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "18+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco no longer uses Swashbuckle for OpenAPI documentation"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each extension loads without console errors in the backoffice of the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

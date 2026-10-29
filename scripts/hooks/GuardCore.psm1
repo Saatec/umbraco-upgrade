@@ -619,6 +619,12 @@ function Test-GitCommand {
         'switch' {
             if ($a -contains '-f' -or $a -contains '--force' -or $a -contains '--discard-changes') { return (New-GuardDecision 'git.discard-changes' 'git switch --force') }
         }
+        'rm' {
+            if (@($a | Where-Object { $_ -in @('-n', '--dry-run') -or (Test-ShortFlag $_ 'n') }).Count -gt 0) { return $null }
+            $dd = [array]::IndexOf($a, '--')
+            $paths = $(if ($dd -ge 0) { @($a | Select-Object -Skip ($dd + 1)) } else { @($a | Where-Object { -not $_.StartsWith('-') }) })
+            return (Test-ProjectDelete -PathArgs $paths -Cwd $dir -Context $Context)
+        }
     }
     return $null
 }
@@ -662,6 +668,77 @@ function Test-ApprovalRecorded {
         if ($ap['action'] -eq $Action -and $ap['decision'] -eq 'approved' -and -not $ap['consumed']) { return $true }
     }
     return $false
+}
+
+# ================================================================== deleting project files
+
+function Get-DeletePathArgs {
+    # Path arguments of rm, Remove-Item, and their aliases; options and their values are skipped.
+    param([object[]]$ArgList)
+    $pathOptions = @('-path', '-literalpath', '-lp', '-pspath')
+    $valueOptions = @('-filter', '-include', '-exclude', '-erroraction', '-ea', '-stream', '-credential', '-warningaction', '-wa', '-informationaction', '-infa', '-errorvariable', '-ev', '-outvariable', '-ov')
+    $paths = @()
+    $endOfOptions = $false
+    for ($k = 0; $k -lt $ArgList.Count; $k++) {
+        $a = [string]$ArgList[$k]
+        if (-not $endOfOptions -and $a -eq '--') { $endOfOptions = $true; continue }
+        if (-not $endOfOptions -and $a.Length -gt 1 -and $a.StartsWith('-')) {
+            $low = $a.ToLowerInvariant().TrimEnd(':')
+            if ($pathOptions -contains $low -and ($k + 1) -lt $ArgList.Count) { $paths += [string]$ArgList[$k + 1]; $k++ }
+            elseif ($valueOptions -contains $low) { $k++ }
+            continue
+        }
+        $paths += $a
+    }
+    return @($paths | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim().Trim('"', "'") } | Where-Object { $_ })
+}
+
+function Test-RemovalApproved {
+    # True when a recorded, unused remove-custom-feature approval names the path or a folder that contains it.
+    param($Context, [string]$Path)
+    foreach ($ap in @($Context.state['approvals'])) {
+        if ($ap['action'] -ne 'remove-custom-feature' -or $ap['decision'] -ne 'approved' -or $ap['consumed']) { continue }
+        foreach ($s in (([string]$ap['scope']) -split ';')) {
+            $s2 = $s.Trim().Trim('/').Replace('\', '/')
+            if ($s2 -and ($Path -ieq $s2 -or $Path.StartsWith($s2 + '/', [System.StringComparison]::OrdinalIgnoreCase))) { return $true }
+        }
+    }
+    return $false
+}
+
+function Test-ProjectDelete {
+    # Deleting tracked project files: denied where project files may not change, and otherwise asked for unless a
+    # remove-custom-feature approval names every file. Build output and the state folder are not checked.
+    param([string[]]$PathArgs, [string]$Cwd, $Context)
+    $root = $Context.projectRoot
+    $base = $(if ($Cwd) { $Cwd } else { $root })
+    $prefixRun = Invoke-GitCommand -Root $root -Arguments @('rev-parse', '--show-prefix')
+    if ($prefixRun.exitCode -ne 0) { return $null }
+    $prefix = $(if (@($prefixRun.stdout).Count -gt 0) { [string]$prefixRun.stdout[0] } else { '' })
+    $uncovered = @()
+    foreach ($p in $PathArgs) {
+        if ($p -match '\$|`|%') { $uncovered += "a computed path ($p)"; continue }
+        $target = $p.Replace('\', '/')
+        if ($target -match '^/([a-zA-Z])/(.*)$') { $target = $Matches[1] + ':/' + $Matches[2] }
+        # git expands the path and any wildcard into the tracked files it names (paths from the repository top).
+        $r = Invoke-GitCommand -Root $base -Arguments @('ls-files', '--full-name', '--', $target)
+        if ($r.exitCode -ne 0) { continue }
+        foreach ($f in @($r.stdout | Where-Object { $_ })) {
+            $rel = [string]$f
+            if ($prefix) { if (-not $rel.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) { continue }; $rel = $rel.Substring($prefix.Length) }
+            if ($rel -match '(?i)^\.umbraco-upgrade/' -or $rel -match '(?i)(^|/)(bin|obj)/') { continue }
+            if (-not (Test-RemovalApproved -Context $Context -Path $rel)) { $uncovered += $rel }
+        }
+    }
+    if ($uncovered.Count -eq 0) { return $null }
+    $state = $Context.state
+    if ($state['mode'] -eq 'plan') { return (New-GuardDecision 'project.plan-mode-write') }
+    if ($state['gates']['safety']['status'] -ne 'passed' -or $state['gates']['planApproval']['status'] -ne 'approved') { return (New-GuardDecision 'project.write-before-approval') }
+    $branch = Get-CurrentBranchFast -Root $root
+    if ($state['gitBaseline']['upgradeBranch'] -and $branch -ne $state['gitBaseline']['upgradeBranch']) { return (New-GuardDecision 'project.write-off-branch' "current branch: $branch") }
+    $list = @($uncovered | Select-Object -First 5) -join ', '
+    if ($uncovered.Count -gt 5) { $list += " and $($uncovered.Count - 5) more" }
+    return (New-GuardDecision 'approval.project-file-delete' $list)
 }
 
 function Test-OneCommand {
@@ -800,6 +877,12 @@ function Test-OneCommand {
     # Package removal.
     if ($name -eq 'dotnet' -and $lower.Count -ge 2 -and (($lower[0] -eq 'remove' -and $lower -contains 'package') -or ($lower[0] -eq 'package' -and $lower[1] -eq 'remove'))) { return (New-GuardDecision 'approval.package-removal' 'dotnet remove package') }
     if ((Get-GuardList 'packageRemoval') -contains $name) { return (New-GuardDecision 'approval.package-removal' $name) }
+
+    # Deleting tracked project files.
+    if ((Get-GuardList 'deleteCommands') -contains $name) {
+        $d = Test-ProjectDelete -PathArgs (Get-DeletePathArgs -ArgList $a) -Cwd $Record['cwd'] -Context $Context
+        if ($d) { return $d }
+    }
 
     return $null
 }

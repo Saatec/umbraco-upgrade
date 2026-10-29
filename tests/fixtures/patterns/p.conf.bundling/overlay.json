@@ -1,0 +1,8 @@
+{
+  "id": "p.conf.bundling",
+  "baseline": "gen.v8",
+  "expects": [
+    "config.bundling"
+  ],
+  "description": "Runtime bundling of scripts and styles in a layout view."
+}

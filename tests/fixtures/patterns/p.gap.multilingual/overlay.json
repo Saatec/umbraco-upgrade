@@ -1,0 +1,8 @@
+{
+  "id": "p.gap.multilingual",
+  "baseline": "gen.v13",
+  "expects": [
+    "content.multilingual-variants"
+  ],
+  "description": "Rendering a property in a fixed culture."
+}

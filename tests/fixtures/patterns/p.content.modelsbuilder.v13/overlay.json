@@ -1,0 +1,8 @@
+{
+  "id": "p.content.modelsbuilder.v13",
+  "baseline": "gen.v13",
+  "expects": [
+    "content.models-builder"
+  ],
+  "description": "A source-code models mode with committed generated models."
+}

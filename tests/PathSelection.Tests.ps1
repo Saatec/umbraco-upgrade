@@ -245,7 +245,10 @@ Describe 'Unknown and invalid targets' -Tag 'mocked' {
         $r.Json.status | Should -Be 'selected'
         $r.Json.target.resolvedBy | Should -Be 'knowledge'
         $r.Json.nuget.checked | Should -BeFalse
-        Get-StepList (Get-Recommended $r.Json) | Should -Be @('13.10.1>17.7.1', '17.7.1>18.2.1')
+        $v = Get-Content -Raw (Join-Path (Get-RepoRoot) 'knowledge/versions.json') | ConvertFrom-Json
+        $l17 = (@($v.majors | Where-Object { $_.major -eq 17 })[0]).latestKnown.value
+        $l18 = (@($v.majors | Where-Object { $_.major -eq 18 })[0]).latestKnown.value
+        Get-StepList (Get-Recommended $r.Json) | Should -Be @("13.10.1>$l17", "$l17>$l18")
     }
 }
 

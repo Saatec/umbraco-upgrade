@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "auth.custom-user-permissions",
+  "title": "Custom user groups and permissions in code",
+  "description": "Code that defines custom backoffice actions or changes user group permissions.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "gap",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": true,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "custom-permissions",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?IAction\\b|\\bAssignUserGroupPermission\\b|\\bReplaceUserGroupPermissions\\b|\\bIUserGroupService\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "Permissions are granular in the new backoffice and actions are client-side extensions.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "review-per-group",
+      "option": "Review each permission change against the target permission model",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/manage-and-publish-content/users-and-members/users.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Users are people who have access to the Umbraco backoffice"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each affected user group has the expected permissions on the local copy",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

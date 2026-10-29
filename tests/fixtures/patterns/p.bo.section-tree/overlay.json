@@ -1,0 +1,8 @@
+{
+  "id": "p.bo.section-tree",
+  "baseline": "gen.v13",
+  "expects": [
+    "backoffice.section-tree"
+  ],
+  "description": "A custom tree controller for a project section."
+}

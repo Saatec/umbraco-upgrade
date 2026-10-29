@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "code.xpath-and-settings-nodes",
+  "title": "XPath content queries and settings nodes",
+  "description": "Content located by XPath queries, often settings stored on content nodes and read at startup or in long-lived services.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "xpath-api",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\b(?:Typed)?Content(?:Single)?AtXPath\\b|\\bGet(?:Single)?ByXPath\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "xpath-string",
+      "weight": "supporting",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\"\\s*/{1,2}[A-Za-z]\\w*\\[@",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "XPath support is removed; dynamic roots and content finders replace the documented uses.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "XPath has been removed"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "An alternative is using the Dynamic Roots in the Multinode Treepicker"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "content-type-queries",
+      "option": "Replace XPath with content-type queries or tree traversal through the target query APIs",
+      "when": "Code queries content by type or position",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/querying/ipublishedcontentquery.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The IPublishedContentQuery interface contains different query methods for accessing strongly typed content in services etc"
+        }
+      ]
+    },
+    {
+      "id": "dynamic-roots",
+      "option": "Use dynamic roots in the multinode tree picker",
+      "when": "The XPath configured a picker start node",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "An alternative is using the Dynamic Roots in the Multinode Treepicker"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Settings read from content resolve to the same nodes as before",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

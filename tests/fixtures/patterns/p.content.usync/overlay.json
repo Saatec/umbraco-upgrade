@@ -1,0 +1,8 @@
+{
+  "id": "p.content.usync",
+  "baseline": "gen.v8",
+  "expects": [
+    "content.model-source-of-truth"
+  ],
+  "description": "Document types serialized to files by a synchronization package."
+}

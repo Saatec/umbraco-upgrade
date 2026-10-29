@@ -98,6 +98,8 @@ try {
             publishProfiles = @($inventory.publishProfiles).Count; looseAssemblies = @($inventory.looseAssemblies).Count; files = $inventory.fileCount
         }
         patterns = @($patterns.patterns)
+        baselineSignals = @($patterns.baselineSignals | ForEach-Object { $_.pattern })
+        requiresPackageMetadata = @($patterns.requiresPackageMetadata)
         unclassifiedFiles = @($patterns.unclassified.files).Count
         database = [ordered]@{ engine = $engine; configuredTarget = $dbTarget; note = 'Connection strings are never printed. A local copy must be declared by the user before any database work.' }
         evidence = @($evidence)

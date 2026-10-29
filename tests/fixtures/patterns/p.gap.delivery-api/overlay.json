@@ -1,0 +1,8 @@
+{
+  "id": "p.gap.delivery-api",
+  "baseline": "gen.v13",
+  "expects": [
+    "jobs.delivery-api"
+  ],
+  "description": "The headless delivery API enabled in configuration."
+}

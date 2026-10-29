@@ -1,0 +1,8 @@
+{
+  "id": "p.bo.dashboard",
+  "baseline": "gen.v13",
+  "expects": [
+    "backoffice.dashboard"
+  ],
+  "description": "A project-authored dashboard registered in a package.manifest."
+}

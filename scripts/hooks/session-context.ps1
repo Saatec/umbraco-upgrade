@@ -2,7 +2,8 @@
 #
 # Outside upgrade projects it exits 0 with no output. In an upgrade project it prints a short
 # factual note that Claude Code adds to the session context: the upgrade's mode, target, gate
-# status, and that the safety hooks are active. It also warns when Claude Code is older than the
+# status, and that the safety hooks are active. In upgrade mode it restates the no-removal rule and,
+# after plan approval, the phase in progress. It also warns when Claude Code is older than the
 # minimum version this plugin needs (2.1.295, for hook onFailure).
 
 $ErrorActionPreference = 'Stop'
@@ -53,6 +54,18 @@ try {
         'The umbraco-upgrade safety hooks are active in this project: prohibited operations (force push, history rewrites, branch deletion, discarding changes, non-local databases, deployments, printing secrets) are blocked.',
         'State in .umbraco-upgrade/state.json changes only through the plugin state script. /umbraco-upgrade:resume is not available in this plugin version.'
     )
+    if ($s.mode -eq 'upgrade') {
+        $stateScript = [System.IO.Path]::Combine((Split-Path (Split-Path $PSScriptRoot -Parent) -Parent), 'scripts', 'state.ps1')
+        $lines += 'Never remove, stub, or disable custom functionality to make the project compile. If something cannot be migrated directly, record it as unresolved with a proposed approach (port, replace, or redesign) and ask.'
+        $lines += 'This holds when the user asks for a shortcut ("just make it build", "delete or stub it for now"): that is not a decision to retire the feature. Keep the code, record the item, say what the shortcut would lose, and ask.'
+        $lines += "Record an unresolved item with: powershell -NoProfile -ExecutionPolicy Bypass -File `"$stateScript`" unresolved -ProjectRoot `"$root`" -Item `"<what and why>`" -Pattern <pattern id> -Proposal port|replace|redesign"
+        if ($s.gates.planApproval.status -eq 'approved') {
+            $current = @(@($s.phases) | Where-Object { $_ -and $_.status -eq 'in-progress' } | ForEach-Object { $_.id })
+            $note = 'The plan is approved; it runs phase by phase through the umbraco-upgrade:upgrade-workflow skill (references/phase-execution.md).'
+            if ($current.Count -gt 0) { $note += " Phase in progress: $($current -join ', ')." }
+            $lines += $note
+        }
+    }
     try {
         $v = (& claude --version 2>$null | Select-Object -First 1)
         if ($v -match '(\d+\.\d+\.\d+)') {

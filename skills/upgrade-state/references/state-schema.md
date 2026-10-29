@@ -30,4 +30,6 @@ Readers accept the same major version. `state.ps1 migrate` upgrades older minors
 - A gate can start or pass only when every earlier gate has passed (safety may be `skipped` in plan mode; plan approval counts when `approved`).
 - `discovery` passes only with evidence files; `versionPath` only with a requested target, a source version or user confirmation (never while source signals conflict), a resolved target version, the target's LTS status and .NET version, and a selected path with its decision id; `safety` only in upgrade mode, with `guardSelfTest = passed`, a recorded upgrade branch, and a rollback document.
 - `planApproval` moves to `awaiting-approval` through `request-plan-approval` (binds the plan hash) and to `approved` or `rejected` through `approve`.
-- Phases are frozen once the plan is approved. A phase is `done` only when every acceptance criterion is met or waived and a checkpoint commit is recorded.
+- Phases are frozen once the plan is approved. A phase starts (`in-progress`) only while the approved plan is unchanged, after gate 3 passed, and when every earlier phase is `done` or `deferred`.
+- An acceptance criterion is `met` only with evidence files under `.umbraco-upgrade/`, and `waived` only with the user's words. A phase is `done` only when every acceptance criterion is met or waived and a checkpoint commit is recorded.
+- An unresolved item moves to `decided` or `resolved` only with the id of the decision that records the user's answer.

@@ -22,6 +22,8 @@ Describe 'Protect-Text' -Tag 'mocked' {
         @{ name = 'a bearer header'; text = 'Authorization: Bearer FAKE-SECRET-FOR-TESTS-11abcdefgh' }
         @{ name = 'a SAS signature'; text = 'https://acct.blob.example.invalid/c?sv=2020&sig=FAKE-SECRET-FOR-TESTS-12' }
         @{ name = 'an account key'; text = 'DefaultEndpointsProtocol=https;AccountName=a;AccountKey=FAKE-SECRET-FOR-TESTS-13;EndpointSuffix=core.example.invalid' }
+        @{ name = 'an unquoted YAML value'; text = "variables:`r`n  SA_PASSWORD: FAKE-SECRET-FOR-TESTS-17   # local only`r`n  other: 1" }
+        @{ name = 'a user-secrets list line'; text = 'Maps:ApiKey = FAKE-SECRET-FOR-TESTS-18' }
     ) {
         $out = Protect-Text $text
         $out | Should -Not -Match $script:Marker
@@ -44,8 +46,12 @@ Describe 'Protect-Text' -Tag 'mocked' {
         @{ name = 'the server of a connection string'; text = 'Server=localhost;Database=SampleSite' }
         @{ name = 'a GUID'; text = '"Id": "00000000-0000-0000-0000-000000000013"' }
         @{ name = 'a file path'; text = '"view": "/App_Plugins/BadgeEditor2/badge.controller.js"' }
+        @{ name = 'a POSIX project path'; text = '"repoRoot": "/home/dev/src/umbraco13-site-a8f3k2Q9"' }
         @{ name = 'a package id'; text = '<package id="Umbraco.Cms.Web.BackOffice" version="13.10.1" />' }
         @{ name = 'the fetch credentials option'; text = "fetch(url, { credentials: 'include' }); fetch(u, { credentials: 'same-origin' })" }
+        @{ name = 'YAML variable references'; text = "token: `${{ secrets.DEPLOY_TOKEN }}`npassword: `$(DbPassword)" }
+        @{ name = 'prose after a sensitive word'; text = '- Credentials: stored in user secrets' }
+        @{ name = 'a build error line'; text = 'MSBUILD : error MSB1009: Project file does not exist.' }
     ) {
         (Protect-Text $text) | Should -Be $text
     }
@@ -117,6 +123,24 @@ Describe 'No planted fake secret leaves the scripts' -Tag 'fixture-based' {
         $j.hookSpecificOutput.updatedToolOutput.type | Should -Be 'text'
         $j.hookSpecificOutput.updatedToolOutput.file.content | Should -Match '"ApiKey": "\*\*\*REDACTED\*\*\*"'
         $j.hookSpecificOutput.updatedToolOutput.file.numLines | Should -Be 6
+    }
+
+    It 'the redaction hook redacts Grep results and keeps their shape' {
+        $content = "appsettings.Development.json:4:    `"ApiKey`": `"FAKE-SECRET-FOR-TESTS-19`",`nServices/WeatherClient.cs:12:        var key = options.ApiKey;"
+        $payload = @{ session_id = 's'; cwd = $script:proj13; hook_event_name = 'PostToolUse'; tool_name = 'Grep'; tool_input = @{ pattern = 'ApiKey'; path = $script:proj13; output_mode = 'content' }
+            tool_response = [ordered]@{ mode = 'content'; numFiles = 2; filenames = @('appsettings.Development.json', 'Services/WeatherClient.cs'); content = $content; numLines = 2 } } | ConvertTo-Json -Depth 6 -Compress
+        $r = Invoke-PluginScript -Script 'scripts/hooks/redact-output.ps1' -StdIn $payload
+        $r.ExitCode | Should -Be 0
+        $r.StdOut | Should -Not -Match $script:Marker
+        $out = ($r.StdOut | ConvertFrom-Json).hookSpecificOutput.updatedToolOutput
+        @($out.PSObject.Properties | ForEach-Object { $_.Name }) -join ',' | Should -Be 'mode,numFiles,filenames,content,numLines'
+        $out.numFiles | Should -Be 2
+        @($out.filenames).Count | Should -Be 2
+        $out.content | Should -Match '"ApiKey": "\*\*\*REDACTED\*\*\*"'
+        $out.content | Should -Match ([regex]::Escape('var key = options.ApiKey;'))
+        $clean = @{ session_id = 's'; cwd = $script:proj13; hook_event_name = 'PostToolUse'; tool_name = 'Grep'; tool_input = @{ pattern = 'class'; path = $script:proj13 }
+            tool_response = [ordered]@{ mode = 'files_with_matches'; numFiles = 1; filenames = @('Services/WeatherClient.cs') } } | ConvertTo-Json -Depth 6 -Compress
+        (Invoke-PluginScript -Script 'scripts/hooks/redact-output.ps1' -StdIn $clean).StdOut | Should -BeNullOrEmpty
     }
 
     It 'the redaction hook keeps non-ASCII text intact' {

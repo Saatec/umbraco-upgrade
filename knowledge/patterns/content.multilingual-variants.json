@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.multilingual-variants",
+  "title": "Multilingual and variant content",
+  "description": "Content varied by culture, with culture-specific queries in code and dictionary or language services.",
+  "kind": "customization",
+  "area": "content-database",
+  "owner": "migrate-content-database",
+  "prevalence": "gap",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": true,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "culture-variation",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\bContentVariation\\.Culture\\b|\\bIVariationContextAccessor\\b|\\bILocalizationService\\b|\\bculture\\s*:\\s*\"[a-z]{2}(?:-[A-Z]{2})?\"",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "Content can vary by culture; published content holds all language variations of a node.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/language-variation.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Language Variation allows you to have different variations of content based on a language culture"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/language-variation.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "contains all language variations of a node"
+        }
+      ]
+    },
+    {
+      "crosses": 18,
+      "difficulty": "low",
+      "summary": "The localization service is removed; language and dictionary services replace it.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "18+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Its responsibilities have been split between two services"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "flag-and-test-cultures",
+      "option": "Flag for review and test every culture after the database step",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/language-variation.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Language Variation allows you to have different variations of content based on a language culture"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each culture of a sample page renders on the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

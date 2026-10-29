@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "phase-rules",
+  "description": "Plugin heuristics for composing plan phases from discovery and the selected path (design section 7.2). These are planning rules of this plugin, not version facts. The split thresholds were checked against the synthetic fixtures in tests/PhaseComposition.Tests.ps1.",
+  "split": {
+    "maxOccurrences": 25,
+    "maxFiles": 15,
+    "highDifficultyOwnPhase": true,
+    "reason": "A phase should stay reviewable in one sitting and end in one checkpoint commit. More than about 25 changed call sites or 15 files makes a phase hard to verify, and a high-difficulty pattern needs its own acceptance criteria and checkpoint."
+  },
+  "codePort": {
+    "rule": "When the path builds a new codebase at some step (generation boundary from 8 or earlier), custom code is ported once, onto the final codebase; intermediate stops serve the database migration only. When every step keeps the existing codebase (in place or staged), each pattern is handled at every step whose crossing breaks it, because the code must build at every stop. Content conversions are placed at each step whose crossing needs them.",
+    "alternative": "Port custom code at the first new codebase and carry it through the later stops. This suits a project that must go live on an intermediate version; record it as a decision when the user prefers it.",
+    "reason": "Porting code onto a throwaway intermediate project and again at each later stop multiplies the work without changing the result on the target."
+  },
+  "combineMinorSteps": true,
+  "groupOrder": ["application-framework", "packages", "custom-code", "backoffice", "config-auth-integrations", "content-conversion"],
+  "groups": {
+    "backoffice": { "idPrefixes": ["backoffice."], "ids": ["api.content-apps"], "excludeIds": ["backoffice.package-copied-assets", "backoffice.orphan-plugin-folder"] }
+  },
+  "functionalVerification": {
+    "minCustomizationPatterns": 6,
+    "whenInvolves": "migrate-build-tests",
+    "reason": "A functional verification phase pays off when several customizations interact, or when a pattern can break at runtime while the build still passes."
+  },
+  "packages": {
+    "cmsPackageIdPattern": "^(?:Umbraco\\.Cms(?:\\..+)?|UmbracoCms(?:\\..+)?)$",
+    "cmsDependencyIdPattern": "^(?:Umbraco\\.Cms|UmbracoCms)",
+    "platformPackagePrefixes": ["Microsoft.AspNet.", "Microsoft.Owin", "Owin", "Microsoft.Web.Infrastructure", "Microsoft.CodeDom.Providers.", "Microsoft.Net.Compilers", "System.Web."],
+    "platformReason": "Packages of the ASP.NET (System.Web) stack are replaced by ASP.NET Core itself when a 7 or 8 source moves to 9 or later.",
+    "maxNuspecLookupsPerPackage": 6
+  }
+}

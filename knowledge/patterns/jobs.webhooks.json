@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "jobs.webhooks",
+  "title": "Webhooks and custom webhook events",
+  "description": "Custom webhook events or code that manages webhooks.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "gap",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": true,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "webhook-code",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bIWebhookEvent\\b|:\\s*(?:[\\w\\.]+\\.)?WebhookEventBase\\s*<|\\.WebhookEvents\\s*\\(\\s*\\)|\\bIWebhookService\\b",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "Webhook payload property names use camel case.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "property names in the payload now use camelCase instead of PascalCase"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/webhooks.md",
+          "docsVersion": "13",
+          "appliesTo": "13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Webhooks provide real-time, event-driven communication within Umbraco"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/headless-and-apis/webhooks.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Webhooks provide real-time, event-driven communication within Umbraco"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "check-receivers",
+      "option": "Check each webhook receiver against the new payload casing",
+      "when": "Always",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "property names in the payload now use camelCase instead of PascalCase"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each webhook receiver accepts a test payload from the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "config.untracked-environment-config",
+  "title": "Environment configuration outside source control",
+  "description": "Configuration files ignored by source control or edited in place per environment, so the real production shape is not in the repository.",
+  "kind": "customization",
+  "area": "deployment-rehearsal",
+  "owner": "deployment-rehearsal",
+  "involves": [
+    "discovery"
+  ],
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "ignored-config",
+      "weight": "strong",
+      "files": [
+        "**/.gitignore"
+      ],
+      "regex": "(?im)^\\s*/?(?:[\\w\\-\\*\\./]*/)?(?:appsettings(?:\\.[\\w\\-\\*]+)?\\.json|web\\.config)\\s*$",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "Configuration cannot be compared across versions without the production shape (values redacted).",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "record-config-shape",
+      "option": "Ask the user for the production configuration shape (keys only, values redacted) and record it",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "The production configuration keys are listed (no values) and mapped to the target",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

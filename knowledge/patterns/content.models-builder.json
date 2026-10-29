@@ -1,0 +1,210 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.models-builder",
+  "title": "Models builder mode and generated models",
+  "description": "Strongly typed content models generated in a non-default mode, committed generated files, and partial classes that extend them.",
+  "kind": "customization",
+  "area": "application-framework",
+  "owner": "migrate-application-framework",
+  "involves": [
+    "migrate-custom-code"
+  ],
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "legacy-mode-setting",
+      "weight": "strong",
+      "files": [
+        "**/web.config",
+        "**/Web.config"
+      ],
+      "regex": "Umbraco\\.ModelsBuilder\\.ModelsMode\"\\s+value=\"(?!PureLive\")\\w+",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "core-mode-setting",
+      "weight": "strong",
+      "files": [
+        "**/appsettings*.json"
+      ],
+      "regex": "\"ModelsMode\"\\s*:\\s*\"(?!InMemoryAuto\"|Nothing\")\\w+",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "generated-file",
+      "weight": "strong",
+      "files": [
+        "**/*.generated.cs"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "model-partial",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "partial\\s+class\\s+\\w+\\s*:\\s*(?:[\\w\\.]+\\.)?PublishedContentModel\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "published-model-attribute",
+      "weight": "supporting",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\[\\s*PublishedModel\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "low",
+      "summary": "In the ASP.NET Core generation the mode is set by the Umbraco:CMS:ModelsBuilder:ModelsMode key, with the modes the target documents.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/templating/modelsbuilder/builder-modes.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The mode is indicated by the Umbraco:CMS:ModelsBuilder:ModelsMode key in the configuration"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/configuration/modelsbuildersettings.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This section allows you to configure the Umbraco models builder"
+        }
+      ]
+    },
+    {
+      "crosses": 15,
+      "difficulty": "medium",
+      "summary": "Generated models use removed interfaces and must be rebuilt.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "15+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This means that the models need to be rebuilt"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "15+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Snapshots have been removed, meaning any code using IPublishedSnapshot"
+        }
+      ]
+    },
+    {
+      "crosses": 17,
+      "difficulty": "low",
+      "summary": "The in-memory mode and Razor runtime compilation moved to a separate package.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "17+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "have been moved to a separate package: Umbraco.Cms.DevelopmentMode.Backoffice"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "map-mode",
+      "option": "Map the mode to a target mode and regenerate models after the database step",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/templating/modelsbuilder/builder-modes.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The mode is indicated by the Umbraco:CMS:ModelsBuilder:ModelsMode key in the configuration"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/templating-and-rendering/templating/modelsbuilder/builder-modes.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Replace InMemoryAuto with one of the valid options: SourceCodeAuto, SourceCodeManual, or InMemoryAuto"
+        }
+      ]
+    },
+    {
+      "id": "rebuild-models-15",
+      "option": "Rebuild the models (remove the old generated files first) when crossing 15; replace the removed snapshot accessor in custom code",
+      "when": "The path crosses 15",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "15+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This means that the models need to be rebuilt"
+        }
+      ]
+    },
+    {
+      "id": "keep-partials",
+      "option": "Keep partial classes and update them to the regenerated models",
+      "when": "Partial classes extend generated models",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Models are regenerated against the migrated local copy and the solution builds with views precompiled",
+      "verification": "automated"
+    }
+  ],
+  "sources": []
+}

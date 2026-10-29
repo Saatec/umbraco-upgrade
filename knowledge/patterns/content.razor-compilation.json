@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.razor-compilation",
+  "title": "Razor view compilation settings",
+  "description": "Projects that disable view compilation at build or publish, or rely on runtime compilation. Default templates of some versions do this, so it is a baseline signal.",
+  "kind": "baseline",
+  "area": "build-tests",
+  "owner": "migrate-build-tests",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "compile-disabled",
+      "weight": "strong",
+      "files": [
+        "**/*.csproj"
+      ],
+      "regex": "<RazorCompileOn(?:Build|Publish)>\\s*false",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "runtime-compilation",
+      "weight": "strong",
+      "files": [
+        "**/*.csproj",
+        "**/*.cs"
+      ],
+      "regex": "Microsoft\\.AspNetCore\\.Mvc\\.Razor\\.RuntimeCompilation",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 17,
+      "difficulty": "low",
+      "summary": "Source-code models modes do not need runtime compilation; remove the settings that disable build-time compilation.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "17+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "ensure the following settings are removed from your .csproj file"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "17+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "have been moved to a separate package: Umbraco.Cms.DevelopmentMode.Backoffice"
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/core/compatibility/aspnet-core/10/razor-runtime-compilation-obsolete",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Razor runtime compilation is obsolete and is not recommended for production scenarios"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "precompile-views",
+      "option": "Enable build-time view compilation so view errors surface at build",
+      "when": "Always during verification",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "17+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "ensure the following settings are removed from your .csproj file"
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/core/compatibility/aspnet-core/10/razor-runtime-compilation-obsolete",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Razor runtime compilation is obsolete and is not recommended for production scenarios"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "The solution builds with views precompiled",
+      "verification": "automated"
+    }
+  ],
+  "sources": []
+}

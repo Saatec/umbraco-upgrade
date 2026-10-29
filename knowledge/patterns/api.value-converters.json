@@ -1,0 +1,136 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "api.value-converters",
+  "title": "Property value converters",
+  "description": "Converters that turn stored property values into typed objects for views.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "converter",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?PropertyValueConverterBase\\b|\\bIPropertyValueConverter\\b|\\[\\s*PropertyValueType\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "low",
+      "summary": "Property value converters are documented for the ASP.NET Core generation.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/property-editors/property-value-converters.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "A Property Value Converter converts a property editor's database-stored value to another type"
+        }
+      ]
+    },
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "Converters paired with manifest-based editors match on the UI alias instead of the editor alias.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "However, in Umbraco 14 you should use the EditorUiAlias instead"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-custom-property-editors-to-umbraco-14.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Since the migration moves the alias to EditorUiAlias"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/backoffice-extensions/property-editors/property-value-converters.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "A Property Value Converter converts a property editor's database-stored value into another type that is stored in the Umbraco cache"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "port-signatures",
+      "option": "Port to the target converter signatures",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/property-editors/property-value-converters.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "A Property Value Converter converts a property editor's database-stored value to another type"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/backoffice-extensions/property-editors/property-value-converters.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "A Property Value Converter converts a property editor's database-stored value into another type that is stored in the Umbraco cache"
+        }
+      ]
+    },
+    {
+      "id": "match-ui-alias",
+      "option": "Match manifest-based editors on the UI alias in IsConverter",
+      "when": "Target 14 or later and the editor was registered in a package manifest",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "However, in Umbraco 14 you should use the EditorUiAlias instead"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-custom-property-editors-to-umbraco-14.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Since the migration moves the alias to EditorUiAlias"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Every property that uses a custom converter renders typed values on the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

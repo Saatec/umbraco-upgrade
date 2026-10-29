@@ -1,0 +1,160 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "code.static-service-access",
+  "title": "Static service and context access",
+  "description": "Code that reaches CMS services, the current request, or the current context through static accessors or service locators instead of constructor injection, including custom view base classes that do this.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "legacy-application-context",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bApplicationContext\\.Current\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "legacy-umbraco-context",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bUmbracoContext\\.Current\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "legacy-current",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bCurrent\\.(?:Services|Factory|UmbracoContext|UmbracoHelper|PublishedContentQuery)\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "dependency-resolver",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bDependencyResolver\\.Current\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "httpcontext-current",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bHttpContext\\.Current\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "custom-view-base",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "class\\s+\\w+(?:<[^>]+>)?\\s*:\\s*(?:[\\w\\.]+\\.)?UmbracoViewPage\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "From 9 the web framework is ASP.NET Core, custom code is reimplemented, and dependency injection is built in.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/using-ioc.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco v9+ supports dependency injection out of the box"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/upgrade-from-8-to-latest.md",
+          "docsVersion": "18",
+          "appliesTo": "9+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "All templates and custom code will need to be reimplemented"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "constructor-injection",
+      "option": "Inject services through constructors (and @inject in views), registered in a composer or builder extension",
+      "when": "Always for the ASP.NET Core generation",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/using-ioc.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco v9+ supports dependency injection out of the box"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/backend-and-custom-logic/using-ioc.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco supports dependency injection out of the box using the"
+        }
+      ]
+    },
+    {
+      "id": "review-lifetimes",
+      "option": "Review service lifetimes so singletons do not capture request-scoped objects",
+      "when": "A service holds content or request state",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "The site builds and every page that used the static access renders without a runtime error",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

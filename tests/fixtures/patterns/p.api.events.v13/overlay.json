@@ -1,0 +1,8 @@
+{
+  "id": "p.api.events.v13",
+  "baseline": "gen.v13",
+  "expects": [
+    "api.event-handlers"
+  ],
+  "description": "A content saving notification handler, registered by a builder extension method."
+}

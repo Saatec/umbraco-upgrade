@@ -1,0 +1,8 @@
+{
+  "id": "p.content.grid",
+  "baseline": "gen.v8",
+  "expects": [
+    "content.legacy-grid"
+  ],
+  "description": "A data type using the legacy grid layout, grid editor configuration, and grid rendering in a view."
+}

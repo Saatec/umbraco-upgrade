@@ -1,6 +1,10 @@
 {
   "id": "p.data.custom-table.v8",
   "baseline": "gen.v8",
-  "expects": ["data.custom-tables"],
-  "description": "A custom table created by a migration plan that a component runs at startup."
+  "expects": [
+    "data.custom-tables",
+    "api.composition-di"
+  ],
+  "description": "A custom table created by a migration plan that a component runs at startup.",
+  "note": "A component registered by a composer runs the migration, so the startup composition pattern (api.composition-di) fires too."
 }

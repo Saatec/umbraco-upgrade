@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.code-first-doctypes",
+  "title": "Code-first content type libraries",
+  "description": "Document types defined in C# attributes by a library and synchronized at startup.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "content-type-attribute",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\[\\s*(?:DocumentType|MediaType|MemberType)\\s*\\(",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "low",
+      "summary": "The types live in the database; the library needs a release for the target or is no longer needed.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "confirm-types-in-database",
+      "option": "Confirm the types exist in the database, then remove the library with an approval",
+      "when": "The types are in the database",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [],
+      "requiresApproval": "package-removal"
+    }
+  ],
+  "checks": [
+    {
+      "text": "All content types defined in code exist in the migrated local copy",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

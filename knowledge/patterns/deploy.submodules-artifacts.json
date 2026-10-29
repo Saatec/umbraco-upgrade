@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "deploy.submodules-artifacts",
+  "title": "Git submodules and committed build artifacts",
+  "description": "Submodules, committed archives, and build output paths pointing into other projects.",
+  "kind": "customization",
+  "area": "deployment-rehearsal",
+  "owner": "deployment-rehearsal",
+  "involves": [
+    "discovery"
+  ],
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "gitmodules",
+      "weight": "strong",
+      "files": [
+        ".gitmodules"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "committed-archive",
+      "weight": "strong",
+      "files": [
+        "**/*.zip",
+        "**/*.7z",
+        "**/*.rar"
+      ],
+      "excludeFiles": [
+        "**/media/created-packages/**"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "external-output-path",
+      "weight": "strong",
+      "files": [
+        "**/*.csproj"
+      ],
+      "regex": "<OutputPath>\\s*\\.\\.[\\\\/]",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "low",
+      "summary": "Deployment planning must account for code and assets outside the main project.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "flag-in-deployment-plan",
+      "option": "Exclude them from the migration inventory and list them in the deployment plan",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "The deployment plan lists each submodule and committed artifact",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

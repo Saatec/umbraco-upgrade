@@ -1,0 +1,153 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.non-core-editor-data",
+  "title": "Community or custom editor data",
+  "description": "Content stored by non-core property editors whose data format belongs to a package or to custom code.",
+  "kind": "customization",
+  "area": "packages-backoffice",
+  "owner": "migrate-packages-backoffice",
+  "involves": [
+    "migrate-content-database"
+  ],
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "community-package",
+      "weight": "strong",
+      "files": [
+        "**/*.csproj",
+        "**/*.vbproj",
+        "**/packages.config",
+        "**/Directory.Packages.props"
+      ],
+      "regex": "(?:\\bid|\\bInclude)\\s*=\\s*\"(?:Our\\.Umbraco\\.[\\w\\.]+)\"",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 8,
+      "difficulty": "medium",
+      "summary": "Third-party editor data is carried over as stored in 7, and custom editor configuration may need custom migrators.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-8.md",
+          "docsVersion": "18",
+          "appliesTo": "8",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco has no way of knowing how custom property editors have intended to structure their configuration data"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-8.md",
+          "docsVersion": "18",
+          "appliesTo": "8",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The migration will transform the data stored in third party editors as well"
+        }
+      ]
+    },
+    {
+      "crosses": 14,
+      "difficulty": "high",
+      "summary": "Property editors split into a server schema and a client UI; data types migrate on upgrade and AngularJS editor UIs are rebuilt.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-custom-property-editors-to-umbraco-14.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco 14 introduces a split between server-side and client-side Property Editor aliases"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-custom-property-editors-to-umbraco-14.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco automatically migrates all Data Types to include an EditorUiAlias value"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-backoffice-extensions-from-angularjs.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "AngularJS code does not run in the new backoffice, so you rebuild each extension"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "target-release",
+      "option": "Use the package release for the target (checked through package metadata)",
+      "when": "A release exists for the target",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/packages/installing-and-uninstalling-packages.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This article will cover the process of installing as well as uninstalling packages from your Umbraco CMS website"
+        }
+      ]
+    },
+    {
+      "id": "convert-to-core-editor",
+      "option": "Convert the data to a core editor with a migration tested on the local copy",
+      "when": "No release exists, or a core editor covers the need",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    },
+    {
+      "id": "custom-editor-with-schema",
+      "option": "Keep a custom editor: a new UI plus a server-side schema for the stored data",
+      "when": "The data format must stay",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-custom-property-editors-to-umbraco-14.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco 14 introduces a split between server-side and client-side Property Editor aliases"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-custom-property-editors-to-umbraco-14.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Since the migration moves the alias to EditorUiAlias"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Every data type that used the editor shows and saves its data in the backoffice of the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

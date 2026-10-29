@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/progproger/umbraco-upgrade/schemas/pattern.schema.json",
+  "title": "umbraco-upgrade pattern record",
+  "description": "One customization pattern in knowledge/patterns/: how discovery detects it, what changes when an upgrade crosses a given major, and the handling options a migrate-* skill chooses from. Schema version 1.1.0. Validated in the test suite with the subset in scripts/lib/JsonSchema.psm1.",
+  "type": "object",
+  "required": ["schemaVersion", "id", "title", "description", "kind", "area", "owner", "prevalence", "status", "detection", "flagOnly", "requiresDecision", "detectors", "impact", "handling", "checks", "sources"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "type": "string", "pattern": "^1\\.\\d+\\.\\d+$" },
+    "id": { "type": "string", "pattern": "^[a-z]+\\.[a-z0-9\\-]+$" },
+    "title": { "type": "string", "minLength": 1 },
+    "description": { "type": "string", "minLength": 1 },
+    "kind": { "description": "customization: project-specific work, counted for phases. baseline: present in default installations of some generation; reported separately and never counted as a customization.", "enum": ["customization", "baseline"] },
+    "area": { "enum": ["content-database", "application-framework", "custom-code", "packages-backoffice", "config-auth-integrations", "build-tests", "functional-verification", "deployment-rehearsal"] },
+    "owner": { "type": "string", "pattern": "^(migrate-[a-z\\-]+|deployment-rehearsal|discovery)$" },
+    "involves": { "type": "array", "items": { "type": "string", "pattern": "^(migrate-[a-z\\-]+|deployment-rehearsal|discovery)$" } },
+    "prevalence": { "enum": ["common", "universal", "gap", "project-specific"] },
+    "status": { "description": "verified when every impact entry cites an official page whose evidence phrase was confirmed; otherwise hypothesis.", "enum": ["verified", "hypothesis"] },
+    "detection": { "description": "static: detectors run in gate 1. package-metadata: classified at planning from NuGet metadata. database-review: checked on the declared local database copy.", "enum": ["static", "package-metadata", "database-review"] },
+    "flagOnly": { "type": "boolean" },
+    "requiresDecision": { "type": "boolean" },
+    "detectors": { "type": "array", "items": { "$ref": "#/$defs/detector" } },
+    "catchAll": {
+      "type": "object",
+      "required": ["files", "regex"],
+      "additionalProperties": false,
+      "properties": {
+        "files": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "regex": { "type": "string", "minLength": 1 }
+      }
+    },
+    "appliesWhen": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pathHasDatabaseStep": { "type": "boolean" },
+        "maxSourceMajor": { "type": "integer" },
+        "anyPattern": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "versionSignals": { "type": "object" },
+    "notes": { "type": "string" },
+    "impact": { "type": "array", "items": { "$ref": "#/$defs/impact" } },
+    "handling": { "type": "array", "items": { "$ref": "#/$defs/option" } },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["text", "verification"],
+        "additionalProperties": false,
+        "properties": {
+          "text": { "type": "string", "minLength": 1 },
+          "verification": { "enum": ["automated", "manual"] }
+        }
+      }
+    },
+    "sources": {
+      "description": "Pages that document the detection signals of older generations (fetched in Stage 2).",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["url", "appliesTo"],
+        "additionalProperties": false,
+        "properties": {
+          "url": { "type": "string", "pattern": "^https://" },
+          "appliesTo": { "type": "string" },
+          "fetchedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "generation": { "enum": ["v7", "v8", "v9-v13", "v14+"] },
+    "citation": {
+      "type": "object",
+      "required": ["url", "docsVersion", "appliesTo", "verifiedAt", "evidence"],
+      "additionalProperties": false,
+      "properties": {
+        "url": { "type": "string", "pattern": "^https://" },
+        "docsVersion": { "type": "string", "minLength": 1 },
+        "appliesTo": { "type": "string", "minLength": 1 },
+        "verifiedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "evidence": { "type": "string", "minLength": 5 }
+      }
+    },
+    "detector": {
+      "type": "object",
+      "required": ["id", "weight", "generations"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9\\-]+$" },
+        "weight": { "enum": ["strong", "supporting"] },
+        "files": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "regex": { "type": "string", "minLength": 1 },
+        "pluginScope": { "enum": ["matched", "unmatched"] },
+        "excludeFiles": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "derived": { "enum": ["app-plugin-orphan", "implicit-namespace", "package-metadata"] },
+        "namespaces": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["namespace", "packages"],
+            "additionalProperties": false,
+            "properties": {
+              "namespace": { "type": "string", "minLength": 1 },
+              "packages": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+            }
+          }
+        },
+        "generations": { "type": "array", "items": { "$ref": "#/$defs/generation" } }
+      }
+    },
+    "impact": {
+      "type": "object",
+      "required": ["crosses", "difficulty", "summary", "status", "sources"],
+      "additionalProperties": false,
+      "properties": {
+        "crosses": { "description": "Applies when the source major is below this major and the target major is at or above it.", "type": "integer" },
+        "difficulty": { "enum": ["low", "medium", "high"] },
+        "summary": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["verified", "hypothesis"] },
+        "sources": { "type": "array", "items": { "$ref": "#/$defs/citation" } }
+      }
+    },
+    "option": {
+      "type": "object",
+      "required": ["id", "option", "when", "targets", "status", "sources"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9\\-]+$" },
+        "option": { "type": "string", "minLength": 1 },
+        "when": { "type": "string", "minLength": 1 },
+        "targets": { "type": "array", "items": { "$ref": "#/$defs/generation" } },
+        "status": { "enum": ["verified", "hypothesis"] },
+        "sources": { "type": "array", "items": { "$ref": "#/$defs/citation" } },
+        "requiresApproval": { "enum": ["db-migration-local", "db-snapshot-local", "package-removal", "ci-deploy-config-change", "outside-project-path", "remove-custom-feature"] }
+      }
+    }
+  }
+}

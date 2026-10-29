@@ -1,0 +1,8 @@
+{
+  "id": "p.conf.static-reader",
+  "baseline": "gen.v13",
+  "expects": [
+    "config.static-readers"
+  ],
+  "description": "A static class that builds configuration from a JSON file by itself."
+}

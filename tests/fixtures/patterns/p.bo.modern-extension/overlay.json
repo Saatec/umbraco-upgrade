@@ -1,0 +1,9 @@
+{
+  "id": "p.bo.modern-extension",
+  "baseline": "gen.v14plus",
+  "expects": [],
+  "expectsBaseline": [
+    "backoffice.modern-extension"
+  ],
+  "description": "A Management API controller next to the modern extension of the baseline (a baseline signal)."
+}

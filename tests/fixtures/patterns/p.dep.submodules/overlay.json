@@ -1,0 +1,8 @@
+{
+  "id": "p.dep.submodules",
+  "baseline": "gen.v13",
+  "expects": [
+    "deploy.submodules-artifacts"
+  ],
+  "description": "A git submodule for shared front-end assets."
+}

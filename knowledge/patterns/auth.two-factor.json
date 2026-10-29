@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "auth.two-factor",
+  "title": "Two-factor authentication providers",
+  "description": "Two-factor providers for users or members.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "gap",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": true,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "two-factor-provider",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bITwoFactorProvider\\b|\\bAddTwoFactorProvider\\b",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "User two-factor setup needs a client-side registration.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This has been moved to the Backoffice client and requires a registration through the new extension type"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/run-in-production/security/two-factor-authentication.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco users and members support a two-factor authentication (2FA) abstraction for implementing a 2FA provider of your choice"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "mfa-extension",
+      "option": "Register the provider for the new backoffice client",
+      "when": "Target 14 or later",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This has been moved to the Backoffice client and requires a registration through the new extension type"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/run-in-production/security/two-factor-authentication.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco users and members support a two-factor authentication (2FA) abstraction for implementing a 2FA provider of your choice"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "A test user enrolls and signs in with the second factor on the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

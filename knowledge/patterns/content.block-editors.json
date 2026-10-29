@@ -1,0 +1,173 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.block-editors",
+  "title": "Block list and block grid page builders",
+  "description": "Pages composed of element types rendered through block partials, with block models in code.",
+  "kind": "customization",
+  "area": "content-database",
+  "owner": "migrate-content-database",
+  "involves": [
+    "migrate-custom-code"
+  ],
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "block-alias",
+      "weight": "strong",
+      "files": [
+        "**/*.config",
+        "**/*.json",
+        "**/*.xml",
+        "**/*.config.js",
+        "**/*.uda"
+      ],
+      "regex": "\\bUmbraco\\.Block(?:List|Grid)\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "block-model",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\bBlock(?:List|Grid)Model\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "block-partials",
+      "weight": "supporting",
+      "files": [
+        "**/Views/Partials/blocklist/**",
+        "**/Views/Partials/blockgrid/**"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 15,
+      "difficulty": "medium",
+      "summary": "The block editor data format changes and a content migration runs on upgrade; it can be long on large sites.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-15.md",
+          "docsVersion": "18",
+          "appliesTo": "15+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco 15 changes the internal data format of all"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-15.md",
+          "docsVersion": "18",
+          "appliesTo": "15+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "might require a long-running content migration"
+        }
+      ]
+    },
+    {
+      "crosses": 18,
+      "difficulty": "medium",
+      "summary": "Block lists in single mode migrate to the single block editor; custom editors that nest block lists need a processor.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/single-block-migration.md",
+          "docsVersion": "18",
+          "appliesTo": "18",
+          "verifiedAt": "2026-10-29",
+          "evidence": "It now runs by default during the upgrade to Umbraco 18"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "18+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Sites with custom property editors that nest block list values must implement ITypedSingleBlockListProcessor"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "run-documented-migration",
+      "option": "Let the documented migration run on the local copy and time it",
+      "when": "The path crosses 15 or 18",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-15.md",
+          "docsVersion": "18",
+          "appliesTo": "15+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco 15 changes the internal data format of all"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/single-block-migration.md",
+          "docsVersion": "18",
+          "appliesTo": "18",
+          "verifiedAt": "2026-10-29",
+          "evidence": "It now runs by default during the upgrade to Umbraco 18"
+        }
+      ]
+    },
+    {
+      "id": "single-block-processor",
+      "option": "Implement the documented processor for custom editors that nest block lists",
+      "when": "A custom editor nests block list values and the path crosses 18",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/single-block-migration.md",
+          "docsVersion": "18",
+          "appliesTo": "18",
+          "verifiedAt": "2026-10-29",
+          "evidence": "If your non-core property editor nests content and stores it within its own value, you must extend the migration"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "18+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Sites with custom property editors that nest block list values must implement ITypedSingleBlockListProcessor"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Block content renders on the local site after the data migration",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

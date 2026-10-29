@@ -1,0 +1,8 @@
+{
+  "id": "p.ext.payment",
+  "baseline": "gen.v13",
+  "expects": [
+    "ext.payment-gateway"
+  ],
+  "description": "A payment callback endpoint and a form that posts to a hosted payment page."
+}

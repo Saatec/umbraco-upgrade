@@ -1,0 +1,8 @@
+{
+  "id": "p.data.raw-sql-custom",
+  "baseline": "gen.v13",
+  "expects": [
+    "data.raw-sql-custom"
+  ],
+  "description": "A repository that reads a custom table with hand-written SQL through the CMS database."
+}

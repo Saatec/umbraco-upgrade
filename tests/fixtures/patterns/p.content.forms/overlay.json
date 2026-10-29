@@ -1,0 +1,8 @@
+{
+  "id": "p.content.forms",
+  "baseline": "gen.v13",
+  "expects": [
+    "content.forms"
+  ],
+  "description": "The forms add-on with a custom field type."
+}

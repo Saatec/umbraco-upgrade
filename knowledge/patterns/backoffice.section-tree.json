@@ -1,0 +1,157 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "backoffice.section-tree",
+  "title": "Custom backoffice sections and trees",
+  "description": "New backoffice sections or trees for managing custom data, defined by tree controllers, section classes, or legacy tree and application configuration.",
+  "kind": "customization",
+  "area": "packages-backoffice",
+  "owner": "migrate-packages-backoffice",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "tree-attribute",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\[\\s*(?:Umbraco)?Tree\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13"
+      ]
+    },
+    {
+      "id": "tree-controller",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?(?:TreeController|FileSystemTreeController)\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13"
+      ]
+    },
+    {
+      "id": "section-class",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?ISection\\b|\\bSectionService\\.MakeNew\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13"
+      ]
+    },
+    {
+      "id": "legacy-tree-config",
+      "weight": "strong",
+      "files": [
+        "**/config/trees.config"
+      ],
+      "regex": "type=\"(?![Uu]mbraco\\.)[^\"]+\"",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "high",
+      "summary": "Sections and trees become section, tree, and workspace extensions; backoffice controllers are replaced by Management API controllers.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/backoffice-extensions/extending-overview/extension-types/sections.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "A comprehensive summary of the available extension types associated with sections"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "BackOffice controllers have been replaced with the Management API"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/tutorials/creating-a-backoffice-api.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "To create a custom API, you need to create a class that inherits from Umbraco.Cms.Api.Management.Controllers.ManagementApiControllerBase"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "keep-on-13",
+      "option": "Port to the 13 section and tree controller APIs",
+      "when": "Target 13 or earlier",
+      "targets": [
+        "v9-v13"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/section-trees.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "You can create your own sections and trees to extend Umbraco"
+        }
+      ]
+    },
+    {
+      "id": "section-tree-extensions",
+      "option": "Rebuild as section, tree, and workspace extensions with a Management API controller for the data",
+      "when": "Target 14 or later",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/backoffice-extensions/extending-overview/extension-types/sections.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "A comprehensive summary of the available extension types associated with sections"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/tutorials/creating-a-backoffice-api.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "To create a custom API, you need to create a class that inherits from Umbraco.Cms.Api.Management.Controllers.ManagementApiControllerBase"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "We recommend basing your Backoffice APIs on the ManagementApiControllerBase class"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "The section and tree show and manage their data on the local site for each permitted user group",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

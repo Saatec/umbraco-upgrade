@@ -1,0 +1,105 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "code.vendored-source",
+  "title": "Vendored third-party source in the solution",
+  "description": "A starter kit, theme, or package imported as full source and modified. It looks like custom code but has an upstream owner.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "involves": [
+    "discovery"
+  ],
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": true,
+  "detectors": [
+    {
+      "id": "created-packages",
+      "weight": "strong",
+      "files": [
+        "**/App_Data/packages/createdPackages.config"
+      ],
+      "regex": "<package\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "package-action",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?IPackageAction\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "packaged-zip",
+      "weight": "strong",
+      "files": [
+        "**/media/created-packages/*.zip"
+      ],
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "The vendored code needs its own port, an upstream release for the target, or a redesign.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "upstream-release",
+      "option": "Replace the vendored copy with an upstream release for the target, re-applying local changes",
+      "when": "An upstream release exists for the target",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    },
+    {
+      "id": "port-as-custom-code",
+      "option": "Port it as custom code",
+      "when": "No upstream release exists and the code is still used",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    },
+    {
+      "id": "redesign",
+      "option": "Redesign the feature on the target platform",
+      "when": "The vendored design does not fit the target",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "The user has chosen port, replace, or redesign for the vendored code, and the choice is recorded",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

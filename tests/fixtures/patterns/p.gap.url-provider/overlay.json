@@ -1,0 +1,8 @@
+{
+  "id": "p.gap.url-provider",
+  "baseline": "gen.v13",
+  "expects": [
+    "api.url-providers"
+  ],
+  "description": "A custom URL provider for product pages."
+}

@@ -500,6 +500,75 @@ Describe 'Session context hook' -Tag 'fixture-based' {
         $r2.ExitCode | Should -Be 0
         $r2.StdOut | Should -BeNullOrEmpty
     }
+
+    It 'restates the no-removal rule and names the phase in progress during plan execution' {
+        $d = New-ApprovedUpgradeProject -StartFirstPhase
+        try {
+            $payload = @{ session_id = 's'; cwd = $d; hook_event_name = 'SessionStart'; source = 'startup' } | ConvertTo-Json -Compress
+            $r = Invoke-PluginScript -Script 'scripts/hooks/session-context.ps1' -StdIn $payload
+            $r.StdOut | Should -Match ([regex]::Escape('Never remove, stub, or disable custom functionality to make the project compile.'))
+            $r.StdOut | Should -Match 'Phase in progress: P1\.'
+            $r.StdOut | Should -Match 'state\.ps1" unresolved -ProjectRoot'
+            Test-Path ([regex]::Match($r.StdOut, '-File "([^"]+state\.ps1)"').Groups[1].Value) | Should -BeTrue
+        } finally { Remove-TestDirectory $d }
+    }
+}
+
+Describe 'Guard and deleting tracked project files' -Tag 'fixture-based' {
+    BeforeAll {
+        $script:exec = New-ApprovedUpgradeProject -Baseline 'gen.v13' -Overlay 'p.bo.authorized-api' -StartFirstPhase
+        [System.IO.File]::WriteAllText((Join-Path $script:exec 'scratch-note.txt'), 'untracked')
+        function Get-AskRule($r) { if (-not $r.StdOut) { return $null }; return [regex]::Match(($r.StdOut | ConvertFrom-Json).hookSpecificOutput.permissionDecisionReason, '\[([a-z\.\-]+)\]').Groups[1].Value }
+    }
+    AfterAll { Remove-TestDirectory $script:exec }
+
+    It 'asks before <tool> deletes tracked files: <cmd>' -ForEach @(
+        @{ tool = 'Bash'; cmd = 'git rm -q Backoffice/ExportApiController.cs' }
+        @{ tool = 'Bash'; cmd = 'git rm --cached Backoffice/ExportApiController.cs' }
+        @{ tool = 'Bash'; cmd = 'rm -f Backoffice/ExportApiController.cs' }
+        @{ tool = 'Bash'; cmd = 'rm -rf Backoffice' }
+        @{ tool = 'Bash'; cmd = 'rm Backoffice/*.cs' }
+        @{ tool = 'Bash'; cmd = 'cd Backoffice && rm ExportServerVariables.cs' }
+        @{ tool = 'Bash'; cmd = 'f=Backoffice/ExportApiController.cs; rm "$f"' }
+        @{ tool = 'PowerShell'; cmd = 'Remove-Item -LiteralPath Backoffice\ExportApiController.cs -Force' }
+        @{ tool = 'PowerShell'; cmd = 'Remove-Item Backoffice -Recurse -Force' }
+        @{ tool = 'PowerShell'; cmd = 'del .\Backoffice\ExportServerVariables.cs' }
+    ) {
+        $r = Invoke-Guard -ToolName $tool -ToolInput @{ command = $cmd } -Cwd $script:exec
+        $r.ExitCode | Should -Be 0
+        Get-AskRule $r | Should -Be 'approval.project-file-delete'
+        Test-Path (Join-Path $script:exec 'Backoffice/ExportApiController.cs') | Should -BeTrue
+    }
+
+    It 'lets through deletes of untracked files, build output, the state folder, and dry runs: <cmd>' -ForEach @(
+        @{ tool = 'Bash'; cmd = 'rm -f scratch-note.txt' }
+        @{ tool = 'Bash'; cmd = 'rm -rf bin obj' }
+        @{ tool = 'Bash'; cmd = 'rm -f .umbraco-upgrade/tmp/out.txt' }
+        @{ tool = 'Bash'; cmd = 'git rm -n Backoffice/ExportApiController.cs' }
+        @{ tool = 'Bash'; cmd = 'rm -rf /tmp/uu-not-a-project-path' }
+    ) {
+        $r = Invoke-Guard -ToolName $tool -ToolInput @{ command = $cmd } -Cwd $script:exec
+        $r.ExitCode | Should -Be 0
+        $r.StdOut | Should -BeNullOrEmpty
+    }
+
+    It 'lets a delete through when a remove-custom-feature approval names the files' {
+        [void](Invoke-PluginScript -Script 'scripts/state.ps1' -Arguments @('approve', '-ProjectRoot', $script:exec, '-Action', 'remove-custom-feature', '-Decision', 'approved', '-Scope', 'Backoffice/ExportApiController.cs', '-Note', 'The user retired the export endpoint.'))
+        (Invoke-Guard -ToolName 'Bash' -ToolInput @{ command = 'git rm -q Backoffice/ExportApiController.cs' } -Cwd $script:exec).StdOut | Should -BeNullOrEmpty
+        Get-AskRule (Invoke-Guard -ToolName 'Bash' -ToolInput @{ command = 'rm -rf Backoffice' } -Cwd $script:exec) | Should -Be 'approval.project-file-delete'
+    }
+
+    It 'blocks deletes of tracked files before plan approval and in plan mode' {
+        $r = Invoke-Guard -ToolName 'Bash' -ToolInput @{ command = 'rm -f Program.cs' } -Cwd $script:proj
+        $r.ExitCode | Should -Be 2
+        $r.StdErr | Should -Match ([regex]::Escape('[project.write-before-approval]'))
+        $plan = New-UpgradeProject -Baseline 'gen.v13' -Mode plan
+        try {
+            $r = Invoke-Guard -ToolName 'PowerShell' -ToolInput @{ command = 'Remove-Item Program.cs' } -Cwd $plan
+            $r.ExitCode | Should -Be 2
+            $r.StdErr | Should -Match ([regex]::Escape('[project.plan-mode-write]'))
+        } finally { Remove-TestDirectory $plan }
+    }
 }
 
 Describe 'hooks.json' -Tag 'fixture-based' {
@@ -516,5 +585,6 @@ Describe 'hooks.json' -Tag 'fixture-based' {
         }
         @($h.hooks.PreToolUse | ForEach-Object { $_.matcher }) | Should -Contain 'Bash|PowerShell'
         @($h.hooks.PostToolUse.hooks | ForEach-Object { $_.if }) | Should -Contain 'Read(//**/appsettings*.json)'
+        @($h.hooks.PostToolUse | ForEach-Object { $_.matcher }) | Should -Contain 'Grep'
     }
 }

@@ -1,0 +1,8 @@
+{
+  "id": "p.data.secondary-store",
+  "baseline": "gen.v8",
+  "expects": [
+    "data.secondary-datastore"
+  ],
+  "description": "A second database reached through an ORM context."
+}

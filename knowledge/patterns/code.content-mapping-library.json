@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "code.content-mapping-library",
+  "title": "Mapping libraries over published content",
+  "description": "A library maps published content to hand-written classes through attributes or conventions, usually with generic As<T>() calls.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "generic-as-call",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\.As<\\s*\\w+(?:\\.\\w+)*\\s*>\\s*\\(\\s*\\)",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "mapping-package",
+      "weight": "supporting",
+      "files": [
+        "**/*.csproj",
+        "**/*.vbproj",
+        "**/packages.config",
+        "**/Directory.Packages.props"
+      ],
+      "regex": "(?:\\bid|\\bInclude)\\s*=\\s*\"(?:[\\w\\.]*Umbraco[\\w\\.]*(?:Mapper|Mapping)[\\w\\.]*)\"",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "A mapping library needs a release for the target generation, or a replacement.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "models-builder-plus-mapping",
+      "option": "Use generated models and map by hand where a view model is needed",
+      "when": "No maintained release of the library supports the target",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/templating/modelsbuilder/builder-modes.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The mode is indicated by the Umbraco:CMS:ModelsBuilder:ModelsMode key in the configuration"
+        }
+      ]
+    },
+    {
+      "id": "maintained-mapper",
+      "option": "Keep a mapping library that has a release for the target (checked through package metadata)",
+      "when": "Package metadata shows a release for the target",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Every view model built by the library has the same values before and after (spot-check pages)",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

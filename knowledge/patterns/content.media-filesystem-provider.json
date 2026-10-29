@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.media-filesystem-provider",
+  "title": "Custom media file system providers",
+  "description": "Media stored outside the local file system, through a custom file system or a cloud storage provider.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "gap",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": true,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "custom-filesystem",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?IFileSystem\\b|\\bSetMediaFileSystem\\b|\\bAddAzureBlobMediaFileSystem\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "legacy-provider-config",
+      "weight": "strong",
+      "files": [
+        "**/config/FileSystemProviders.config"
+      ],
+      "regex": "type=\"(?!Umbraco\\.Core\\.IO\\.PhysicalFileSystem)[^\"]+\"",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "Media file systems are configured in code with a provider package for the target.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/filesystemproviders.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco uses an instance of PhysicalFileSystem to handle the storage location of the media archive"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/filesystemproviders/azure-blob-storage.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The setup consists of adding a package to your site, setting the correct configuration, and adding the services and middleware"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/server-side-extensions/filesystemproviders/azure-blob-storage.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The setup consists of adding a package to your site, setting the correct configuration, and adding the services and middleware"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "provider-for-target",
+      "option": "Use the provider package release for the target and configure it at startup",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/filesystemproviders/azure-blob-storage.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The setup consists of adding a package to your site, setting the correct configuration, and adding the services and middleware"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/server-side-extensions/filesystemproviders/azure-blob-storage.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The setup consists of adding a package to your site, setting the correct configuration, and adding the services and middleware"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Media upload and display work against a test storage account from the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

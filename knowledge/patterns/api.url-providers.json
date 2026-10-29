@@ -1,0 +1,119 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "api.url-providers",
+  "title": "Custom URL providers",
+  "description": "Code that changes how content URLs are generated.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "gap",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": true,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "url-provider",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bIUrlProvider\\b|:\\s*(?:[\\w\\.]+\\.)?(?:DefaultUrlProvider|NewDefaultUrlProvider)\\b|\\bUrlProviderResolver\\b|\\bUrlProviders\\s*\\(\\s*\\)",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "low",
+      "summary": "URL providers are part of the outbound request pipeline.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/request-pipeline/outbound-pipeline.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The outbound pipeline consists out of the following steps"
+        }
+      ]
+    },
+    {
+      "crosses": 17,
+      "difficulty": "medium",
+      "summary": "URL providers generate preview URLs and need a unique alias.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "17+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "the IUrlProvider interface has been extended with the GetPreviewUrlAsync() method"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/backend-and-custom-logic/routing/request-pipeline/outbound-pipeline.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The outbound pipeline consists out of the following steps"
+        }
+      ]
+    },
+    {
+      "crosses": 18,
+      "difficulty": "low",
+      "summary": "The default URL provider class is renamed.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "18+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "the replacements have been renamed to drop the suffix"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "port-url-provider",
+      "option": "Port to the target interface and register it in the URL provider collection",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/request-pipeline/outbound-pipeline.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The outbound pipeline consists out of the following steps"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "17+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "the IUrlProvider interface has been extended with the GetPreviewUrlAsync() method"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Generated URLs and preview URLs match the expected values on the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

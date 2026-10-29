@@ -1,0 +1,133 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "auth.external-member-login",
+  "title": "External sign-in for members",
+  "description": "Members sign in through an external identity provider (OpenID Connect or OAuth).",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "owin-oidc",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bUseOpenIdConnectAuthentication\\b|\\[\\s*assembly\\s*:\\s*OwinStartup",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "owin-package",
+      "weight": "strong",
+      "files": [
+        "**/*.csproj",
+        "**/*.vbproj",
+        "**/packages.config",
+        "**/Directory.Packages.props"
+      ],
+      "regex": "(?:\\bid|\\bInclude)\\s*=\\s*\"(?:Microsoft\\.Owin\\.Security\\.[\\w\\.]+)\"",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "member-external-login",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bAddMemberExternalLogins\\b|\\bAddOpenIdConnect\\s*\\(",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "From 9, users and members support external login providers (OAuth) through the CMS external login support.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/security/external-login-providers.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Both the Umbraco backoffice users and website members support external login providers (OAuth) for performing authentication"
+        }
+      ]
+    },
+    {
+      "crosses": 14,
+      "difficulty": "low",
+      "summary": "Member external logins are documented the same way for the new backoffice generation.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/run-in-production/security/external-login-providers.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Both the Umbraco backoffice users and website members support external login providers (OAuth) for performing authentication"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "member-external-login-api",
+      "option": "Register the provider through the member external login API",
+      "when": "The provider supports OpenID Connect or OAuth",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/security/external-login-providers.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Both the Umbraco backoffice users and website members support external login providers (OAuth) for performing authentication"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/run-in-production/security/external-login-providers.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Both the Umbraco backoffice users and website members support external login providers (OAuth) for performing authentication"
+        }
+      ]
+    },
+    {
+      "id": "manual-sign-in",
+      "option": "Keep a manual OpenID Connect sign-in that signs members in through the member sign-in manager",
+      "when": "The flow needs custom claims handling",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "A test member signs in through the external provider against a test tenant, never production",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

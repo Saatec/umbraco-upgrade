@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "backoffice.package-copied-assets",
+  "title": "Package assets copied into App_Plugins",
+  "description": "A package that copies its backoffice files into App_Plugins on build, so a folder that matches a package reference holds a package.manifest.",
+  "kind": "customization",
+  "area": "packages-backoffice",
+  "owner": "migrate-packages-backoffice",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "matched-manifest",
+      "weight": "strong",
+      "files": [
+        "**/App_Plugins/*/package.manifest"
+      ],
+      "pluginScope": "matched",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "low",
+      "summary": "package.manifest is no longer supported; the package needs its release for the target.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The package.manifest file is no longer supported and has been replaced with the umbraco-package.json file"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "upgrade-package",
+      "option": "Upgrade the package to its release for the target, then remove the old copied folder with an approval",
+      "when": "A release exists for the target",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The package.manifest file is no longer supported and has been replaced with the umbraco-package.json file"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/packages/installing-and-uninstalling-packages.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This article will cover the process of installing as well as uninstalling packages from your Umbraco CMS website"
+        }
+      ],
+      "requiresApproval": "package-removal"
+    }
+  ],
+  "checks": [
+    {
+      "text": "The package UI works on the local site and the old copied folder is gone from source control",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

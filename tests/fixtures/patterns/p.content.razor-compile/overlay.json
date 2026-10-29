@@ -1,0 +1,9 @@
+{
+  "id": "p.content.razor-compile",
+  "baseline": "gen.v14plus",
+  "expects": [],
+  "expectsBaseline": [
+    "content.razor-compilation"
+  ],
+  "description": "A project that disables view compilation at build and publish (a baseline signal)."
+}

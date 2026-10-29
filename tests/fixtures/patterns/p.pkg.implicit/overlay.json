@@ -1,0 +1,8 @@
+{
+  "id": "p.pkg.implicit",
+  "baseline": "gen.v13",
+  "expects": [
+    "pkg.implicit-transitive"
+  ],
+  "description": "Code that uses a JSON library no direct package reference provides."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "p.code.content-write",
+  "baseline": "gen.v13",
+  "expects": [
+    "code.content-write"
+  ],
+  "description": "A service that creates and publishes content from a front-end request."
+}

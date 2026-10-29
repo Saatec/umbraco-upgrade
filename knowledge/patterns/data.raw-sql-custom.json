@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "data.raw-sql-custom",
+  "title": "Raw SQL over custom tables",
+  "description": "Repositories issue hand-written SQL through the CMS database object.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "database-call",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\b(?:Database|_database|database|db|_db)\\.(?:Fetch|Execute|Query|Single|SingleOrDefault|First|FirstOrDefault|Page|ExecuteScalar)\\s*[<(]",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "sql-builder",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "new\\s+Sql\\s*[<(]|\\bSql<ISqlContext>",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "low",
+      "summary": "The CMS ships NPoco for database access, documented with custom tables.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/server-side-extensions/database.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "NPoco allows custom database tables to be added to your site"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/server-side-extensions/database.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco ships with"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "keep-sql",
+      "option": "Keep the SQL and port the data access calls",
+      "when": "The database engine does not change",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/server-side-extensions/database.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco ships with"
+        }
+      ]
+    },
+    {
+      "id": "review-engine-sql",
+      "option": "Rewrite engine-specific SQL",
+      "when": "The database engine changes",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each repository method returns the same rows on the migrated local copy",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

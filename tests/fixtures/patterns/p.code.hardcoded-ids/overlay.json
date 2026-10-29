@@ -1,0 +1,8 @@
+{
+  "id": "p.code.hardcoded-ids",
+  "baseline": "gen.v13",
+  "expects": [
+    "code.hardcoded-ids"
+  ],
+  "description": "An integer node ID in configuration and in a content lookup."
+}

@@ -390,6 +390,15 @@ function Set-PhaseStatus {
     if ($state['gates']['planApproval']['status'] -ne 'approved') { throw 'Phases can start only after the plan is approved.' }
     $phase = @($state['phases']) | Where-Object { $_['id'] -eq $PhaseId } | Select-Object -First 1
     if ($null -eq $phase) { throw "Unknown phase '$PhaseId'." }
+    if ($Status -eq 'in-progress') {
+        $check = Test-PlanHash -ProjectRoot $ProjectRoot
+        if (-not $check.matches) { throw 'plan.md changed after approval. The approval no longer covers it; request approval again.' }
+        if ($state['gates']['safety']['status'] -ne 'passed') { throw 'Phases can start only after gate 3 (safety setup) has passed.' }
+        foreach ($p in @($state['phases'])) {
+            if ($p['id'] -eq $PhaseId) { break }
+            if ($p['status'] -notin @('done', 'deferred')) { throw "Phase $($p['id']) is '$($p['status'])'. Phases run in plan order; finish or defer it first." }
+        }
+    }
     if ($Status -eq 'done') {
         $open = @($phase['acceptanceCriteria'] | Where-Object { $_['status'] -notin @('met', 'waived') })
         if ($open.Count -gt 0) { throw "Phase $PhaseId has unmet acceptance criteria: $((@($open) | ForEach-Object { $_['id'] }) -join ', ')." }
@@ -399,6 +408,59 @@ function Set-PhaseStatus {
     if ($Status -eq 'in-progress' -and -not $phase['startedAt']) { $phase['startedAt'] = Get-UtcTimestamp }
     $phase['status'] = $Status
     return (Save-UpgradeState -ProjectRoot $ProjectRoot -State $state -Event 'phase' -Detail "$PhaseId=$Status")
+}
+
+function Set-AcceptanceCriterion {
+    # Records the result of one acceptance criterion. met needs evidence files under .umbraco-upgrade/; waived needs
+    # the user's words in -Note (a waiver is the user's decision, never the agent's).
+    param(
+        [Parameter(Mandatory)][string]$ProjectRoot, [Parameter(Mandatory)][string]$PhaseId, [Parameter(Mandatory)][string]$CriterionId,
+        [Parameter(Mandatory)][ValidateSet('met', 'not-met', 'waived', 'pending')][string]$Status, [string[]]$Evidence = @(), [string]$Note = ''
+    )
+    $state = Read-UpgradeState $ProjectRoot
+    if ($state['gates']['planApproval']['status'] -ne 'approved') { throw 'Acceptance criteria are recorded only after the plan is approved.' }
+    $phase = @($state['phases']) | Where-Object { $_['id'] -eq $PhaseId } | Select-Object -First 1
+    if ($null -eq $phase) { throw "Unknown phase '$PhaseId'." }
+    if ($phase['status'] -ne 'in-progress') { throw "Phase $PhaseId is '$($phase['status'])', not in progress." }
+    $ac = @($phase['acceptanceCriteria']) | Where-Object { $_['id'] -eq $CriterionId } | Select-Object -First 1
+    if ($null -eq $ac) { throw "Unknown acceptance criterion '$CriterionId' in phase $PhaseId." }
+    $ev = @($Evidence | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+    $dir = Get-StateDir $ProjectRoot
+    foreach ($e in $ev) {
+        if ($e -match '(^|[\\/])\.\.([\\/]|$)' -or [System.IO.Path]::IsPathRooted($e)) { throw "Evidence '$e' must be a path relative to .umbraco-upgrade/." }
+        if (-not [System.IO.File]::Exists((Join-Path $dir $e))) { throw "Evidence file '$e' does not exist under .umbraco-upgrade/." }
+    }
+    if ($Status -eq 'met' -and $ev.Count -eq 0) { throw "Criterion $CriterionId can be met only with evidence (write it with Write-Evidence.ps1 first)." }
+    if ($Status -eq 'waived' -and -not $Note.Trim()) { throw 'A waiver needs the user''s words in -Note.' }
+    $ac['status'] = $Status
+    if ($ev.Count -gt 0) { $ac['evidence'] = @(@($ac['evidence']) + $ev | Where-Object { $_ } | Select-Object -Unique) }
+    $detail = "$PhaseId $CriterionId=$Status"
+    if ($Note) { $detail += " note: $Note" }
+    return (Save-UpgradeState -ProjectRoot $ProjectRoot -State $state -Event 'criterion' -Detail $detail)
+}
+
+function Add-PhaseFailure {
+    # Records a failure with its recovery steps (A7). The phase keeps its status unless -Status is given.
+    param([Parameter(Mandatory)][string]$ProjectRoot, [Parameter(Mandatory)][string]$PhaseId, [Parameter(Mandatory)][string]$Summary, [Parameter(Mandatory)][string]$Recovery, [string]$EvidenceFile = $null)
+    $state = Read-UpgradeState $ProjectRoot
+    $phase = @($state['phases']) | Where-Object { $_['id'] -eq $PhaseId } | Select-Object -First 1
+    if ($null -eq $phase) { throw "Unknown phase '$PhaseId'." }
+    $rec = [ordered]@{ at = (Get-UtcTimestamp); summary = $Summary; recovery = $Recovery; evidence = $(if ($EvidenceFile) { $EvidenceFile } else { $null }) }
+    $phase['failures'] = @(@($phase['failures']) + $rec)
+    return (Save-UpgradeState -ProjectRoot $ProjectRoot -State $state -Event 'phase-failure' -Detail "$PhaseId $Summary")
+}
+
+function Set-UnresolvedStatus {
+    # Updates an unresolved item after the user answered. The decision text and its sources go to decisions.md.
+    param([Parameter(Mandatory)][string]$ProjectRoot, [Parameter(Mandatory)][string]$Id, [ValidateSet('awaiting-user', 'decided', 'resolved', 'deferred')][string]$Status = 'decided', [ValidateSet('', 'undecided', 'port', 'replace', 'redesign')][string]$Proposal = '', [string]$Decision = '')
+    $state = Read-UpgradeState $ProjectRoot
+    $u = @($state['unresolved']) | Where-Object { $_['id'] -eq $Id } | Select-Object -First 1
+    if ($null -eq $u) { throw "Unknown unresolved item '$Id'." }
+    if ($Status -in @('decided', 'resolved') -and -not $Decision) { throw "Give the decision id (-Decision D-xxx) that records the user's answer in decisions.md." }
+    if ($Decision -and @($state['decisions']) -notcontains $Decision) { throw "Unknown decision '$Decision'." }
+    $u['status'] = $Status
+    if ($Proposal) { $u['proposal'] = $Proposal }
+    return (Save-UpgradeState -ProjectRoot $ProjectRoot -State $state -Event 'unresolved-update' -Detail "$Id=$Status $Decision")
 }
 
 function Set-PhaseCheckpoint {
@@ -424,4 +486,4 @@ function Update-StateSchemaVersion {
     return [ordered]@{ from = $from; to = $script:SchemaVersion; changed = $true }
 }
 
-Export-ModuleMember -Function Get-StateDir, Get-StatePath, Test-StateExists, Get-PluginVersion, Get-StateSchema, Test-UpgradeState, Read-UpgradeState, Save-UpgradeState, New-UpgradeState, Set-UpgradeGate, Set-GateFields, Request-PlanApproval, Add-Approval, Test-ApprovalAvailable, Test-PlanHash, Update-StateSection, Add-Decision, Add-Unresolved, Set-UpgradePhases, Set-PhaseStatus, Set-PhaseCheckpoint, Update-StateSchemaVersion, Get-PlanPath
+Export-ModuleMember -Function Get-StateDir, Get-StatePath, Test-StateExists, Get-PluginVersion, Get-StateSchema, Test-UpgradeState, Read-UpgradeState, Save-UpgradeState, New-UpgradeState, Set-UpgradeGate, Set-GateFields, Request-PlanApproval, Add-Approval, Test-ApprovalAvailable, Test-PlanHash, Update-StateSection, Add-Decision, Add-Unresolved, Set-UpgradePhases, Set-PhaseStatus, Set-PhaseCheckpoint, Set-AcceptanceCriterion, Add-PhaseFailure, Set-UnresolvedStatus, Update-StateSchemaVersion, Get-PlanPath

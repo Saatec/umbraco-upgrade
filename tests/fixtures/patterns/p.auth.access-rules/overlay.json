@@ -1,0 +1,8 @@
+{
+  "id": "p.auth.access-rules",
+  "baseline": "gen.v13",
+  "expects": [
+    "auth.access-rules"
+  ],
+  "description": "A custom access check that uses the public access service."
+}

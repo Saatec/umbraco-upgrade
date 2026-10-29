@@ -1,24 +1,200 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "id": "backoffice.angular-property-editor",
   "title": "Project-authored AngularJS property editors",
-  "description": "Property editors registered in a package.manifest under App_Plugins, with AngularJS controllers and HTML views. The backoffice from v14 on no longer runs AngularJS.",
+  "description": "Property editors registered in a package.manifest under App_Plugins, with AngularJS controllers and HTML views, in a folder that matches no package reference. The backoffice from 14 on no longer runs AngularJS.",
+  "kind": "customization",
   "area": "packages-backoffice",
   "owner": "migrate-packages-backoffice",
   "prevalence": "common",
-  "status": "hypothesis",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
   "detectors": [
-    { "id": "manifest-property-editors", "weight": "strong", "files": ["**/App_Plugins/*/package.manifest"], "regex": "\"propertyEditors\"\\s*:\\s*\\[\\s*\\{", "generations": ["v7", "v8", "v9-v13"] },
-    { "id": "angular-controller", "weight": "strong", "files": ["**/App_Plugins/**/*.js"], "regex": "angular\\.module\\(\\s*[\"']umbraco[\"']\\s*\\)\\s*\\.controller\\s*\\(", "generations": ["v7", "v8", "v9-v13"] },
-    { "id": "editor-view", "weight": "supporting", "files": ["**/App_Plugins/**/*.html"], "regex": "ng-(?:model|controller)\\s*=", "generations": ["v7", "v8", "v9-v13"] }
+    {
+      "id": "manifest-property-editors",
+      "weight": "strong",
+      "files": [
+        "**/App_Plugins/*/package.manifest"
+      ],
+      "regex": "\"propertyEditors\"\\s*:\\s*\\[\\s*\\{",
+      "pluginScope": "unmatched",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13"
+      ]
+    },
+    {
+      "id": "angular-controller",
+      "weight": "strong",
+      "files": [
+        "**/App_Plugins/**/*.js"
+      ],
+      "regex": "angular\\.module\\(\\s*[\"']umbraco[\"']\\s*\\)\\s*\\.controller\\s*\\(",
+      "pluginScope": "unmatched",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13"
+      ]
+    },
+    {
+      "id": "editor-view",
+      "weight": "supporting",
+      "files": [
+        "**/App_Plugins/**/*.html"
+      ],
+      "regex": "ng-(?:model|controller)\\s*=",
+      "pluginScope": "unmatched",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "high",
+      "summary": "AngularJS no longer runs in the backoffice; each editor is rebuilt as a web component registered in umbraco-package.json, and data types migrate to a UI alias plus a server schema.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-backoffice-extensions-from-angularjs.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "AngularJS code does not run in the new backoffice, so you rebuild each extension"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-custom-property-editors-to-umbraco-14.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco 14 introduces a split between server-side and client-side Property Editor aliases"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-custom-property-editors-to-umbraco-14.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco automatically migrates all Data Types to include an EditorUiAlias value"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Angular JS has been removed in Umbraco 14"
+        }
+      ]
+    }
   ],
   "handling": [
-    { "option": "Keep the editor unchanged", "when": "The target is v13 or earlier", "docs": "Package Manifest for the target version" },
-    { "option": "Rewrite as a web component registered in umbraco-package.json, keeping or defining a server-side schema for stored data", "when": "The target is v14 or later", "docs": "Migrate Custom Property Editors to Umbraco Version 14 and Later" }
+    {
+      "id": "keep-on-13",
+      "option": "Keep the editor unchanged",
+      "when": "Target 13 or earlier",
+      "targets": [
+        "v9-v13"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/package-manifest.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The package.manifest JSON file format is used to describe one or more custom Umbraco property editors, grid editors or parameter editors"
+        }
+      ]
+    },
+    {
+      "id": "rebuild-as-web-component",
+      "option": "Rebuild as a property editor UI web component registered in umbraco-package.json, with the migrated UI alias as its alias and the migrated schema alias",
+      "when": "Target 14 or later",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-backoffice-extensions-from-angularjs.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "AngularJS code does not run in the new backoffice, so you rebuild each extension"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-backoffice-extensions-from-angularjs.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco migrates your existing Data Types when you upgrade"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-custom-property-editors-to-umbraco-14.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco automatically migrates all Data Types to include an EditorUiAlias value"
+        }
+      ]
+    },
+    {
+      "id": "server-schema",
+      "option": "Keep or define a server-side schema for stored data (a data editor) when the stored format must stay",
+      "when": "The editor stores custom JSON",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-custom-property-editors-to-umbraco-14.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco 14 introduces a split between server-side and client-side Property Editor aliases"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-custom-property-editors-to-umbraco-14.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Since the migration moves the alias to EditorUiAlias"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each editor loads, edits, and saves a value in the backoffice of the local site",
+      "verification": "manual"
+    },
+    {
+      "text": "Existing values render unchanged on the front end",
+      "verification": "manual"
+    }
   ],
   "sources": [
-    { "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Extending/Property-Editors/Package-Manifest/index.md", "appliesTo": "8", "fetchedAt": "2026-10-12" },
-    { "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/package-manifest.md", "appliesTo": "13", "fetchedAt": "2026-10-12" },
-    { "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-custom-property-editors-to-umbraco-14.md", "appliesTo": "14+", "fetchedAt": "2026-10-12" }
+    {
+      "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Extending/Property-Editors/Package-Manifest/index.md",
+      "appliesTo": "8",
+      "fetchedAt": "2026-10-12"
+    },
+    {
+      "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/package-manifest.md",
+      "appliesTo": "13",
+      "fetchedAt": "2026-10-12"
+    },
+    {
+      "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-custom-property-editors-to-umbraco-14.md",
+      "appliesTo": "14+",
+      "fetchedAt": "2026-10-12"
+    }
   ]
 }

@@ -1,0 +1,8 @@
+{
+  "id": "p.code.custom-routing",
+  "baseline": "gen.v13",
+  "expects": [
+    "code.custom-routing"
+  ],
+  "description": "A controller route registered with endpoint routing and a virtual page controller."
+}

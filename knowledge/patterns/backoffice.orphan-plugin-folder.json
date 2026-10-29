@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "backoffice.orphan-plugin-folder",
+  "title": "Orphan App_Plugins folders",
+  "description": "An App_Plugins folder that matches no package reference and holds no manifest of either generation, often left over from a removed package.",
+  "kind": "customization",
+  "area": "packages-backoffice",
+  "owner": "migrate-packages-backoffice",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": true,
+  "detectors": [
+    {
+      "id": "orphan-folder",
+      "weight": "strong",
+      "derived": "app-plugin-orphan",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "low",
+      "summary": "Leftover folders do nothing but can be mistaken for live extensions.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "remove-after-confirmation",
+      "option": "Remove only after the user confirms the folder is unused",
+      "when": "The user confirms",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [],
+      "requiresApproval": "remove-custom-feature"
+    }
+  ],
+  "checks": [
+    {
+      "text": "The user confirmed each folder as unused before removal, with the approval recorded",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

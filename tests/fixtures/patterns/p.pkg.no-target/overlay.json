@@ -1,0 +1,6 @@
+{
+  "id": "p.pkg.no-target",
+  "baseline": "gen.v13",
+  "expects": [],
+  "description": "A community package whose releases declare no dependency range that includes the target, one that does, and one whose range has no upper bound (classified from package metadata)."
+}

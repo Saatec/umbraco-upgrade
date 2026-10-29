@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "auth.backoffice-session-on-frontend",
+  "title": "Front-end features gated on the backoffice login",
+  "description": "Front-end pages that read the backoffice login to show editor-only features.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "project-specific",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": true,
+  "requiresDecision": true,
+  "detectors": [
+    {
+      "id": "backoffice-ticket",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\bGetUmbracoAuthTicket\\b|\\bSecurity\\.CurrentUser\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "The backoffice uses its own authentication scheme, so front-end checks of the backoffice login need a redesign.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "move-into-backoffice",
+      "option": "Move the feature into the backoffice, or redesign it with its own authorization (the user decides)",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "The user has decided how the feature works on the target, and the decision is recorded",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

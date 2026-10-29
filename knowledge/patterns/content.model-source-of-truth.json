@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.model-source-of-truth",
+  "title": "Content model files under source control",
+  "description": "Document types, data types, and templates serialized to files (for example by a synchronization package or a deployment tool), instead of living only in the database.",
+  "kind": "customization",
+  "area": "content-database",
+  "owner": "migrate-content-database",
+  "involves": [
+    "discovery"
+  ],
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "sync-folder",
+      "weight": "strong",
+      "files": [
+        "**/uSync/**",
+        "**/config/uSync*.config"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "deployment-files",
+      "weight": "strong",
+      "files": [
+        "**/*.uda"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "Content model files can make content-transfer paths viable; they must match the version of the tool used for the target.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "transfer-tool",
+      "option": "Use the files with a content-transfer tool whose support for the exact source and target is verified",
+      "when": "The tool documents support for the source and target",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    },
+    {
+      "id": "database-preserving",
+      "option": "Treat the database as the source of truth and keep the files in sync after the migration",
+      "when": "A database-preserving path is selected",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Content model files are regenerated or confirmed in sync after the database step",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

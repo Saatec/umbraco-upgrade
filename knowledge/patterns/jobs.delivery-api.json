@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "jobs.delivery-api",
+  "title": "Content delivery API usage",
+  "description": "Projects that enable the headless content delivery API or extend it.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "gap",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": true,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "delivery-api-enabled",
+      "weight": "strong",
+      "files": [
+        "**/appsettings*.json"
+      ],
+      "regex": "\"DeliveryApi\"\\s*:\\s*\\{[\\s\\S]{0,400}?\"Enabled\"\\s*:\\s*true",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "delivery-api-extension",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bIApiContentPathResolver\\b|\\bIContentIndexHandler\\b|\\bIApiContentResponseBuilder\\b",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "The delivery API is opt-in through configuration; content finders do not apply to it.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/content-delivery-api.md",
+          "docsVersion": "13",
+          "appliesTo": "12-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "It must be explicitly enabled through configuration before it can be utilized"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/headless-and-apis/content-delivery-api.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The Delivery API is an opt-in feature in Umbraco"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/backend-and-custom-logic/routing/request-pipeline/icontentfinder.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The IContentFinder is not available when using the Content Delivery API"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "test-consumers",
+      "option": "Test every delivery API consumer against the target",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/headless-and-apis/content-delivery-api.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The Delivery API is an opt-in feature in Umbraco"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Delivery API responses for sample content match what consumers expect",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

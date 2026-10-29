@@ -1,0 +1,8 @@
+{
+  "id": "p.gap.media-fs",
+  "baseline": "gen.v13",
+  "expects": [
+    "content.media-filesystem-provider"
+  ],
+  "description": "Media stored in cloud blob storage through a provider package."
+}

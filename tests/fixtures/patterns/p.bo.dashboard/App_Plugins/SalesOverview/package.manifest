@@ -1,0 +1,10 @@
+{
+    "dashboards": [
+        {
+            "alias": "sampleSiteSalesOverview",
+            "view": "/App_Plugins/SalesOverview/overview.html",
+            "sections": ["content"],
+            "weight": 10
+        }
+    ]
+}

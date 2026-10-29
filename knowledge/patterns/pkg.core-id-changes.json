@@ -1,48 +1,191 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "id": "pkg.core-id-changes",
   "title": "Core and first-party package IDs per generation",
   "description": "The CMS core ships under different package IDs in different generations. Version detection reads these IDs from package references, lock files, and assets files. Configuration status keys and assembly metadata are secondary signals.",
+  "kind": "baseline",
   "area": "application-framework",
   "owner": "migrate-application-framework",
   "prevalence": "universal",
   "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
   "detectors": [],
   "versionSignals": {
     "corePackageIds": [
-      { "id": "UmbracoCms", "generations": ["v7", "v8"], "primary": true },
-      { "id": "UmbracoCms.Core", "generations": ["v7", "v8"], "primary": true },
-      { "id": "Umbraco.Cms", "generations": ["aspnetcore"], "primary": true },
-      { "id": "Umbraco.Cms.Core", "generations": ["aspnetcore"], "primary": true },
-      { "id": "Umbraco.Cms.Web.Website", "generations": ["aspnetcore"], "primary": false },
-      { "id": "Umbraco.Cms.Web.BackOffice", "generations": ["aspnetcore"], "primary": false },
-      { "id": "Umbraco.Cms.Web.Common", "generations": ["aspnetcore"], "primary": false },
-      { "id": "Umbraco.Cms.Infrastructure", "generations": ["aspnetcore"], "primary": false },
-      { "id": "Umbraco.Cms.Api.Management", "generations": ["aspnetcore"], "primary": false }
+      {
+        "id": "UmbracoCms",
+        "generations": [
+          "v7",
+          "v8"
+        ],
+        "primary": true
+      },
+      {
+        "id": "UmbracoCms.Core",
+        "generations": [
+          "v7",
+          "v8"
+        ],
+        "primary": true
+      },
+      {
+        "id": "Umbraco.Cms",
+        "generations": [
+          "aspnetcore"
+        ],
+        "primary": true
+      },
+      {
+        "id": "Umbraco.Cms.Core",
+        "generations": [
+          "aspnetcore"
+        ],
+        "primary": true
+      },
+      {
+        "id": "Umbraco.Cms.Web.Website",
+        "generations": [
+          "aspnetcore"
+        ],
+        "primary": false
+      },
+      {
+        "id": "Umbraco.Cms.Web.BackOffice",
+        "generations": [
+          "aspnetcore"
+        ],
+        "primary": false
+      },
+      {
+        "id": "Umbraco.Cms.Web.Common",
+        "generations": [
+          "aspnetcore"
+        ],
+        "primary": false
+      },
+      {
+        "id": "Umbraco.Cms.Infrastructure",
+        "generations": [
+          "aspnetcore"
+        ],
+        "primary": false
+      },
+      {
+        "id": "Umbraco.Cms.Api.Management",
+        "generations": [
+          "aspnetcore"
+        ],
+        "primary": false
+      }
     ],
     "configStatusKeys": [
-      { "key": "umbracoConfigurationStatus", "generations": ["v7"], "source": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Reference/Configuration-for-Umbraco-7-and-8/webconfig/index-v7.md" },
-      { "key": "Umbraco.Core.ConfigurationStatus", "generations": ["v8"], "source": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Reference/Configuration-for-Umbraco-7-and-8/webconfig/index.md" }
+      {
+        "key": "umbracoConfigurationStatus",
+        "generations": [
+          "v7"
+        ],
+        "source": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Reference/Configuration-for-Umbraco-7-and-8/webconfig/index-v7.md"
+      },
+      {
+        "key": "Umbraco.Core.ConfigurationStatus",
+        "generations": [
+          "v8"
+        ],
+        "source": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Reference/Configuration-for-Umbraco-7-and-8/webconfig/index.md"
+      }
     ],
-    "coreAssemblies": ["Umbraco.Core.dll", "Umbraco.Cms.Core.dll", "umbraco.dll"],
-    "legacyConfigFiles": ["config/umbracoSettings.config", "config/trees.config", "config/Dashboard.config", "config/applications.config"],
-    "appSettingsSection": ["Umbraco", "CMS"],
+    "coreAssemblies": [
+      "Umbraco.Core.dll",
+      "Umbraco.Cms.Core.dll",
+      "umbraco.dll"
+    ],
+    "legacyConfigFiles": [
+      "config/umbracoSettings.config",
+      "config/trees.config",
+      "config/Dashboard.config",
+      "config/applications.config"
+    ],
+    "appSettingsSection": [
+      "Umbraco",
+      "CMS"
+    ],
     "backofficeManifests": [
-      { "glob": "**/App_Plugins/*/package.manifest", "hint": "angularjs-backoffice" },
-      { "glob": "**/App_Plugins/*/umbraco-package.json", "hint": "modern-backoffice" }
+      {
+        "glob": "**/App_Plugins/*/package.manifest",
+        "hint": "angularjs-backoffice"
+      },
+      {
+        "glob": "**/App_Plugins/*/umbraco-package.json",
+        "hint": "modern-backoffice"
+      }
     ],
     "generations": [
-      { "id": "v7", "minMajor": 7, "maxMajor": 7, "platform": ".NET Framework", "backoffice": "AngularJS" },
-      { "id": "v8", "minMajor": 8, "maxMajor": 8, "platform": ".NET Framework", "backoffice": "AngularJS" },
-      { "id": "v9-v13", "minMajor": 9, "maxMajor": 13, "platform": "ASP.NET Core", "backoffice": "AngularJS" },
-      { "id": "v14+", "minMajor": 14, "maxMajor": null, "platform": "ASP.NET Core", "backoffice": "Web Components" }
+      {
+        "id": "v7",
+        "minMajor": 7,
+        "maxMajor": 7,
+        "platform": ".NET Framework",
+        "backoffice": "AngularJS"
+      },
+      {
+        "id": "v8",
+        "minMajor": 8,
+        "maxMajor": 8,
+        "platform": ".NET Framework",
+        "backoffice": "AngularJS"
+      },
+      {
+        "id": "v9-v13",
+        "minMajor": 9,
+        "maxMajor": 13,
+        "platform": "ASP.NET Core",
+        "backoffice": "AngularJS"
+      },
+      {
+        "id": "v14+",
+        "minMajor": 14,
+        "maxMajor": null,
+        "platform": "ASP.NET Core",
+        "backoffice": "Web Components"
+      }
     ]
   },
+  "notes": "Generation boundaries are detection hints only. Every version fact here is unverified until the version knowledge verifies it.",
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "The legacy core package IDs are replaced by the IDs of the ASP.NET Core generation (mapping verified from package metadata in the package knowledge).",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
   "handling": [
-    { "option": "Replace legacy core package IDs with the IDs of the target generation", "when": "Crossing from v8 or earlier to v9 or later", "docs": "Target version upgrade guide" }
+    {
+      "id": "replace-core-ids",
+      "option": "Replace legacy core package IDs with the IDs of the target generation (from the package knowledge)",
+      "when": "Crossing from 8 or earlier to 9 or later",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Only target-generation core packages are referenced, at the resolved target version",
+      "verification": "automated"
+    }
   ],
   "sources": [
-    { "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md", "appliesTo": "latest", "fetchedAt": "2026-10-12" }
-  ],
-  "notes": "Generation boundaries are detection hints only. Every version fact here is unverified until the version knowledge verifies it."
+    {
+      "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+      "appliesTo": "latest",
+      "fetchedAt": "2026-10-12"
+    }
+  ]
 }

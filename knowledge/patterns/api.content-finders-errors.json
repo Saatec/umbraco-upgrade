@@ -1,0 +1,205 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "api.content-finders-errors",
+  "title": "Content finders, not-found pages, and error handling",
+  "description": "Custom URL-to-content resolution, not-found page handling, and application-level error handling.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "involves": [
+    "migrate-config-auth-integrations"
+  ],
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "content-finder",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bIContentFinder\\b|\\bIContentLastChanceFinder\\b|\\bContentFinderResolver\\b|\\bContentLastChanceFinderResolver\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "application-error",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/Global.asax"
+      ],
+      "regex": "\\bApplication_Error\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "custom-errors",
+      "weight": "strong",
+      "files": [
+        "**/web.config",
+        "**/Web.config"
+      ],
+      "regex": "<customErrors\\s+mode=\"(?:On|RemoteOnly)\"",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "error-pages-config",
+      "weight": "strong",
+      "files": [
+        "**/config/umbracoSettings.config"
+      ],
+      "regex": "<errorPage\\s|<error404>\\s*(?!1\\s*</error404>)[^<\\s]",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "error404-collection",
+      "weight": "strong",
+      "files": [
+        "**/appsettings*.json"
+      ],
+      "regex": "\"Error404Collection\"",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "low",
+      "summary": "Content finders are added through a builder extension or a composer; error pages use the options the target documents.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/request-pipeline/icontentfinder.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "To create a custom content finder, with custom logic to find an Umbraco document based on a request, implement the IContentFinder interface"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/request-pipeline/icontentfinder.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "use either an Umbraco builder extension, or a composer to add it"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/tutorials/custom-error-page.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This provides a number of options when setting up custom error pages on your website"
+        }
+      ]
+    },
+    {
+      "crosses": 14,
+      "difficulty": "low",
+      "summary": "Content finders are not used by the content delivery API.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/backend-and-custom-logic/routing/request-pipeline/icontentfinder.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The IContentFinder is not available when using the Content Delivery API"
+        }
+      ]
+    },
+    {
+      "crosses": 18,
+      "difficulty": "low",
+      "summary": "The default URL content finder and URL provider classes are renamed.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "18+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "the replacements have been renamed to drop the suffix"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "content-finder-collection",
+      "option": "Port content finders and register them in the content finder collection",
+      "when": "Custom finders exist",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/request-pipeline/icontentfinder.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "To create a custom content finder, with custom logic to find an Umbraco document based on a request, implement the IContentFinder interface"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/backend-and-custom-logic/routing/request-pipeline/icontentfinder.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The IContentFinder is not available when using the Content Delivery API"
+        }
+      ]
+    },
+    {
+      "id": "error-middleware",
+      "option": "Move application error handling to exception-handling middleware and configure not-found pages in settings",
+      "when": "Global error handling or not-found configuration exists",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/tutorials/custom-error-page.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This provides a number of options when setting up custom error pages on your website"
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/aspnet/core/fundamentals/error-handling",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Handle errors in ASP.NET Core"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "A missing URL shows the not-found page and an error shows the error page on the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

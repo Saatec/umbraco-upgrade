@@ -1,0 +1,8 @@
+{
+  "id": "p.auth.custom-roles",
+  "baseline": "gen.v7",
+  "expects": [
+    "auth.custom-roles"
+  ],
+  "description": "A custom role provider that reads member roles from an external list."
+}

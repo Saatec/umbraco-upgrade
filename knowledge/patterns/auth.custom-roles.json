@@ -1,0 +1,106 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "auth.custom-roles",
+  "title": "Custom role providers and roles from external systems",
+  "description": "Member roles computed by a custom role provider, taken from an external system, or assigned in code.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "role-provider",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?(?:RoleProvider|MembersRoleProvider)\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "role-manager-config",
+      "weight": "strong",
+      "files": [
+        "**/web.config",
+        "**/Web.config"
+      ],
+      "regex": "<roleManager\\b[^>]*\\benabled=\"true\"",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "assign-roles",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\.AssignRoles?\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "Role providers do not exist in the ASP.NET Core generation.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "member-groups",
+      "option": "Sync roles to member groups",
+      "when": "The external system is the source of truth and roles change rarely",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/fundamentals/data/members.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Members are used for registering and authentication external / frontend users of an Umbraco installation"
+        }
+      ]
+    },
+    {
+      "id": "claims-transformation",
+      "option": "Add roles through claims transformation or an injected role service",
+      "when": "Roles are computed per request",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "A member of each role sees exactly the pages of that role on the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

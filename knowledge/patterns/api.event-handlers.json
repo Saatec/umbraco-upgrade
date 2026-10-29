@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "api.event-handlers",
+  "title": "Content and request event handlers",
+  "description": "Code that reacts to content, media, or member lifecycle events, or to request events.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "legacy-event-subscription",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\b(?:ContentService|MediaService|MemberService|ContentTypeService|PublishedContentRequest)\\.\\w+\\s*\\+=",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "notification-handler",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bINotification(?:Async)?Handler\\s*<\\s*(?:Content|Media|Member|Dictionary|Template|DataType|ContentType|MediaType|MemberType|RoutingRequest|SendingContent|SendingMedia)\\w*Notification\\s*>",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "From 9, code hooks into CMS workflows through notifications and notification handlers.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/notifications.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "All notifications reside in the Umbraco.Cms.Core.Notifications namespace and are postfixed with Notification"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/notifications.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "to allow you to hook into the workflow process for the backoffice"
+        }
+      ]
+    },
+    {
+      "crosses": 14,
+      "difficulty": "low",
+      "summary": "Notifications can no longer modify the models sent to the backoffice.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "You can no longer modify the models being transferred through the API"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/server-side-extensions/notifications.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "All notifications reside in the Umbraco.Cms.Core.Notifications namespace and are postfixed with Notification"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "notification-handlers",
+      "option": "Port each subscription to a notification handler registered in a composer; use async handlers for I/O",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/notifications.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "All notifications reside in the Umbraco.Cms.Core.Notifications namespace and are postfixed with Notification"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/server-side-extensions/notifications.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "All notifications reside in the Umbraco.Cms.Core.Notifications namespace and are postfixed with Notification"
+        }
+      ]
+    },
+    {
+      "id": "model-changes-to-api",
+      "option": "Move backoffice model changes into an own API controller or a backoffice extension",
+      "when": "A handler modified models sent to the backoffice and the target is 14 or later",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "You can no longer modify the models being transferred through the API"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each handler fires for its event on the local site (save, publish, or request the affected item)",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

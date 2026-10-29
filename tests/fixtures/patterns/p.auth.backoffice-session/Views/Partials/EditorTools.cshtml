@@ -1,0 +1,8 @@
+@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@{
+    var ticket = Request.GetOwinContext().Request.GetUmbracoAuthTicket();
+}
+@if (ticket != null)
+{
+    <div class="editor-tools">Edit this page</div>
+}

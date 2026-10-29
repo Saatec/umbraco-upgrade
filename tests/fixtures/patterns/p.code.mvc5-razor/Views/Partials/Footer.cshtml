@@ -1,0 +1,8 @@
+@helper Year()
+{
+    <span>@System.DateTime.UtcNow.Year</span>
+}
+<footer>
+    @Html.Action("Menu", "Navigation")
+    <p>Copyright @Year()</p>
+</footer>

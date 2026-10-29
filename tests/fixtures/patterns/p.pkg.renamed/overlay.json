@@ -1,0 +1,6 @@
+{
+  "id": "p.pkg.renamed",
+  "baseline": "gen.v13",
+  "expects": [],
+  "description": "A package that is deprecated with an alternate package (classified from package metadata)."
+}

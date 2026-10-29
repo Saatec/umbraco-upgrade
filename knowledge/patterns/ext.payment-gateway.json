@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "ext.payment-gateway",
+  "title": "Payment gateway integration",
+  "description": "Online payments through a gateway SDK or redirect protocol, with callback endpoints.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "payment-callback",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "(?i)public\\s+[\\w<>\\.]+\\s+(?:payment|checkout)\\w*(?:callback|notify|notification|return|webhook)\\w*\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "gateway-form-post",
+      "weight": "strong",
+      "files": [
+        "**/*.cshtml"
+      ],
+      "regex": "(?i)<form[^>]+action\\s*=\\s*\"https://[^\"]*(?:pay|payment|checkout|gateway)",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "Gateway SDKs need .NET editions; callbacks must be verified end to end.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "vendor-dotnet-sdk",
+      "option": "Use the vendor .NET edition of the SDK, or its HTTP API through the client factory",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    },
+    {
+      "id": "rehearse-callbacks",
+      "option": "Verify callbacks in a sandbox account during the deployment rehearsal",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "A sandbox payment completes and its callback is processed on the local or rehearsal site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

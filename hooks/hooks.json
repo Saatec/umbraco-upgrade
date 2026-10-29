@@ -50,6 +50,12 @@
           { "type": "command", "if": "Read(//**/*.pubxml*)", "command": "powershell", "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/redact-output.ps1"], "timeout": 30 },
           { "type": "command", "if": "Read(//**/*.publishsettings)", "command": "powershell", "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/redact-output.ps1"], "timeout": 30 }
         ]
+      },
+      {
+        "matcher": "Grep",
+        "hooks": [
+          { "type": "command", "command": "powershell", "args": ["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", "${CLAUDE_PLUGIN_ROOT}/scripts/hooks/redact-output.ps1"], "timeout": 30 }
+        ]
       }
     ],
     "SessionStart": [

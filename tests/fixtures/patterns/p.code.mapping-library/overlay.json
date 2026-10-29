@@ -1,0 +1,8 @@
+{
+  "id": "p.code.mapping-library",
+  "baseline": "gen.v7",
+  "expects": [
+    "code.content-mapping-library"
+  ],
+  "description": "View models built by a generic As<T>() mapping call over published content."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "p.auth.member-flows",
+  "baseline": "gen.v8",
+  "expects": [
+    "auth.member-flows"
+  ],
+  "description": "A front-end member login built on the legacy membership helper."
+}

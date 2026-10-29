@@ -1,0 +1,77 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "deploy.containers-or-cloud",
+  "title": "Containers, infrastructure as code, and load balancing",
+  "description": "Container definitions and infrastructure templates that host the site.",
+  "kind": "customization",
+  "area": "deployment-rehearsal",
+  "owner": "deployment-rehearsal",
+  "prevalence": "gap",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": true,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "container-or-iac",
+      "weight": "strong",
+      "files": [
+        "**/Dockerfile",
+        "**/docker-compose*.yml",
+        "**/*.bicep",
+        "**/*.tf"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "Docker hosting and load balancing have their own documented setup considerations.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/run-in-production/infrastructure-and-ops/server-setup/running-umbraco-in-docker.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Exactly how you choose to compose your Dockerfile will depend on your project specific needs"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/run-in-production/infrastructure-and-ops/server-setup/load-balancing.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Configuring and setting up a load balanced server environment requires planning, design and testing"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "update-with-approval",
+      "option": "Update images and templates with an approval; rehearse; never deploy",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [],
+      "requiresApproval": "ci-deploy-config-change"
+    }
+  ],
+  "checks": [
+    {
+      "text": "The container or template change is reviewed by the user; nothing is deployed by the plugin",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

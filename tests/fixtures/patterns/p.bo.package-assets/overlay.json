@@ -1,0 +1,8 @@
+{
+  "id": "p.bo.package-assets",
+  "baseline": "gen.v13",
+  "expects": [
+    "backoffice.package-copied-assets"
+  ],
+  "description": "A package that copied its backoffice files into an App_Plugins folder named after the package."
+}

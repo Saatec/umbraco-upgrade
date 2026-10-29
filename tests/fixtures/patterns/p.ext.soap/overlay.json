@@ -1,0 +1,8 @@
+{
+  "id": "p.ext.soap",
+  "baseline": "gen.v8",
+  "expects": [
+    "ext.soap-client"
+  ],
+  "description": "A generated SOAP client for an external service."
+}

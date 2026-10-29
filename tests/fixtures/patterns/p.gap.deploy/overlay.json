@@ -1,0 +1,8 @@
+{
+  "id": "p.gap.deploy",
+  "baseline": "gen.v13",
+  "expects": [
+    "content.deploy-or-courier"
+  ],
+  "description": "The vendor deployment tool referenced by the web project."
+}

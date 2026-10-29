@@ -1,26 +1,226 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "id": "data.custom-tables",
   "title": "Custom database tables via ORM attributes and migrations",
   "description": "Project tables in the CMS database, defined by attributed classes and created by migrations or schema helpers at startup.",
+  "kind": "customization",
   "area": "content-database",
   "owner": "migrate-content-database",
+  "involves": [
+    "migrate-custom-code"
+  ],
   "prevalence": "common",
-  "status": "hypothesis",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
   "detectors": [
-    { "id": "table-attribute", "weight": "strong", "files": ["**/*.cs"], "regex": "\\[\\s*TableName\\s*\\(", "generations": ["v7", "v8", "v9-v13", "v14+"] },
-    { "id": "schema-helper", "weight": "strong", "files": ["**/*.cs"], "regex": "\\bDatabaseSchemaHelper\\b", "generations": ["v7"] },
-    { "id": "migration-base", "weight": "strong", "files": ["**/*.cs"], "regex": ":\\s*(?:[\\w\\.]+\\.)?(?:MigrationBase|PackageMigrationPlan|AsyncMigrationBase)\\b", "generations": ["v7", "v8", "v9-v13", "v14+"] },
-    { "id": "migration-plan", "weight": "strong", "files": ["**/*.cs"], "regex": "new\\s+(?:[\\w\\.]+\\.)?MigrationPlan\\s*\\(", "generations": ["v8", "v9-v13", "v14+"] },
-    { "id": "create-table", "weight": "supporting", "files": ["**/*.cs"], "regex": "(?:\\.CreateTable\\s*<|Create\\.Table\\s*<)", "generations": ["v7", "v8", "v9-v13", "v14+"] }
+    {
+      "id": "table-attribute",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\[\\s*TableName\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "schema-helper",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bDatabaseSchemaHelper\\b",
+      "generations": [
+        "v7"
+      ]
+    },
+    {
+      "id": "migration-base",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?(?:MigrationBase|PackageMigrationPlan|AsyncMigrationBase|PackageMigrationBase|AsyncPackageMigrationBase)\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "migration-plan",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "new\\s+(?:[\\w\\.]+\\.)?MigrationPlan\\s*\\(",
+      "generations": [
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "create-table",
+      "weight": "supporting",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "(?:\\.CreateTable\\s*<|Create\\.Table\\s*<)",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "The 13 documentation creates custom tables with a migration plan executed from a composer and component.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/database.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "It is possible to add custom database tables to your site to store additional data that should not be stored as normal content nodes"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/database.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The following code sample shows how this is done using a composer and component"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/database.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "IMigrationPlanExecutor"
+        }
+      ]
+    },
+    {
+      "crosses": 16,
+      "difficulty": "low",
+      "summary": "Package migrations get an asynchronous base class.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "16+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Umbraco 16 adds support for asynchronous migrations"
+        }
+      ]
+    },
+    {
+      "crosses": 18,
+      "difficulty": "medium",
+      "summary": "The synchronous migration base classes are removed; custom migrations inherit the asynchronous base class.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "18+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Custom migrations must inherit AsyncMigrationBase and implement MigrateAsync"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "18+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Package migrations must inherit AsyncPackageMigrationBase"
+        }
+      ]
+    }
   ],
   "handling": [
-    { "option": "Port data access and migrations to the target scoping and migration APIs", "when": "The database is preserved through the upgrade", "docs": "Creating a Custom Database Table for the target version" },
-    { "option": "Compare expected tables with the real schema on a declared local copy before relying on the code", "when": "A local database copy is available", "docs": "Creating a Custom Database Table for the target version" }
+    {
+      "id": "port-data-access",
+      "option": "Port data access and migrations to the target scoping and migration APIs",
+      "when": "The database is preserved through the upgrade",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/database.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "It is possible to add custom database tables to your site to store additional data that should not be stored as normal content nodes"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/server-side-extensions/database.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "NPoco allows custom database tables to be added to your site"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "18+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Custom migrations must inherit AsyncMigrationBase and implement MigrateAsync"
+        }
+      ]
+    },
+    {
+      "id": "compare-schema",
+      "option": "Compare the expected tables with the real schema on the declared local copy before relying on the code",
+      "when": "A local database copy is declared",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each custom table exists on the migrated local copy with the expected columns",
+      "verification": "manual"
+    },
+    {
+      "text": "The migration plan runs once and is recorded as complete on the local copy",
+      "verification": "manual"
+    }
   ],
   "sources": [
-    { "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Tutorials/Creating-Tables-for-Umbraco-with-PetaPoco/index.md", "appliesTo": "7", "fetchedAt": "2026-10-12" },
-    { "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Extending/Database/index.md", "appliesTo": "8", "fetchedAt": "2026-10-12" },
-    { "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/database.md", "appliesTo": "13", "fetchedAt": "2026-10-12" }
+    {
+      "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Tutorials/Creating-Tables-for-Umbraco-with-PetaPoco/index.md",
+      "appliesTo": "7",
+      "fetchedAt": "2026-10-12"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Extending/Database/index.md",
+      "appliesTo": "8",
+      "fetchedAt": "2026-10-12"
+    },
+    {
+      "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/database.md",
+      "appliesTo": "13",
+      "fetchedAt": "2026-10-12"
+    }
   ]
 }

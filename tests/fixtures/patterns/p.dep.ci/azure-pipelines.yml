@@ -1,0 +1,10 @@
+# Synthetic fixture: build pipeline pinned to an SDK.
+trigger:
+  - main
+pool:
+  vmImage: windows-latest
+steps:
+  - task: UseDotNet@2
+    inputs:
+      version: 8.0.x
+  - script: dotnet build --configuration Release

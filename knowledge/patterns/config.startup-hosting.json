@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "config.startup-hosting",
+  "title": "Application startup and hosting model",
+  "description": "How the application boots: Global.asax in 7 and 8, a startup class or minimal hosting from 9, and template lines a target removes.",
+  "kind": "baseline",
+  "area": "application-framework",
+  "owner": "migrate-application-framework",
+  "prevalence": "universal",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "global-asax",
+      "weight": "strong",
+      "files": [
+        "**/Global.asax"
+      ],
+      "regex": "Umbraco\\.Web\\.UmbracoApplication",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "startup-class",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\.AddUmbraco\\s*\\(",
+      "generations": [
+        "v9-v13"
+      ]
+    },
+    {
+      "id": "minimal-hosting",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bCreateUmbracoBuilder\\s*\\(",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "installer-endpoints",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bUseInstallerEndpoints\\s*\\(",
+      "generations": [
+        "v9-v13"
+      ]
+    },
+    {
+      "id": "view-imports-smidge",
+      "weight": "strong",
+      "files": [
+        "**/_ViewImports.cshtml"
+      ],
+      "regex": "\\bSmidge\\b",
+      "generations": [
+        "v9-v13"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "high",
+      "summary": "From 9 the web framework is ASP.NET Core and templates and custom code are reimplemented, startup included.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/upgrade-from-8-to-latest.md",
+          "docsVersion": "18",
+          "appliesTo": "9+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "All templates and custom code will need to be reimplemented"
+        }
+      ]
+    },
+    {
+      "crosses": 14,
+      "difficulty": "low",
+      "summary": "Remove the installer endpoints call and the Smidge lines of the 13 template.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Remove u.UseInstallerEndpoints(); from the program.cs file"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Smidge has been removed from the default installation"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "target-template",
+      "option": "Rebuild startup from the project template of the target and the version notes of each major crossed",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/upgrade-from-8-to-latest.md",
+          "docsVersion": "18",
+          "appliesTo": "9+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "All templates and custom code will need to be reimplemented"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Remove u.UseInstallerEndpoints(); from the program.cs file"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "The site starts on the local copy and reaches the backoffice login",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

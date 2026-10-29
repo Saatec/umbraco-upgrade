@@ -197,4 +197,4 @@ function Get-DatabaseSummary {
     return ,($items.ToArray())
 }
 
-Export-ModuleMember -Function ConvertFrom-ConnectionString, Test-LocalHostName, Get-DataSourceInfo, Get-EffectiveConnectionString, Get-DatabaseSummary, Get-LaunchProfileEnvironment
+Export-ModuleMember -Function ConvertFrom-ConnectionString, Test-LocalHostName, Get-DataSourceInfo, Get-EffectiveConnectionString, Get-DatabaseSummary, Get-LaunchProfileEnvironment, Get-UserSecretsPath

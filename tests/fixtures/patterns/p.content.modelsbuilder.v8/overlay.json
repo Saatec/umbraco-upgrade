@@ -1,0 +1,8 @@
+{
+  "id": "p.content.modelsbuilder.v8",
+  "baseline": "gen.v8",
+  "expects": [
+    "content.models-builder"
+  ],
+  "description": "A non-default models builder mode and a partial class that extends a generated model."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "p.jobs.cdn-purge",
+  "baseline": "gen.v13",
+  "expects": [
+    "jobs.cdn-purge"
+  ],
+  "description": "A service that purges CDN URLs after content changes."
+}

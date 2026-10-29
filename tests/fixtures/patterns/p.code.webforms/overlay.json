@@ -1,0 +1,8 @@
+{
+  "id": "p.code.webforms",
+  "baseline": "gen.v7",
+  "expects": [
+    "code.webforms"
+  ],
+  "description": "A WebForms admin page and a user-control dashboard."
+}

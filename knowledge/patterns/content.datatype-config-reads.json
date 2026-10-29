@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.datatype-config-reads",
+  "title": "Server-side reads of data type configuration",
+  "description": "Code that reads a data type configuration at runtime, for example value lists or block groups.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "involves": [
+    "migrate-build-tests"
+  ],
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "legacy-prevalues",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\bGetPreValues(?:Collection)?ByDataTypeId\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "configuration-read",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\.ConfigurationAs\\s*<|\\b(?:ValueListConfiguration|BlockGridConfiguration|BlockListConfiguration)\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "datatype-service-read",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\b(?:_?dataTypeService|DataTypeService)\\.Get\\w*\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "Property editors are split into server and client parts; code that reads their configuration needs a behavior check because changed semantics can compile silently.",
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "property editors have been split into two, individually reusable parts"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "port-configuration-reads",
+      "option": "Port to the target configuration API and add a behavior check for each read",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/management/services/datatypeservice.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The DataTypeService acts as a \"gateway\" to Umbraco data for operations which are related to DataTypes"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each configuration read returns the expected values on the local site (behavior check, not build)",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

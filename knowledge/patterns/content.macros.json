@@ -1,0 +1,188 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.macros",
+  "title": "Macros and partial view macros",
+  "description": "Reusable components inserted into rich text or the grid, or rendered from templates, including macro parameter editors.",
+  "kind": "customization",
+  "area": "content-database",
+  "owner": "migrate-content-database",
+  "involves": [
+    "migrate-custom-code"
+  ],
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "macro-partials",
+      "weight": "strong",
+      "files": [
+        "**/Views/MacroPartials/**",
+        "**/macroScripts/**",
+        "**/xslt/*.xslt"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "render-macro",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.vb",
+        "**/*.vbhtml"
+      ],
+      "regex": "\\bRenderMacro(?:Async)?\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "macro-markup",
+      "weight": "strong",
+      "files": [
+        "**/*.config",
+        "**/*.json",
+        "**/*.xml",
+        "**/*.cshtml",
+        "**/*.html"
+      ],
+      "regex": "<\\?UMBRACO_MACRO|umb-rte-macro",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "parameter-editor",
+      "weight": "strong",
+      "files": [
+        "**/App_Plugins/*/package.manifest"
+      ],
+      "regex": "\"isParameterEditor\"\\s*:\\s*true",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "high",
+      "summary": "Macros are removed; partial views or blocks in the rich text editor replace them, and rich text that contains macros needs a content migration.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Macros and Partial View Macros have been removed. Use partial views and/or blocks in the Rich Text Editor (RTE)"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/templating/macros.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Macros and Partial View Macros will be removed in the next version. Consider using Partial Views or Blocks in Rich Text Editor."
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/get-started/upgrading-and-migrating/find-your-upgrade-path/migrating-macros.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "There are a multitude of options for migrating away from macros to use blocks in the Rich Text Editor instead"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "keep-macros-on-13",
+      "option": "Keep macros on a 13 target",
+      "when": "Target 13 or earlier",
+      "targets": [
+        "v9-v13"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/templating/macros.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Macros and Partial View Macros will be removed in the next version. Consider using Partial Views or Blocks in Rich Text Editor."
+        }
+      ]
+    },
+    {
+      "id": "partial-views",
+      "option": "Replace template-rendered macros with partial views",
+      "when": "The macro is rendered from templates only",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Macros and Partial View Macros have been removed. Use partial views and/or blocks in the Rich Text Editor (RTE)"
+        }
+      ]
+    },
+    {
+      "id": "rte-blocks-with-migration",
+      "option": "Replace macros in rich text with blocks in the rich text editor, with a content migration (custom migration or batch tool) tested on the local copy",
+      "when": "Rich text content contains macro markup",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/get-started/upgrading-and-migrating/find-your-upgrade-path/migrating-macros.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "There are a multitude of options for migrating away from macros to use blocks in the Rich Text Editor instead"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/get-started/upgrading-and-migrating/find-your-upgrade-path/migrating-macros.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "If you want the conversion to happen automatically as you upgrade, you can define a"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Rich text content on the local copy is scanned for macro markup before macros are declared unused",
+      "verification": "manual"
+    },
+    {
+      "text": "Every former macro renders the same output from its replacement",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

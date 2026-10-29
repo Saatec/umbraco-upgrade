@@ -1,0 +1,8 @@
+{
+  "id": "p.content.legacy-pickers",
+  "baseline": "gen.v7",
+  "expects": [
+    "content.legacy-picker-values"
+  ],
+  "description": "Serialized data types that still use obsolete picker editors."
+}

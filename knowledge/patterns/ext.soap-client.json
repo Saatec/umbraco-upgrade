@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "ext.soap-client",
+  "title": "SOAP and WCF service references",
+  "description": "Generated SOAP clients for external systems, with endpoint configuration in service model sections.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "service-reference",
+      "weight": "strong",
+      "files": [
+        "**/Service References/**/Reference.cs",
+        "**/Connected Services/**/Reference.cs",
+        "**/*.svcmap",
+        "**/*.wsdl"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "service-model-client",
+      "weight": "strong",
+      "files": [
+        "**/web.config",
+        "**/Web.config",
+        "**/app.config"
+      ],
+      "regex": "<system\\.serviceModel>[\\s\\S]{0,2000}?<client>",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "client-base",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:System\\.ServiceModel\\.)?ClientBase\\s*<",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "SOAP clients are regenerated for .NET with the dotnet-svcutil tool.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/core/additional-tools/dotnet-svcutil-guide",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "is a command-line tool for generating a web service reference compatible with .NET projects"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "regenerate-client",
+      "option": "Regenerate the client with the .NET service reference tool and register it in dependency injection",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/core/additional-tools/dotnet-svcutil-guide",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "is a command-line tool for generating a web service reference compatible with .NET projects"
+        }
+      ]
+    },
+    {
+      "id": "endpoint-from-options",
+      "option": "Bind the endpoint address and credentials through options, never hard-coded",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/core/extensions/options",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The options pattern uses classes to provide strongly typed access to groups of related settings"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each SOAP call succeeds against a test endpoint from the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

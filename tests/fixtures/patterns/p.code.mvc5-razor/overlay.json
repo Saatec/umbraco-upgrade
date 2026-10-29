@@ -1,0 +1,8 @@
+{
+  "id": "p.code.mvc5-razor",
+  "baseline": "gen.v8",
+  "expects": [
+    "code.mvc5-razor-features"
+  ],
+  "description": "A child action rendered from a layout, with a Razor helper block."
+}

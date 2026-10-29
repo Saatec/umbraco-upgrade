@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "pkg.implicit-transitive",
+  "title": "Implicit transitive dependencies",
+  "description": "Code that uses a third-party namespace no direct package reference of its SDK-style project provides, so it compiles only through a transitive dependency.",
+  "kind": "customization",
+  "area": "application-framework",
+  "owner": "migrate-application-framework",
+  "involves": [
+    "migrate-build-tests"
+  ],
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "namespace-without-reference",
+      "weight": "strong",
+      "derived": "implicit-namespace",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ],
+      "namespaces": [
+        {
+          "namespace": "Newtonsoft.Json",
+          "packages": [
+            "Newtonsoft.Json"
+          ]
+        },
+        {
+          "namespace": "Serilog",
+          "packages": [
+            "Serilog",
+            "Serilog.AspNetCore",
+            "Serilog.Extensions.Hosting"
+          ]
+        },
+        {
+          "namespace": "MailKit",
+          "packages": [
+            "MailKit"
+          ]
+        },
+        {
+          "namespace": "MimeKit",
+          "packages": [
+            "MimeKit",
+            "MailKit"
+          ]
+        },
+        {
+          "namespace": "HtmlAgilityPack",
+          "packages": [
+            "HtmlAgilityPack"
+          ]
+        },
+        {
+          "namespace": "SixLabors.ImageSharp",
+          "packages": [
+            "SixLabors.ImageSharp",
+            "SixLabors.ImageSharp.Web"
+          ]
+        },
+        {
+          "namespace": "Markdig",
+          "packages": [
+            "Markdig"
+          ]
+        }
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "low",
+      "summary": "Each major updates the CMS dependencies; code that relies on a transitive library can break or change behavior.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "dependencies have been updated to their latest compatible versions"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "explicit-reference",
+      "option": "Add an explicit package reference at a version compatible with the target",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each listed namespace is provided by a direct package reference and the solution builds",
+      "verification": "automated"
+    }
+  ],
+  "sources": []
+}

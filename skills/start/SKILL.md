@@ -1,6 +1,6 @@
 ---
 name: start
-description: Start an Umbraco CMS major-version upgrade. Runs discovery, version checks, safety setup, and writes a plan, then stops for your approval.
+description: Start an Umbraco CMS major-version upgrade. Runs discovery, version checks, and safety setup, writes a plan, stops for your approval, then executes it phase by phase with checkpoints.
 argument-hint: <target-version> [project-path]
 arguments: [target, path]
 disable-model-invocation: true
@@ -36,4 +36,4 @@ Load the `umbraco-upgrade:upgrade-workflow` skill with the Skill tool and follow
 - session id: `${CLAUDE_SESSION_ID}`
 - plugin data directory: `${CLAUDE_PLUGIN_DATA}`
 
-The workflow runs gates 1 to 4 and stops at gate 4 for approval. In this plugin version, plan execution is not available: after the user approves, record the approval and stop.
+The workflow runs gates 1 to 4 and stops at gate 4 for approval. After the user approves in chat, it executes the plan phase by phase, each phase ending with a checkpoint commit on the upgrade branch. Final verification and the report (gate 5) come in a later plugin version.

@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "pkg.loose-binaries",
+  "title": "Loose assembly references and committed binaries",
+  "description": "References with hint paths outside package folders and assemblies committed to source control.",
+  "kind": "customization",
+  "area": "application-framework",
+  "owner": "migrate-application-framework",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "hint-path",
+      "weight": "strong",
+      "files": [
+        "**/*.csproj",
+        "**/*.vbproj"
+      ],
+      "regex": "<HintPath>(?![^<]*[\\\\/]packages[\\\\/])[^<]+\\.dll\\s*</HintPath>",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "committed-dll",
+      "weight": "strong",
+      "files": [
+        "**/*.dll"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "Framework assemblies referenced from modern .NET may fail at runtime; each needs a package or source.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "find-package",
+      "option": "Replace each loose assembly with a package or its source",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    },
+    {
+      "id": "runtime-check",
+      "option": "Test any remaining loose assembly at runtime on the local site",
+      "when": "No replacement exists",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Every remaining loose assembly is exercised at runtime on the local site",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

@@ -21,7 +21,10 @@
     unresolved             -Item text [-Pattern id] [-Proposal port|replace|redesign]
     phases                 -JsonFile path
     phase                  -PhaseId P1 -Status in-progress|blocked|done|failed|deferred
-    checkpoint             -PhaseId P1 -Commit <sha>
+    checkpoint             -PhaseId P1 -Commit <sha>   (New-Checkpoint.ps1 commits and calls this)
+    criterion              -PhaseId P1 -CriterionId P1-AC1 -Status met|not-met|waived|pending [-Evidence a,b] [-Note text]
+    phase-failure          -PhaseId P1 -Summary text -Recovery text [-EvidenceFile path]
+    unresolved-update      -Id U-001 -Status decided|resolved|deferred|awaiting-user [-Proposal port|replace|redesign] [-DecisionId D-001]
     migrate
     session-marker         -SessionId <id> -DataDir <plugin data dir> [-Remove]
 
@@ -30,7 +33,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet('init', 'get', 'validate', 'gate', 'gate-fields', 'request-plan-approval', 'approve', 'require-approval', 'check-plan', 'set', 'decision', 'unresolved', 'phases', 'phase', 'checkpoint', 'migrate', 'session-marker')]
+    [ValidateSet('init', 'get', 'validate', 'gate', 'gate-fields', 'request-plan-approval', 'approve', 'require-approval', 'check-plan', 'set', 'decision', 'unresolved', 'unresolved-update', 'phases', 'phase', 'checkpoint', 'criterion', 'phase-failure', 'migrate', 'session-marker')]
     [string]$Command,
     [string]$ProjectRoot = '',
     [string]$Mode, [string]$Target,
@@ -39,6 +42,8 @@ param(
     [string]$Section, [string]$Set, [string]$JsonFile,
     [string]$Item, [string]$Pattern, [string]$Proposal = 'undecided',
     [string]$PhaseId, [string]$Commit,
+    [string]$CriterionId, [string]$Summary, [string]$Recovery, [string]$EvidenceFile,
+    [string]$Id, [string]$DecisionId,
     [string]$Field,
     [string]$SessionId, [string]$DataDir, [switch]$Remove,
     [switch]$Invalidate
@@ -169,6 +174,24 @@ try {
             if (-not $PhaseId -or -not $Commit) { throw 'checkpoint needs -PhaseId and -Commit.' }
             [void](Set-PhaseCheckpoint -ProjectRoot $ProjectRoot -PhaseId $PhaseId -Commit $Commit)
             $out.phase = $PhaseId; $out.commit = $Commit
+        }
+        'criterion' {
+            if (-not $PhaseId -or -not $CriterionId -or -not $Status) { throw 'criterion needs -PhaseId, -CriterionId, and -Status.' }
+            $s = Set-AcceptanceCriterion -ProjectRoot $ProjectRoot -PhaseId $PhaseId -CriterionId $CriterionId -Status $Status -Evidence $Evidence -Note $Note
+            $ph = @($s['phases']) | Where-Object { $_['id'] -eq $PhaseId } | Select-Object -First 1
+            $out.criterion = @($ph['acceptanceCriteria']) | Where-Object { $_['id'] -eq $CriterionId } | Select-Object -First 1
+            $out.open = @(@($ph['acceptanceCriteria']) | Where-Object { $_['status'] -notin @('met', 'waived') } | ForEach-Object { $_['id'] })
+        }
+        'phase-failure' {
+            if (-not $PhaseId -or -not $Summary -or -not $Recovery) { throw 'phase-failure needs -PhaseId, -Summary, and -Recovery.' }
+            [void](Add-PhaseFailure -ProjectRoot $ProjectRoot -PhaseId $PhaseId -Summary $Summary -Recovery $Recovery -EvidenceFile $EvidenceFile)
+            $out.phase = $PhaseId
+        }
+        'unresolved-update' {
+            if (-not $Id -or -not $Status) { throw 'unresolved-update needs -Id and -Status.' }
+            $p2 = ''; if ($PSBoundParameters.ContainsKey('Proposal')) { $p2 = $Proposal }
+            [void](Set-UnresolvedStatus -ProjectRoot $ProjectRoot -Id $Id -Status $Status -Proposal $p2 -Decision $DecisionId)
+            $out.id = $Id; $out.status = $Status
         }
         'migrate' {
             $out.migration = Update-StateSchemaVersion -ProjectRoot $ProjectRoot

@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "pkg.renamed-community",
+  "title": "Packages renamed or replaced for newer versions",
+  "description": "Referenced packages that are deprecated on NuGet with an alternate package, or that the package knowledge maps to a successor.",
+  "kind": "customization",
+  "area": "packages-backoffice",
+  "owner": "migrate-packages-backoffice",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "package-metadata",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "deprecated-with-alternate",
+      "weight": "strong",
+      "derived": "package-metadata",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "low",
+      "summary": "The successor package must be verified for the target from its own metadata.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "successor-package",
+      "option": "Move to the successor named by the package metadata, verified for the target",
+      "when": "Package metadata names an alternate",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/extending/packages/installing-and-uninstalling-packages.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This article will cover the process of installing as well as uninstalling packages from your Umbraco CMS website"
+        }
+      ],
+      "requiresApproval": "package-removal"
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each successor package resolves for the target framework and the site builds",
+      "verification": "automated"
+    }
+  ],
+  "sources": []
+}

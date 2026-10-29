@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.deploy-or-courier",
+  "title": "Vendor deployment and transfer tools",
+  "description": "Projects that use the vendor deployment or courier tools to move schema and content between environments.",
+  "kind": "customization",
+  "area": "content-database",
+  "owner": "migrate-content-database",
+  "prevalence": "gap",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": true,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "deploy-package",
+      "weight": "strong",
+      "files": [
+        "**/*.csproj",
+        "**/*.vbproj",
+        "**/packages.config",
+        "**/Directory.Packages.props"
+      ],
+      "regex": "(?:\\bid|\\bInclude)\\s*=\\s*\"(?:UmbracoDeploy|Umbraco\\.Deploy(?:\\.[\\w\\.]+)?|UmbracoCourier|Umbraco\\.Courier(?:\\.[\\w\\.]+)?)\"",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "courier-config",
+      "weight": "strong",
+      "files": [
+        "**/config/courier.config"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "The deployment tool release must match the target; import with migrations can transform obsolete content.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-deploy/17.latest/upgrading/version-specific.md",
+          "docsVersion": "17",
+          "appliesTo": "17",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Version 17 of Umbraco Deploy has a minimum dependency on Umbraco CMS core of 17.0.0"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-deploy/17.latest/deployment-workflow/import-export/import-with-migrations.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "you can migrate from a Nested Content property in Umbraco 8 to a Block List in Umbraco 13"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "tool-release-for-target",
+      "option": "Upgrade the tool to its release for the target and follow its version notes",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-deploy/17.latest/upgrading/version-specific.md",
+          "docsVersion": "17",
+          "appliesTo": "17",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Version 17 of Umbraco Deploy has a minimum dependency on Umbraco CMS core of 17.0.0"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "A schema and content transfer to a test environment succeeds",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

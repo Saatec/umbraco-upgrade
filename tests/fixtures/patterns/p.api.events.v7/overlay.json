@@ -1,0 +1,9 @@
+{
+  "id": "p.api.events.v7",
+  "baseline": "gen.v7",
+  "expects": [
+    "api.event-handlers",
+    "api.composition-di"
+  ],
+  "description": "A content saving subscription made in a startup event handler (7 subscribes from the startup handler, so the startup pattern fires too)."
+}

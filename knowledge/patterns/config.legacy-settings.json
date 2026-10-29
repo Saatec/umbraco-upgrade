@@ -1,0 +1,147 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "config.legacy-settings",
+  "title": "Custom application settings and configuration sections",
+  "description": "Project settings in web.config appSettings, custom configuration sections, configuration transforms, and code that reads them statically.",
+  "kind": "customization",
+  "area": "application-framework",
+  "owner": "migrate-application-framework",
+  "involves": [
+    "migrate-config-auth-integrations"
+  ],
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "custom-app-setting",
+      "weight": "strong",
+      "files": [
+        "**/web.config",
+        "**/Web.config"
+      ],
+      "regex": "<add\\s+key=\"(?!umbraco|Umbraco\\.|webpages:|ClientValidationEnabled\"|UnobtrusiveJavaScriptEnabled\"|owin:|ValidationSettings:|aspnet:)[^\"]+\"",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "custom-config-section",
+      "weight": "strong",
+      "files": [
+        "**/web.config",
+        "**/Web.config"
+      ],
+      "regex": "<section\\s+name=\"[^\"]+\"\\s+type=\"(?!Umbraco\\.|System\\.|Microsoft\\.)",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "config-transform",
+      "weight": "strong",
+      "files": [
+        "**/Web.*.config",
+        "**/web.*.config"
+      ],
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "static-app-settings",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\b(?:Web)?ConfigurationManager\\.AppSettings\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "Settings move to appsettings.json and the .NET configuration pattern; CMS settings map to documented Umbraco:CMS keys.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/configuration.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "we have moved away from the previous configuration using .config files, to instead using the .NET built-in configuration pattern"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/configuration/globalsettings.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Global settings contains at set of global settings for the CMS"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "appsettings-options",
+      "option": "Move settings to appsettings.json bound through typed options; verify each CMS key in the target docs",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/configuration.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "we have moved away from the previous configuration using .config files, to instead using the .NET built-in configuration pattern"
+        },
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/core/extensions/options",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The options pattern uses classes to provide strongly typed access to groups of related settings"
+        }
+      ]
+    },
+    {
+      "id": "flag-stale-keys",
+      "option": "Flag keys for removed features instead of copying them",
+      "when": "A key belongs to a feature the target removed",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "any UI-related app settings will now have to be configured as"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Every setting the code reads resolves to a value on the local site, with secrets from a secret store",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

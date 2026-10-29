@@ -1,23 +1,171 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "id": "code.surface-controller",
   "title": "Surface controllers",
   "description": "Controllers that handle form posts from rendered pages. Some projects also use them as JSON endpoints for front-end scripts.",
+  "kind": "customization",
   "area": "custom-code",
   "owner": "migrate-custom-code",
   "prevalence": "common",
-  "status": "hypothesis",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
   "detectors": [
-    { "id": "base-type", "weight": "strong", "files": ["**/*.cs"], "regex": ":\\s*(?:[\\w\\.]+\\.)?SurfaceController\\b", "generations": ["v7", "v8", "v9-v13", "v14+"] },
-    { "id": "form-helper", "weight": "strong", "files": ["**/*.cshtml"], "regex": "\\bBeginUmbracoForm\\b", "generations": ["v7", "v8", "v9-v13", "v14+"] },
-    { "id": "surface-url", "weight": "supporting", "files": ["**/*.js", "**/*.ts", "**/*.cshtml"], "regex": "/umbraco/surface/", "generations": ["v7", "v8", "v9-v13", "v14+"] }
+    {
+      "id": "base-type",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?SurfaceController\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "form-helper",
+      "weight": "strong",
+      "files": [
+        "**/*.cshtml"
+      ],
+      "regex": "\\bBeginUmbracoForm\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "surface-url",
+      "weight": "supporting",
+      "files": [
+        "**/*.js",
+        "**/*.ts",
+        "**/*.cshtml"
+      ],
+      "regex": "/umbraco/surface/",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "In the ASP.NET Core generation a surface controller is a regular ASP.NET Core MVC controller.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/surface-controllers.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "A surface controller is an MVC controller that interacts with the front-end rendering of an Umbraco page"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/surface-controllers.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "It is a regular ASP.NET Core MVC controller that"
+        }
+      ]
+    },
+    {
+      "crosses": 14,
+      "difficulty": "low",
+      "summary": "Surface controllers are documented the same way for the new backoffice generation.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/backend-and-custom-logic/routing/surface-controllers.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "A surface controller is an MVC controller that interacts with the front-end rendering of an Umbraco page"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/backend-and-custom-logic/routing/surface-controllers.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "It is a regular ASP.NET Core MVC controller that"
+        }
+      ]
+    }
   ],
   "handling": [
-    { "option": "Port to the target surface controller base type and its constructor dependencies", "when": "The controller handles form posts", "docs": "Surface Controllers for the target version" },
-    { "option": "Move JSON endpoints to API controllers with explicit routes", "when": "Front-end scripts consume JSON from the controller", "docs": "Umbraco API Controllers for the target version" }
+    {
+      "id": "port-surface-controller",
+      "option": "Port to the target surface controller base type and its constructor dependencies",
+      "when": "The controller handles form posts",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/surface-controllers.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "A surface controller is an MVC controller that interacts with the front-end rendering of an Umbraco page"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/backend-and-custom-logic/routing/surface-controllers.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "A surface controller is an MVC controller that interacts with the front-end rendering of an Umbraco page"
+        }
+      ]
+    },
+    {
+      "id": "json-to-api-controller",
+      "option": "Move JSON endpoints to API controllers with explicit routes",
+      "when": "Front-end scripts consume JSON from the controller",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/develop-with-umbraco/application-code/backend-and-custom-logic/routing/umbraco-api-controllers/porting-old-umbraco-apis.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The recommended approach is to base APIs on the ASP.NET Core Controller class instead"
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "text": "Every form posts, validates, and redirects as before on the local site",
+      "verification": "manual"
+    }
   ],
   "sources": [
-    { "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Reference/Routing/Surface-Controllers/index.md", "appliesTo": "8", "fetchedAt": "2026-10-12" },
-    { "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/surface-controllers.md", "appliesTo": "13", "fetchedAt": "2026-10-12" }
+    {
+      "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/Reference/Routing/Surface-Controllers/index.md",
+      "appliesTo": "8",
+      "fetchedAt": "2026-10-12"
+    },
+    {
+      "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/routing/surface-controllers.md",
+      "appliesTo": "13",
+      "fetchedAt": "2026-10-12"
+    }
   ]
 }

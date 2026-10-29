@@ -118,6 +118,43 @@ function Invoke-Guard {
     return (Invoke-PluginScript -Script 'scripts/hooks/guard.ps1' -StdIn $json -Environment $Environment)
 }
 
+function New-ApprovedUpgradeProject {
+    # Synthetic project with gates 1 to 3 passed, an approved plan with the given phases, on the upgrade branch.
+    # The state folder is excluded locally. With -StartFirstPhase, P1 is in progress.
+    param(
+        [string]$Baseline = 'gen.v13', [string]$Overlay = '', $Phases = $null, [switch]$StartFirstPhase, [switch]$LocalCopyDeclared,
+        [string]$Policy = 'exclude-local'
+    )
+    Import-Module (Join-Path $script:RepoRoot 'scripts/lib/State.psm1') -DisableNameChecking -Scope Local
+    $dir = Copy-Fixture -Baseline $Baseline -Overlay $Overlay
+    Initialize-GitRepo -Path $dir -Commit
+    $excludeFile = Join-Path $dir '.git/info/exclude'
+    Add-Content -LiteralPath $excludeFile -Value '.umbraco-upgrade/'
+    [void](New-UpgradeState -ProjectRoot $dir -Mode upgrade -TargetRequested '17')
+    [void](Update-StateSection -ProjectRoot $dir -Section project -Values @{ stateFolderPolicy = $Policy; webProject = 'SampleSite.Web.csproj' })
+    [void](Set-UpgradeGate -ProjectRoot $dir -Gate discovery -Status passed -Evidence @('evidence/discovery/git-status-at-start.json'))
+    [void](Update-StateSection -ProjectRoot $dir -Section source -Values @{ umbraco = '13.10.1'; major = 13; confidence = 'high'; database = @{ engine = 'sqlserver'; localCopyDeclared = [bool]$LocalCopyDeclared; target = 'local' } })
+    [void](Update-StateSection -ProjectRoot $dir -Section target -Values @{ resolved = '17.7.1'; dotnet = 'net10.0'; lts = @{ value = $true; source = 'D-001'; verified = $true } })
+    [void](Update-StateSection -ProjectRoot $dir -Section path -Values @{ selection = 'selected'; strategy = 'in-place'; decision = 'D-001' })
+    [void](Set-UpgradeGate -ProjectRoot $dir -Gate versionPath -Status passed)
+    $null = & git -C $dir checkout -q -b 'umbraco-upgrade/13-to-17' 2>&1
+    [void](Update-StateSection -ProjectRoot $dir -Section gitBaseline -Values @{ upgradeBranch = 'umbraco-upgrade/13-to-17' })
+    [System.IO.File]::WriteAllText((Join-Path $dir '.umbraco-upgrade/rollback.md'), "# Rollback`n")
+    [void](Set-GateFields -ProjectRoot $dir -Gate safety -Fields @{ guardSelfTest = 'passed'; rollbackDoc = 'rollback.md' })
+    [void](Set-UpgradeGate -ProjectRoot $dir -Gate safety -Status passed -Evidence @('rollback.md'))
+    if ($null -eq $Phases) {
+        $Phases = @(
+            [ordered]@{ id = 'P1'; title = 'Packages, framework, and startup'; area = 'application-framework'; patterns = @(); acceptanceCriteria = @([ordered]@{ id = 'P1-AC1'; text = 'The solution builds'; verification = 'automated' }) },
+            [ordered]@{ id = 'P2'; title = 'Custom code'; area = 'custom-code'; patterns = @('code.render-controller'); acceptanceCriteria = @([ordered]@{ id = 'P2-AC1'; text = 'Controllers ported'; verification = 'manual' }) })
+    }
+    [void](Set-UpgradePhases -ProjectRoot $dir -Phases $Phases)
+    [System.IO.File]::WriteAllText((Join-Path $dir '.umbraco-upgrade/plan.md'), "# Upgrade plan`n`nSynthetic plan for tests.`n")
+    [void](Request-PlanApproval -ProjectRoot $dir)
+    [void](Add-Approval -ProjectRoot $dir -Action 'start-plan-execution' -Decision approved -Note 'approve')
+    if ($StartFirstPhase) { [void](Set-PhaseStatus -ProjectRoot $dir -PhaseId 'P1' -Status in-progress) }
+    return $dir
+}
+
 function New-UpgradeProject {
     # Synthetic upgrade project: a gen.* copy in a git repo with initialized state.
     param([string]$Baseline = 'gen.v13', [ValidateSet('upgrade', 'plan')][string]$Mode = 'upgrade', [string]$Target = '17')

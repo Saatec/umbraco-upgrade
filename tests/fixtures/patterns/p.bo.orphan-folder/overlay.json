@@ -1,0 +1,8 @@
+{
+  "id": "p.bo.orphan-folder",
+  "baseline": "gen.v13",
+  "expects": [
+    "backoffice.orphan-plugin-folder"
+  ],
+  "description": "An App_Plugins folder with no manifest and no matching package, left from a removed package."
+}

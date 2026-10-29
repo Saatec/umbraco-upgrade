@@ -1,0 +1,8 @@
+{
+  "id": "p.gap.content-apps",
+  "baseline": "gen.v13",
+  "expects": [
+    "api.content-apps"
+  ],
+  "description": "A content app created by a factory class."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "p.bo.authorized-api",
+  "baseline": "gen.v13",
+  "expects": [
+    "backoffice.authorized-api"
+  ],
+  "description": "An authorized backoffice API controller and a server variables handler."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "p.conf.untracked-config",
+  "baseline": "gen.v13",
+  "expects": [
+    "config.untracked-environment-config"
+  ],
+  "description": "Environment configuration files excluded from source control."
+}

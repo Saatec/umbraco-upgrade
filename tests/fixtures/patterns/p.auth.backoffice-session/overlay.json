@@ -1,0 +1,8 @@
+{
+  "id": "p.auth.backoffice-session",
+  "baseline": "gen.v8",
+  "expects": [
+    "auth.backoffice-session-on-frontend"
+  ],
+  "description": "A front-end view that shows editor tools when a backoffice login is present."
+}

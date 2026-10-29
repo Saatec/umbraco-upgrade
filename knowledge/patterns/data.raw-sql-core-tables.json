@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "data.raw-sql-core-tables",
+  "title": "Raw SQL against CMS internal tables",
+  "description": "Queries that read or write the CMS own tables directly, often with hard-coded property type IDs. A successful build proves nothing about them.",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "involves": [
+    "migrate-build-tests"
+  ],
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "core-table-name",
+      "weight": "strong",
+      "files": [
+        "**/*.cs",
+        "**/*.cshtml",
+        "**/*.sql"
+      ],
+      "regex": "\\b(?:cmsPropertyData|cmsContentXml|cmsContentVersion|cmsContentType|cmsPropertyType|cmsDocument|cmsMember|cmsContent|umbracoNode|umbracoPropertyData|umbracoContentVersion|umbracoDocument|umbracoDocumentVersion)\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 8,
+      "difficulty": "high",
+      "summary": "The CMS schema changed in the 7 to 8 migration; internal-table SQL must be rewritten.",
+      "status": "hypothesis",
+      "sources": []
+    },
+    {
+      "crosses": 14,
+      "difficulty": "high",
+      "summary": "Internal tables can change at any major; every internal-table query is re-verified at runtime.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "replace-with-services",
+      "option": "Replace internal-table SQL with service calls",
+      "when": "A service offers the data",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    },
+    {
+      "id": "rewrite-sql",
+      "option": "Rewrite the SQL against the target schema and test it on the migrated local copy",
+      "when": "No service offers the data",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each internal-table query returns correct results on the migrated local copy (runtime check, not build)",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

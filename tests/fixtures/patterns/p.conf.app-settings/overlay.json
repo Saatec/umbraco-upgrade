@@ -1,0 +1,8 @@
+{
+  "id": "p.conf.app-settings",
+  "baseline": "gen.v7",
+  "expects": [
+    "config.legacy-settings"
+  ],
+  "description": "Project settings in web.config appSettings, read through the static configuration manager."
+}

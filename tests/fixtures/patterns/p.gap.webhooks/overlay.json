@@ -1,0 +1,8 @@
+{
+  "id": "p.gap.webhooks",
+  "baseline": "gen.v13",
+  "expects": [
+    "jobs.webhooks"
+  ],
+  "description": "A custom webhook event."
+}

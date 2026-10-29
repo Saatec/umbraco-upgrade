@@ -1,0 +1,206 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.forms",
+  "title": "Forms add-on customizations and storage",
+  "description": "Forms definitions, custom field and workflow types, themes, and licensing of the vendor forms add-on.",
+  "kind": "customization",
+  "area": "content-database",
+  "owner": "migrate-content-database",
+  "involves": [
+    "migrate-config-auth-integrations"
+  ],
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "forms-package",
+      "weight": "strong",
+      "files": [
+        "**/*.csproj",
+        "**/*.vbproj",
+        "**/packages.config",
+        "**/Directory.Packages.props"
+      ],
+      "regex": "(?:\\bid|\\bInclude)\\s*=\\s*\"(?:UmbracoForms|Umbraco\\.Forms(?:\\.[\\w\\.]+)?)\"",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "forms-data-on-disk",
+      "weight": "strong",
+      "files": [
+        "**/App_Data/UmbracoForms/**"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "custom-forms-type",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:Umbraco\\.Forms\\.Core\\.)?(?:FieldType|WorkflowType)\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "forms-theme",
+      "weight": "supporting",
+      "files": [
+        "**/Views/Partials/Forms/Themes/**"
+      ],
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "medium",
+      "summary": "Forms API endpoints moved and rendered-form tracking changed its default storage; custom field types need client-side components.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-forms/17.latest/upgrading/version-specific.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The Forms API endpoints moved under a delivery path segment"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-forms/17.latest/upgrading/version-specific.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "the default value of the TrackRenderedFormsStorageMethod configuration option is HttpContextItems"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-forms/17.latest/developer/extending/adding-a-fieldtype.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This article illustrates how to add a custom form field type using server-side and client-side components"
+        }
+      ]
+    },
+    {
+      "crosses": 17,
+      "difficulty": "low",
+      "summary": "Forms 17 requires CMS 17 and a subscription license for 17 and later.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-forms/17.latest/upgrading/version-specific.md",
+          "docsVersion": "17",
+          "appliesTo": "17",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Version 17 of Umbraco Forms has a minimum dependency on Umbraco CMS core of 17.0.0"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-forms/17.latest/installation/the-licensing-model.md",
+          "docsVersion": "17",
+          "appliesTo": "17+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "version 17+ will only be available through a subscription-based license"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "upgrade-forms-package",
+      "option": "Upgrade the add-on to the release for the target and follow its version-specific notes",
+      "when": "Always",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-forms/17.latest/upgrading/version-specific.md",
+          "docsVersion": "17",
+          "appliesTo": "17",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Version 17 of Umbraco Forms has a minimum dependency on Umbraco CMS core of 17.0.0"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-forms/17.latest/upgrading/version-specific.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The Forms API endpoints moved under a delivery path segment"
+        }
+      ]
+    },
+    {
+      "id": "reregister-custom-types",
+      "option": "Re-register custom field and workflow types on the target API, with client-side components on 14 and later",
+      "when": "Custom types exist",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-forms/13.latest/developer/extending/adding-a-fieldtype.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "make it inherit from Umbraco.Forms.Core.FieldType"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-forms/17.latest/developer/extending/adding-a-fieldtype.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This article illustrates how to add a custom form field type using server-side and client-side components"
+        }
+      ]
+    },
+    {
+      "id": "replace-with-controllers",
+      "option": "Replace custom types with own controllers (the user decides)",
+      "when": "The user prefers to drop the add-on extension points",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [],
+      "requiresApproval": "remove-custom-feature"
+    }
+  ],
+  "checks": [
+    {
+      "text": "Every form renders, validates, submits, and runs its workflows on the local site",
+      "verification": "manual"
+    },
+    {
+      "text": "The license model for the target is confirmed with the user",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

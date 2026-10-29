@@ -1,0 +1,8 @@
+{
+  "id": "p.gap.health-check",
+  "baseline": "gen.v13",
+  "expects": [
+    "api.health-checks"
+  ],
+  "description": "A custom health check."
+}

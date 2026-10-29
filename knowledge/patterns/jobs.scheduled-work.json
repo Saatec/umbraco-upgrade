@@ -1,0 +1,151 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "jobs.scheduled-work",
+  "title": "Scheduled and externally triggered background work",
+  "description": "Periodic synchronization or maintenance work: legacy scheduled tasks, timers, hosted services, recurring jobs, or scheduler libraries.",
+  "kind": "customization",
+  "area": "config-auth-integrations",
+  "owner": "migrate-config-auth-integrations",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "legacy-scheduled-tasks",
+      "weight": "strong",
+      "files": [
+        "**/config/umbracoSettings.config"
+      ],
+      "regex": "<scheduledTasks\\b[^>]*>\\s*<task\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
+      "id": "recurring-job",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "\\bIRecurringBackgroundJob\\b|:\\s*(?:[\\w\\.]+\\.)?(?:RecurringBackgroundJobBase|RecurringHostedServiceBase)\\b",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "hosted-service",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?(?:BackgroundService|IHostedService)\\b",
+      "generations": [
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "timer-or-scheduler",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "new\\s+(?:System\\.Threading\\.)?Timer\\s*\\(|\\bRecurringJob\\.AddOrUpdate\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "The 13 documentation runs recurring code as recurring background jobs registered at startup.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/scheduling.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Background job classes should implement the IRecurringBackgroundJob interface"
+        }
+      ]
+    },
+    {
+      "crosses": 14,
+      "difficulty": "low",
+      "summary": "Recurring background jobs are documented with a base class and a registration extension.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/server-side-extensions/scheduling.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The recommended way is to inherit from the abstract RecurringBackgroundJobBase class"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "recurring-background-job",
+      "option": "Implement recurring background jobs registered at startup, choosing server roles for load balancing",
+      "when": "The work runs inside the site",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/reference/scheduling.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Background job classes should implement the IRecurringBackgroundJob interface"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/extend-your-project/server-side-extensions/scheduling.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-10-29",
+          "evidence": "The recommended way is to inherit from the abstract RecurringBackgroundJobBase class"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/13.latest/fundamentals/setup/server-setup/load-balancing.md",
+          "docsVersion": "13",
+          "appliesTo": "9-13",
+          "verifiedAt": "2026-10-29",
+          "evidence": "Configuring and setting up a load balanced server environment requires planning, design and testing"
+        }
+      ]
+    },
+    {
+      "id": "external-scheduler",
+      "option": "Use an external scheduler or a scheduler library",
+      "when": "Hosting or load balancing requires it",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each job runs once on the local site and its effect is observed (log entry or data change on the local copy)",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}

@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "data.secondary-datastore",
+  "title": "Second database or non-CMS data access stack",
+  "description": "Connections to other databases, or data access stacks other than the CMS one (ORM contexts, other database clients, plain connections).",
+  "kind": "customization",
+  "area": "custom-code",
+  "owner": "migrate-custom-code",
+  "prevalence": "common",
+  "status": "hypothesis",
+  "detection": "static",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "orm-context",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:[\\w\\.]+\\.)?DbContext\\b",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "orm-package",
+      "weight": "strong",
+      "files": [
+        "**/*.csproj",
+        "**/*.vbproj",
+        "**/packages.config",
+        "**/Directory.Packages.props"
+      ],
+      "regex": "(?:\\bid|\\bInclude)\\s*=\\s*\"(?:EntityFramework|MySql\\.Data|Npgsql|Dapper)\"",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    },
+    {
+      "id": "plain-connection",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": "new\\s+(?:System\\.Data\\.SqlClient\\.|Microsoft\\.Data\\.SqlClient\\.)?(?:SqlConnection|MySqlConnection|NpgsqlConnection|OleDbConnection)\\s*\\(",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
+    }
+  ],
+  "impact": [
+    {
+      "crosses": 9,
+      "difficulty": "medium",
+      "summary": "Data access libraries need .NET (Core) versions, or a port to the target data stack.",
+      "status": "hypothesis",
+      "sources": []
+    }
+  ],
+  "handling": [
+    {
+      "id": "port-data-stack",
+      "option": "Port to the target data stack or a .NET edition of the library",
+      "when": "The data store is still used",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [
+        {
+          "url": "https://learn.microsoft.com/en-us/dotnet/core/porting/",
+          "docsVersion": "dotnet",
+          "appliesTo": "dotnet",
+          "verifiedAt": "2026-10-29",
+          "evidence": "This article explains how to plan and perform upgrades of .NET applications"
+        }
+      ]
+    },
+    {
+      "id": "retire-after-confirmation",
+      "option": "Remove only after the user confirms the store is no longer used",
+      "when": "The user confirms it is dead",
+      "targets": [
+        "v9-v13",
+        "v14+"
+      ],
+      "status": "hypothesis",
+      "sources": [],
+      "requiresApproval": "remove-custom-feature"
+    }
+  ],
+  "checks": [
+    {
+      "text": "Each secondary data store is reachable from the local site, against a local or test copy only",
+      "verification": "manual"
+    }
+  ],
+  "sources": []
+}
