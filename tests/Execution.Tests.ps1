@@ -180,6 +180,55 @@ Describe 'Invoke-DatabaseSnapshot.ps1 (approval tier)' -Tag 'fixture-based' {
     }
 }
 
+Describe 'Test-DatabaseHealth.ps1 (read-only, local copy only)' -Tag 'fixture-based' {
+    BeforeDiscovery {
+        $script:hasLocalDb = $false
+        if (Get-Command sqllocaldb -ErrorAction SilentlyContinue) { $null = & sqllocaldb info MSSQLLocalDB 2>&1; $script:hasLocalDb = ($LASTEXITCODE -eq 0) }
+    }
+    AfterEach { if ($script:d) { Remove-TestDirectory $script:d; $script:d = $null } }
+
+    It 'refuses without a declared local copy, for an unknown folder, and for a non-local database without printing secrets' {
+        $script:d = New-ApprovedUpgradeProject -Baseline 'gen.v13' -Overlay 'p.conf.planted-fake-secrets'
+        $r = Invoke-PluginScript -Script 'scripts/Test-DatabaseHealth.ps1' -Arguments @('-ProjectRoot', $script:d)
+        $r.Json.error | Should -Match 'No local database copy is declared'
+        [void](Update-StateSection -ProjectRoot $script:d -Section source -Values @{ database = @{ localCopyDeclared = $true } })
+        (Invoke-PluginScript -Script 'scripts/Test-DatabaseHealth.ps1' -Arguments @('-ProjectRoot', $script:d, '-Folder', 'P9')).Json.error | Should -Match "Unknown phase 'P9'"
+        $r = Invoke-PluginScript -Script 'scripts/Test-DatabaseHealth.ps1' -Arguments @('-ProjectRoot', $script:d, '-Environment', 'Production')
+        $r.ExitCode | Should -Be 1
+        $r.Json.error | Should -Match 'does not point to a local database'
+        $r.StdOut | Should -Not -Match $script:Fake
+        $r.StdOut | Should -Not -Match 'db\.example\.invalid'
+    }
+
+    It 'records the file size of a local SQLite copy' {
+        $script:d = New-ApprovedUpgradeProject -Baseline 'gen.v14plus' -LocalCopyDeclared
+        Write-TextFile -Path (Join-Path $script:d 'umbraco/Data/Umbraco.sqlite.db') -Content ('x' * 4096)
+        $r = Invoke-PluginScript -Script 'scripts/Test-DatabaseHealth.ps1' -Arguments @('-ProjectRoot', $script:d)
+        $r.ExitCode | Should -Be 0 -Because $r.StdOut
+        $r.Json.engine | Should -Be 'sqlite'
+        $r.Json.file | Should -Be 'Umbraco.sqlite.db'
+        $r.Json.note | Should -Match 'engine''s own tools'
+        $ev = [System.IO.File]::ReadAllText((Join-Path $script:d (Join-Path '.umbraco-upgrade' $r.Json.evidence)))
+        $ev | Should -Match 'never recorded'
+        $ev | Should -Not -Match 'Data Source'
+    }
+
+    It 'counts tables and foreign key problems with catalog queries on LocalDB' -Skip:(-not $script:hasLocalDb) {
+        # The master database of the default LocalDB instance, read only: no database is created or changed.
+        $script:d = New-ApprovedUpgradeProject -Baseline 'gen.v14plus' -LocalCopyDeclared
+        Write-TextFile -Path (Join-Path $script:d 'appsettings.json') -Content '{ "ConnectionStrings": { "umbracoDbDSN": "Server=(localdb)\\MSSQLLocalDB;Database=master;Integrated Security=true", "umbracoDbDSN_ProviderName": "Microsoft.Data.SqlClient" } }'
+        $r = Invoke-PluginScript -Script 'scripts/Test-DatabaseHealth.ps1' -Arguments @('-ProjectRoot', $script:d, '-Top', '5')
+        $r.ExitCode | Should -Be 0 -Because $r.StdOut
+        $r.Json.engine | Should -Be 'localdb'
+        $r.Json.databaseName | Should -Be 'master'
+        @($r.Json.files | Where-Object { $_.fileType -eq 'ROWS' }).Count | Should -Be 1
+        [int]$r.Json.tableCount | Should -BeGreaterOrEqual 0
+        @($r.Json.largestTables).Count | Should -BeLessOrEqual 5
+        [int]$r.Json.foreignKeysDisabledOrNotTrusted | Should -BeGreaterOrEqual 0
+        $r.StdOut | Should -Not -Match 'Integrated Security'
+    }
+}
+
 Describe 'Copy-ConfigValue.ps1' -Tag 'fixture-based' {
     AfterEach { if ($script:d) { Remove-TestDirectory $script:d; $script:d = $null }; if ($script:appdata -and (Test-Path $script:appdata)) { Remove-Item -Recurse -Force $script:appdata } }
 

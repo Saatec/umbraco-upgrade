@@ -143,6 +143,22 @@ Describe 'No planted fake secret leaves the scripts' -Tag 'fixture-based' {
         (Invoke-PluginScript -Script 'scripts/hooks/redact-output.ps1' -StdIn $clean).StdOut | Should -BeNullOrEmpty
     }
 
+    It 'the redaction hook redacts <tool> output and keeps its shape' -ForEach @(@{ tool = 'Bash' }, @{ tool = 'PowerShell' }) {
+        $stdout = "{`n  `"ConnectionStrings`": {`n    `"umbracoDbDSN`": `"Server=db;Database=x;User Id=u;Password=FAKE-SECRET-FOR-TESTS-20;TrustServerCertificate=true`"`n  }`n}"
+        $payload = @{ session_id = 's'; cwd = $script:proj13; hook_event_name = 'PostToolUse'; tool_name = $tool; tool_input = @{ command = 'git show HEAD:appsettings.Production.json' }
+            tool_response = [ordered]@{ stdout = $stdout; stderr = ''; interrupted = $false; isImage = $false } } | ConvertTo-Json -Depth 6 -Compress
+        $r = Invoke-PluginScript -Script 'scripts/hooks/redact-output.ps1' -StdIn $payload
+        $r.ExitCode | Should -Be 0
+        $r.StdOut | Should -Not -Match $script:Marker
+        $out = ($r.StdOut | ConvertFrom-Json).hookSpecificOutput.updatedToolOutput
+        @($out.PSObject.Properties | ForEach-Object { $_.Name }) -join ',' | Should -Be 'stdout,stderr,interrupted,isImage'
+        $out.interrupted | Should -BeFalse
+        $out.stdout | Should -Match 'Password=\*\*\*REDACTED\*\*\*'
+        $clean = @{ session_id = 's'; cwd = $script:proj13; hook_event_name = 'PostToolUse'; tool_name = $tool; tool_input = @{ command = 'git status' }
+            tool_response = [ordered]@{ stdout = 'On branch main'; stderr = ''; interrupted = $false; isImage = $false } } | ConvertTo-Json -Depth 6 -Compress
+        (Invoke-PluginScript -Script 'scripts/hooks/redact-output.ps1' -StdIn $clean).StdOut | Should -BeNullOrEmpty
+    }
+
     It 'the redaction hook keeps non-ASCII text intact' {
         $cafe = 'Caf' + [char]0x00E9 + ' ' + [char]0x00C5 + 'ngstr' + [char]0x00F6 + 'm'
         $content = "{ `"SiteName`": `"$cafe`", `"ApiKey`": `"FAKE-SECRET-FOR-TESTS-16`" }"

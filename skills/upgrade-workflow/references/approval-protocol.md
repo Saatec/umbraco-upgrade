@@ -30,7 +30,7 @@ state.ps1 approve -ProjectRoot "<root>" -Action <action> -Decision approved|reje
   | `package-removal` | the package ids, separated by `;` | the safety hook for `dotnet remove package` |
   | `ci-deploy-config-change` | the files | the safety hook for the edits |
   | `outside-project-path` | what is written where (for example the user secrets of a project) | `Copy-ConfigValue.ps1 -ToUserSecrets` (consumes it); the safety hook for file writes |
-  | `remove-custom-feature` | the removed paths, separated by `;` | `New-Checkpoint.ps1` (consumes it when a deleted file needs it) |
+  | `remove-custom-feature` | the removed paths, separated by `;`. Also used to delete the old files of a feature that a finished port replaced: ask "Delete <paths> now that <new files> replace them?" and put the replacement and its evidence in the note | `New-Checkpoint.ps1` (consumes it when a deleted file needs it); the safety hook asks before a shell command deletes tracked files no approval names |
 
   `state.ps1 require-approval -Action <action>` shows whether an approved, unused approval exists.
 

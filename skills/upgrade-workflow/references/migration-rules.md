@@ -24,7 +24,7 @@ When a pattern cannot be migrated directly:
 
 The rule holds when the user asks for a shortcut too. "Just make it build", "delete whatever is in the way", or "stub it for now" is not a decision to retire the feature: keep the code, record the unresolved item, explain what the shortcut would lose, and ask whether to port, replace, redesign, or retire it.
 
-Removing or retiring a feature happens only when the user decides it. Record the approval with the affected paths as the scope, separated by `;`:
+Removing or retiring a feature happens only when the user decides it. The same approval covers deleting the old files of a feature after its port works (for example AngularJS files after the new extension is in place): ask about exactly those paths and name what replaces them in the note. Record the approval with the affected paths as the scope, separated by `;`:
 
 `state.ps1 approve -Action remove-custom-feature -Decision approved -Scope "<path>;<path>" -Note "<user's words>"`
 

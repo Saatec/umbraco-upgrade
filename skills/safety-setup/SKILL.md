@@ -18,7 +18,7 @@ Scripts are run as `powershell -NoProfile -ExecutionPolicy Bypass -File "${CLAUD
 5. **Backup and local database plan.** Ask the user:
    - whether a restored **local** copy of the site's database exists for the upgrade, and whether it is the database the project's local configuration points to
    - where their production backup lives (only "exists" or "does not exist" is recorded; no paths or names of servers)
-   Record the answer with `state.ps1 set -Section source -Set "database.localCopyDeclared=true|false"`. Do not take a snapshot or connect to any database in this plugin version; snapshots are an approval-tier step of a later version.
+   Record the answer with `state.ps1 set -Section source -Set "database.localCopyDeclared=true|false"`. Do not take a snapshot or connect to any database in gate 3: health counts and snapshots happen in the database phase of plan execution, the snapshot with its own approval.
 6. **Rollback document.** Write `.umbraco-upgrade/rollback.md`: base branch and commit (from `state.ps1 get -Field gitBaseline`), how to return (`git switch <base-branch>`; the upgrade branch stays for inspection), and how to restore the local database copy from the user's backup. Record it: `state.ps1 gate-fields -ProjectRoot "<root>" -Gate safety -Set "rollbackDoc=rollback.md"`.
 7. **Guard self-test.**
    1. `Test-Guard.ps1 -ProjectRoot "<root>" -Issue`. It prints a harmless canary command.

@@ -31,23 +31,6 @@ Import-Module (Join-Path $PSScriptRoot 'lib/ConnectionInfo.psm1') -DisableNameCh
 Import-Module (Join-Path $PSScriptRoot 'lib/State.psm1') -DisableNameChecking
 Import-Module (Join-Path $PSScriptRoot 'lib/Execution.psm1') -DisableNameChecking
 
-function Resolve-DataFile {
-    # The database file of a file-based engine; |DataDirectory| is umbraco/Data (9 and later) or App_Data (7 and 8).
-    param([string]$ConnectionString, [string]$ProjectDir)
-    $cs = ConvertFrom-ConnectionString $ConnectionString
-    $ds = $null
-    foreach ($k in @('data source', 'datasource', 'filename')) { if ($cs.ContainsKey($k)) { $ds = $cs[$k]; break } }
-    if (-not $ds) { throw 'The connection string has no data source file.' }
-    if ($ds -match '(?i)^\|DataDirectory\|[\\/]?(.*)$') {
-        $rest = $Matches[1]
-        $dataDir = Join-Path $ProjectDir 'umbraco/Data'
-        if (-not [System.IO.Directory]::Exists($dataDir)) { $dataDir = Join-Path $ProjectDir 'App_Data' }
-        return (Resolve-FullPath (Join-Path $dataDir $rest))
-    }
-    if ([System.IO.Path]::IsPathRooted($ds)) { return (Resolve-FullPath $ds) }
-    return (Resolve-FullPath (Join-Path $ProjectDir $ds))
-}
-
 try {
     if (-not $ProjectRoot) { $ProjectRoot = (Get-Location).ProviderPath }
     $root = Resolve-FullPath $ProjectRoot.Trim().Trim('"', "'")
@@ -75,7 +58,7 @@ try {
     $files = @()
     switch ($info.engine) {
         { $_ -in @('sqlite', 'sqlce') } {
-            $file = Resolve-DataFile -ConnectionString $eff.connectionString -ProjectDir $ProjectDir
+            $file = Resolve-DataSourceFile -ConnectionString $eff.connectionString -ProjectDir $ProjectDir
             if (-not [System.IO.File]::Exists($file)) { throw "The database file was not found at the configured location (file name: $([System.IO.Path]::GetFileName($file)))." }
             foreach ($f in @($file, ($file + '-wal'), ($file + '-shm'))) {
                 if (-not [System.IO.File]::Exists($f)) { continue }

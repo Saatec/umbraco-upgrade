@@ -1,11 +1,12 @@
-# redact-output.ps1 - PostToolUse hook on Read for secret-bearing files (filtered by the hook's "if" rules)
-# and on Grep (search results show matching lines of any file).
+# redact-output.ps1 - PostToolUse hook on Read for secret-bearing files (filtered by the hook's "if" rules),
+# on Grep (search results show matching lines of any file), and on Bash and PowerShell (command output can
+# show configuration, for example git show or git diff of a settings file).
 #
 # Outside upgrade projects it exits 0 with no output. In an upgrade project it replaces secret values
 # in the result with ***REDACTED*** through updatedToolOutput, keeping the tool's output shape: for Read
 # { type: "text", file: { filePath, content, numLines, startLine, totalLines } } (verified on Claude
-# Code 2.1.296: the replacement is also what the session transcript stores); for Grep the same object
-# with every string value redacted, because a replacement that does not match the shape is ignored.
+# Code 2.1.296: the replacement is also what the session transcript stores); for the other tools the same
+# object with every string value redacted, because a replacement that does not match the shape is ignored.
 # A failure here never blocks: PostToolUse cannot undo the read, so the hook stays silent on errors.
 
 $ErrorActionPreference = 'Stop'
@@ -73,7 +74,7 @@ try {
     if (-not $root) { exit 0 }
     if ($null -eq $tr) { exit 0 }
     Import-Module (Join-Path (Split-Path $PSScriptRoot -Parent) 'lib/Redaction.psm1') -DisableNameChecking
-    if ([string]$hookInput.tool_name -eq 'Grep') {
+    if ([string]$hookInput.tool_name -in @('Grep', 'Bash', 'PowerShell')) {
         $before = ConvertTo-Json -InputObject $tr -Depth 20 -Compress
         $safe = Protect-Tree $tr
         if ((ConvertTo-Json -InputObject $safe -Depth 20 -Compress) -eq $before) { exit 0 }
@@ -81,7 +82,7 @@ try {
             hookSpecificOutput = [ordered]@{
                 hookEventName = 'PostToolUse'
                 updatedToolOutput = $safe
-                additionalContext = 'umbraco-upgrade: secret values in these search results were replaced with ***REDACTED***. Use scripts/Read-RedactedConfig.ps1 for configuration files.'
+                additionalContext = 'umbraco-upgrade: secret values in this tool output were replaced with ***REDACTED***. Use scripts/Read-RedactedConfig.ps1 for configuration files.'
             }
         }
         Write-HookText -To out -Text (ConvertTo-Json -InputObject $out -Depth 20 -Compress)

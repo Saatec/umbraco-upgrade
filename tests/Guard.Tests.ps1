@@ -585,6 +585,6 @@ Describe 'hooks.json' -Tag 'fixture-based' {
         }
         @($h.hooks.PreToolUse | ForEach-Object { $_.matcher }) | Should -Contain 'Bash|PowerShell'
         @($h.hooks.PostToolUse.hooks | ForEach-Object { $_.if }) | Should -Contain 'Read(//**/appsettings*.json)'
-        @($h.hooks.PostToolUse | ForEach-Object { $_.matcher }) | Should -Contain 'Grep'
+        @($h.hooks.PostToolUse | ForEach-Object { $_.matcher }) | Should -Contain 'Grep|Bash|PowerShell'
     }
 }

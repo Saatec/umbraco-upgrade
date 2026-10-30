@@ -22,7 +22,7 @@
     { "id": "approval.site-start", "decision": "ask", "reason": "Starting the site runs database migrations against its configured database. Confirm the database is the declared local copy." },
     { "id": "approval.db-migration", "decision": "ask", "reason": "Running database migrations on the local copy needs your approval." },
     { "id": "approval.package-removal", "decision": "ask", "reason": "Removing a package needs your approval during an Umbraco upgrade." },
-    { "id": "approval.project-file-delete", "decision": "ask", "reason": "This deletes tracked project files that no recorded remove-custom-feature approval names. Never remove custom functionality to make the project compile: keep the code, record an unresolved item, and ask. Retiring a feature is the user's decision, recorded with the paths as its scope." },
+    { "id": "approval.project-file-delete", "decision": "ask", "reason": "This deletes tracked project files that no recorded remove-custom-feature approval names. Never remove custom functionality to make the project compile: keep the code, record an unresolved item, and ask. Retiring a feature, or deleting files a finished port replaced, is the user's decision, recorded as that approval with the paths as its scope." },
     { "id": "approval.ci-deploy-file", "decision": "ask", "reason": "Changing CI or deployment configuration needs your approval." },
     { "id": "approval.outside-project", "decision": "ask", "reason": "This writes outside the project being upgraded." },
     { "id": "approval.mcp-database", "decision": "ask", "reason": "Confirm this database MCP tool targets the declared local database copy." }

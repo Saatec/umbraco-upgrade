@@ -35,7 +35,7 @@ Scripts run as `powershell -NoProfile -ExecutionPolicy Bypass -File "${CLAUDE_PL
    | Remove or replace a package | `package-removal` | the safety hook asks for `dotnet remove package` |
    | CI or deployment files | `ci-deploy-config-change` | the safety hook asks for the edit |
    | Write outside the project (user secrets, tool installs) | `outside-project-path` | `Copy-ConfigValue.ps1 -ToUserSecrets`; the safety hook asks for file writes |
-   | Remove or retire a custom feature | `remove-custom-feature` (scope: the paths) | `New-Checkpoint.ps1` |
+   | Remove or retire a custom feature, or delete files a finished port replaced | `remove-custom-feature` (scope: the paths) | `New-Checkpoint.ps1`; the safety hook asks before shell deletes |
 
 4. **Independent check.** For a phase with a high-difficulty pattern, or more than five criteria, delegate to the `umbraco-upgrade:independent-verifier` agent: give it the project root and the phase id only, not your narrative. Save its report with `Write-Evidence.ps1 -Folder <P> -Name verifier.md -SourceFile <file>` and act on every criterion it does not confirm.
 5. **Criteria.** Record each one with `state.ps1 criterion` and its evidence. Manual criteria need the user's confirmation; ask for it in one message that lists them.

@@ -197,4 +197,21 @@ function Get-DatabaseSummary {
     return ,($items.ToArray())
 }
 
-Export-ModuleMember -Function ConvertFrom-ConnectionString, Test-LocalHostName, Get-DataSourceInfo, Get-EffectiveConnectionString, Get-DatabaseSummary, Get-LaunchProfileEnvironment, Get-UserSecretsPath
+function Resolve-DataSourceFile {
+    # The database file of a file-based engine; |DataDirectory| is umbraco/Data (9 and later) or App_Data (7 and 8).
+    param([Parameter(Mandatory)][string]$ConnectionString, [Parameter(Mandatory)][string]$ProjectDir)
+    $cs = ConvertFrom-ConnectionString $ConnectionString
+    $ds = $null
+    foreach ($k in @('data source', 'datasource', 'filename')) { if ($cs.ContainsKey($k)) { $ds = $cs[$k]; break } }
+    if (-not $ds) { throw 'The connection string has no data source file.' }
+    if ($ds -match '(?i)^\|DataDirectory\|[\\/]?(.*)$') {
+        $rest = $Matches[1]
+        $dataDir = Join-Path $ProjectDir 'umbraco/Data'
+        if (-not [System.IO.Directory]::Exists($dataDir)) { $dataDir = Join-Path $ProjectDir 'App_Data' }
+        return (Resolve-FullPath (Join-Path $dataDir $rest))
+    }
+    if ([System.IO.Path]::IsPathRooted($ds)) { return (Resolve-FullPath $ds) }
+    return (Resolve-FullPath (Join-Path $ProjectDir $ds))
+}
+
+Export-ModuleMember -Function ConvertFrom-ConnectionString, Test-LocalHostName, Get-DataSourceInfo, Get-EffectiveConnectionString, Get-DatabaseSummary, Get-LaunchProfileEnvironment, Get-UserSecretsPath, Resolve-DataSourceFile

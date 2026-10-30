@@ -13,7 +13,7 @@ The tool result starts with `umbraco-upgrade guard [<rule-id>]`. Do not try anot
 
 ## Local database
 
-Database work happens only on a local, restored copy that the user declares. The plugin records only `local` or `non-local`, never a connection string.
+Database work happens only on a local, restored copy that the user declares. The plugin records only `local` or `non-local`, never a connection string. `Test-DatabaseHealth.ps1` (read-only catalog counts) and `Invoke-DatabaseSnapshot.ps1` refuse when no local copy is declared or when the effective connection string does not point to a local database.
 
 ## Scripts that act during execution
 
