@@ -137,7 +137,7 @@ function Read-HttpCache {
     param([string]$DataDir, [Parameter(Mandatory)][string]$Url)
     if (-not $DataDir) { return $null }
     $p = Get-CachePaths -DataDir $DataDir -Url $Url
-    if (-not ([System.IO.File]::Exists($p.meta) -and [System.IO.File]::Exists($p.body))) { return $null }
+    if (-not ([System.IO.File]::Exists((ConvertTo-IoPath $p.meta)) -and [System.IO.File]::Exists((ConvertTo-IoPath $p.body)))) { return $null }
     try { $meta = ConvertTo-PlainObject (Read-JsonFile $p.meta) } catch { return $null }
     $fetched = [DateTime]::Parse([string]$meta['fetchedAt'], [Globalization.CultureInfo]::InvariantCulture, [Globalization.DateTimeStyles]::AdjustToUniversal -bor [Globalization.DateTimeStyles]::AssumeUniversal)
     $meta['ageDays'] = [Math]::Round(([DateTime]::UtcNow - $fetched).TotalDays, 2)

@@ -40,6 +40,10 @@ Describe 'Repository files' -Tag 'fixture-based' {
             $text | Should -Match '(?m)^arguments: \[path\]$'
             $text | Should -Match ([regex]::Escape("Resolve-UpgradeArguments.ps1`" -Command $name -Path"))
         }
+        # Windows PowerShell 5.1 drops an empty native argument, so -Path "" reaches the script without a value.
+        foreach ($name in @('start', 'plan', 'resume', 'verify', 'report')) {
+            Get-Content -Raw (Join-Path $script:root "skills/$name/SKILL.md") | Should -Match 'If no project path was given, leave out `-Path`' -Because $name
+        }
     }
     It 'update-knowledge is a command that only the user can start' {
         $text = Get-Content -Raw (Join-Path $script:root 'skills/update-knowledge/SKILL.md')

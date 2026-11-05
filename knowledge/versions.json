@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.0.0",
   "kind": "versions",
-  "knowledgeVersion": "2026.10.29",
-  "verifiedAt": "2026-10-29",
+  "knowledgeVersion": "2026.11.05",
+  "verifiedAt": "2026-11-05",
   "verifiedBy": "maintainer",
   "product": "umbraco-cms",
   "notes": [
@@ -1026,15 +1026,15 @@
         "note": "Target framework of the latest 17 release in its NuGet package metadata. Matches the CMS to .NET table in the upgrade-details page (latest docs)."
       },
       "latestKnown": {
-        "value": "17.8.0",
+        "value": "17.8.1",
         "status": "verified",
         "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/index.json",
         "sourceType": "package-metadata",
         "sourceVersion": "n/a",
         "appliesTo": "17",
-        "verifiedAt": "2026-10-29",
+        "verifiedAt": "2026-11-05",
         "verifiedBy": "update-knowledge",
-        "note": "Latest stable 17.x release on NuGet on 2026-10-29. Resolve the current latest from NuGet at run time."
+        "note": "Latest stable 17.x release on NuGet on 2026-11-05. Resolve the current latest from NuGet at run time."
       },
       "docsSpace": {
         "value": "17.latest",
@@ -1113,15 +1113,15 @@
         "note": "Target framework of the latest 18 release in its NuGet package metadata. Matches the CMS to .NET table in the upgrade-details page (latest docs)."
       },
       "latestKnown": {
-        "value": "18.3.0",
+        "value": "18.3.1",
         "status": "verified",
         "source": "https://api.nuget.org/v3-flatcontainer/umbraco.cms/index.json",
         "sourceType": "package-metadata",
         "sourceVersion": "n/a",
         "appliesTo": "18",
-        "verifiedAt": "2026-10-29",
+        "verifiedAt": "2026-11-05",
         "verifiedBy": "update-knowledge",
-        "note": "Latest stable 18.x release on NuGet on 2026-10-29. Resolve the current latest from NuGet at run time."
+        "note": "Latest stable 18.x release on NuGet on 2026-11-05. Resolve the current latest from NuGet at run time."
       },
       "docsSpace": {
         "value": "latest",

@@ -30,9 +30,9 @@ function Read-TextFile {
 function Write-TextFile {
     param([Parameter(Mandatory)][string]$Path, [AllowEmptyString()][string]$Content = '')
     $full = Resolve-FullPath $Path
-    $dir = [System.IO.Path]::GetDirectoryName($full)
+    $dir = ConvertTo-IoPath ([System.IO.Path]::GetDirectoryName($full))
     if (-not [System.IO.Directory]::Exists($dir)) { [void][System.IO.Directory]::CreateDirectory($dir) }
-    [System.IO.File]::WriteAllText($full, $Content, $script:Utf8NoBom)
+    [System.IO.File]::WriteAllText((ConvertTo-IoPath $full), $Content, $script:Utf8NoBom)
 }
 
 function Write-AtomicTextFile {
@@ -40,8 +40,10 @@ function Write-AtomicTextFile {
     param([Parameter(Mandatory)][string]$Path, [AllowEmptyString()][string]$Content = '')
     $full = Resolve-FullPath $Path
     $dir = [System.IO.Path]::GetDirectoryName($full)
-    if (-not [System.IO.Directory]::Exists($dir)) { [void][System.IO.Directory]::CreateDirectory($dir) }
-    $tmp = Join-Path $dir ('.' + [System.IO.Path]::GetFileName($full) + '.' + [guid]::NewGuid().ToString('N') + '.tmp')
+    if (-not [System.IO.Directory]::Exists((ConvertTo-IoPath $dir))) { [void][System.IO.Directory]::CreateDirectory((ConvertTo-IoPath $dir)) }
+    # The temporary name adds about 40 characters, so a path well below the limit can still need the prefix.
+    $tmp = ConvertTo-IoPath (Join-Path $dir ('.' + [System.IO.Path]::GetFileName($full) + '.' + [guid]::NewGuid().ToString('N') + '.tmp'))
+    $full = ConvertTo-IoPath $full
     [System.IO.File]::WriteAllText($tmp, $Content, $script:Utf8NoBom)
     try {
         if ([System.IO.File]::Exists($full)) {

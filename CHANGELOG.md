@@ -35,7 +35,7 @@ First release.
 
 ### Knowledge
 
-- Version knowledge for Umbraco 7 to 18 and .NET 5.0 to 10.0, path rules, and package mappings, each fact with its source, status, and verification date (verified 2026-10-14; latest releases updated 2026-10-29).
+- Version knowledge for Umbraco 7 to 18 and .NET 5.0 to 10.0, path rules, and package mappings, each fact with its source, status, and verification date (verified 2026-10-14; latest releases updated 2026-11-05).
 - A registry of 87 customization patterns with detectors, impacts, and handling options per target generation, each cited or marked as a hypothesis.
 
 ### Known limitations

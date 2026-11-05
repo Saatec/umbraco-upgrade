@@ -46,7 +46,7 @@ function Get-KnowledgeFile {
     $result = [ordered]@{ kind = $Kind; origin = 'baseline'; path = $basePath; schemaVersion = $base['schemaVersion']; verifiedAt = $base['verifiedAt']; knowledgeVersion = $base['knowledgeVersion']; baselineVerifiedAt = $base['verifiedAt']; reason = 'no refreshed data'; data = $base }
     if (-not $DataDir) { $result.reason = 'no plugin data directory given'; return $result }
     $refPath = Join-Path (Get-RefreshedKnowledgeDir $DataDir) ($Kind + '.json')
-    if (-not [System.IO.File]::Exists($refPath)) { return $result }
+    if (-not [System.IO.File]::Exists((ConvertTo-IoPath $refPath))) { return $result }
     $ref = $null
     try { $ref = ConvertTo-PlainObject (Read-JsonFile $refPath) } catch { $result.reason = "refreshed file unreadable: $($_.Exception.Message)"; return $result }
     $ver = ''

@@ -145,6 +145,27 @@ Describe 'Documentation cache' -Tag 'mocked' {
         $r.ExitCode | Should -Be 1
         $r.Json.error | Should -Match 'plugin root'
     }
+
+    It 'stores, reuses, and refreshes pages in a data directory whose cache paths are longer than 260 characters' {
+        $top = Join-Path $script:dd ('d' * 60)
+        try {
+            $deep = Join-Path $top (('e' * 60) + '\' + ('f' * 60))
+            $r1 = Invoke-Doc @('-Major', '17', '-Page', 'upgrade-details') $deep
+            $r1.ExitCode | Should -Be 0
+            $r1.Json.status | Should -Be 'ok'
+            $r1.Json.fromCache | Should -BeFalse
+            $r1.Json.bodyPath.Length | Should -BeGreaterThan 260
+            [System.IO.File]::Exists('\\?\' + $r1.Json.bodyPath) | Should -BeTrue
+            $r2 = Invoke-Doc @('-Major', '17', '-Page', 'upgrade-details') $deep
+            $r2.Json.fromCache | Should -BeTrue
+            $r3 = Invoke-Doc @('-Major', '17', '-Page', 'upgrade-details', '-Refresh') $deep
+            $r3.Json.status | Should -Be 'ok'
+            $r3.Json.fromCache | Should -BeFalse
+            @([System.IO.Directory]::GetFiles('\\?\' + (Join-Path $deep 'doc-cache'), '*.tmp')).Count | Should -Be 0
+        } finally {
+            if ([System.IO.Directory]::Exists($top)) { [System.IO.Directory]::Delete('\\?\' + $top, $true) }
+        }
+    }
 }
 
 Describe 'LTS and end-of-life dates' -Tag 'mocked' {

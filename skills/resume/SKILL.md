@@ -21,6 +21,8 @@ Run (from the session's working directory):
 powershell -NoProfile -ExecutionPolicy Bypass -File "${CLAUDE_PLUGIN_ROOT}/scripts/Resolve-UpgradeArguments.ps1" -Command resume -Path "$path"
 ```
 
+If no project path was given, leave out `-Path` and its empty value: Windows PowerShell drops an empty argument, and the script then stops with a missing-argument error.
+
 - If `ok` is false, show each error message exactly, show the usage line, and stop.
 - Show any warnings to the user before continuing.
 - Use `projectRoot` from the output as the project path for every later step.
