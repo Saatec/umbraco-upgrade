@@ -25,6 +25,18 @@
       ]
     },
     {
+      "id": "application-class",
+      "weight": "strong",
+      "files": [
+        "**/*.cs"
+      ],
+      "regex": ":\\s*(?:global::)?(?:Umbraco\\.Web\\.)?UmbracoApplication\\b",
+      "generations": [
+        "v7",
+        "v8"
+      ]
+    },
+    {
       "id": "startup-class",
       "weight": "strong",
       "files": [

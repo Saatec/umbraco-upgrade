@@ -36,4 +36,4 @@ Load the `umbraco-upgrade:upgrade-workflow` skill with the Skill tool and follow
 - session id: `${CLAUDE_SESSION_ID}`
 - plugin data directory: `${CLAUDE_PLUGIN_DATA}`
 
-The workflow runs gates 1 to 4 and stops at gate 4 for approval. After the user approves in chat, it executes the plan phase by phase, each phase ending with a checkpoint commit on the upgrade branch. Final verification and the report (gate 5) come in a later plugin version.
+The workflow runs gates 1 to 4 and stops at gate 4 for approval. After the user approves in chat, it executes the plan phase by phase, each phase ending with a checkpoint commit on the upgrade branch. After the last phase it runs final verification and writes the report (gate 5). An interrupted upgrade continues with `/umbraco-upgrade:resume`.

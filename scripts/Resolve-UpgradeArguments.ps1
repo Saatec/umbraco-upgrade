@@ -5,12 +5,15 @@
 .DESCRIPTION
   Read-only. Prints one JSON object. Exit code 0 when the arguments are usable, 1 otherwise.
   Each failure has a stable code and a specific message. No state is written.
+  start and plan take a target and a path, and refuse a project that already has upgrade state. resume, verify,
+  and report take only a path and need the state; for them a project the version detection does not recognize
+  is a warning, because resume reconciliation reports what changed.
 #>
 [CmdletBinding()]
 param(
     [string]$Target = '',
     [string]$Path = '',
-    [ValidateSet('start', 'plan')][string]$Command = 'start'
+    [ValidateSet('start', 'plan', 'resume', 'verify', 'report')][string]$Command = 'start'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -18,7 +21,8 @@ Set-StrictMode -Version 2.0
 Import-Module (Join-Path $PSScriptRoot 'lib/Compat.psm1') -DisableNameChecking
 Import-Module (Join-Path $PSScriptRoot 'lib/Discovery.psm1') -DisableNameChecking
 
-$usage = "Usage: /umbraco-upgrade:$Command <target-version> [project-path]. Example: /umbraco-upgrade:$Command 17 C:\src\MySite"
+$stateCommand = ($Command -in @('resume', 'verify', 'report'))
+$usage = $(if ($stateCommand) { "Usage: /umbraco-upgrade:$Command [project-path]. Example: /umbraco-upgrade:$Command C:\src\MySite" } else { "Usage: /umbraco-upgrade:$Command <target-version> [project-path]. Example: /umbraco-upgrade:$Command 17 C:\src\MySite" })
 $result = [ordered]@{ ok = $false; command = $Command; usage = $usage; target = $null; projectRoot = $null; detected = $null; stateExists = $false; errors = @(); warnings = @() }
 $errors = New-Object System.Collections.ArrayList
 $warnings = New-Object System.Collections.ArrayList
@@ -28,7 +32,9 @@ function Add-Problem { param($List, [string]$Code, [string]$Message) [void]$List
 try {
     $t = $Target.Trim().Trim('"', "'")
     $p = $Path.Trim().Trim('"', "'")
-    if (-not $t) {
+    if ($stateCommand) {
+        if ($t) { Add-Problem $errors 'unexpected-argument' "/umbraco-upgrade:$Command takes only a project path; the target comes from the recorded state. $usage" }
+    } elseif (-not $t) {
         Add-Problem $errors 'missing-target' "A target version is required. $usage"
     } elseif ($t -notmatch '^\d+(\.\d+){0,2}$') {
         $hint = ''
@@ -55,11 +61,15 @@ try {
             isUmbraco = $v.isUmbraco; version = $v.resolved.version; major = $v.resolved.major; generation = $v.resolved.generation
             confidence = $v.resolved.confidence; needsConfirmation = $v.resolved.needsConfirmation; conflicts = @($v.conflicts).Count
         }
-        if (-not $v.isUmbraco) {
+        if (-not $v.isUmbraco -and $stateCommand) {
+            Add-Problem $warnings 'not-umbraco' "No Umbraco project files were recognized in '$full'. The recorded state is checked against the folder anyway."
+        } elseif (-not $v.isUmbraco) {
             Add-Problem $errors 'not-umbraco' "No Umbraco project found in '$full'. Looked for core package references (packages.config, project files, central package management), Umbraco configuration status keys in web.config, legacy config files, and the Umbraco section in appsettings.json."
         }
-        if ($result.stateExists) {
-            Add-Problem $errors 'state-exists' "An upgrade state already exists at '$(Join-Path $full '.umbraco-upgrade')'. /umbraco-upgrade:resume is not available in this version. Review that folder, then move or remove it yourself before starting again."
+        if ($stateCommand -and -not $result.stateExists) {
+            Add-Problem $errors 'no-state' "No upgrade state in '$full' (looked for .umbraco-upgrade/state.json). Start with /umbraco-upgrade:start or /umbraco-upgrade:plan."
+        } elseif ($result.stateExists -and -not $stateCommand) {
+            Add-Problem $errors 'state-exists' "An upgrade state already exists at '$(Join-Path $full '.umbraco-upgrade')'. To continue it, run /umbraco-upgrade:resume. To start over, review that folder, then move or remove it yourself."
         }
         if ($result.target -and $null -ne $v.resolved.major) {
             $srcMajor = [int]$v.resolved.major
@@ -74,7 +84,7 @@ try {
                 }
             }
         }
-        if ($v.resolved.needsConfirmation) {
+        if ($v.resolved.needsConfirmation -and -not $stateCommand) {
             Add-Problem $warnings 'source-needs-confirmation' "The source version could not be determined with high confidence (confidence: $($v.resolved.confidence)). Discovery will report the signals and ask."
         }
     }

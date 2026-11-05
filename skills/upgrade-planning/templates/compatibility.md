@@ -30,7 +30,7 @@ From `evidence/planning/package-compatibility.json` (NuGet metadata, fetched <da
 
 | Package | Current version | Class | Version for the target, or decision | Notes and source |
 |---|---|---|---|---|
-| <id> | <version> | compatible, no-target-version, framework-only, not-cms-specific, not-found, platform, cms-dependency | <version or "decision U-xxx"> | <dependency range, deprecation, NuGet URL> |
+| <id> | <version> | compatible, renamed, no-target-version, framework-only, not-cms-specific, not-found, platform, cms-dependency | <version, successor, or "decision U-xxx"> | <dependency range, deprecation, NuGet URL> |
 
 ## Detected customizations and target impact
 

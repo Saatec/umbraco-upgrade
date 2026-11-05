@@ -1,0 +1,8 @@
+{
+  "id": "p.ext.payment-controller",
+  "baseline": "gen.v13",
+  "expects": [
+    "ext.payment-gateway"
+  ],
+  "description": "A controller that starts and completes payments with an external gateway."
+}

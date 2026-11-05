@@ -33,7 +33,7 @@
         "**/packages.config",
         "**/Directory.Packages.props"
       ],
-      "regex": "(?:\\bid|\\bInclude)\\s*=\\s*\"(?:Microsoft\\.Owin\\.Security\\.[\\w\\.]+)\"",
+      "regex": "(?:\\bid|\\bInclude)\\s*=\\s*\"(?:Microsoft\\.Owin\\.Security\\.(?!Cookies\"|OAuth\")[\\w\\.]+)\"",
       "generations": [
         "v7",
         "v8"

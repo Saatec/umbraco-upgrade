@@ -1,6 +1,6 @@
 # Phase execution (after the plan is approved)
 
-Runs only in upgrade mode, after gate 3 passed and the user approved the plan. Gate 5 (final verification and report) belongs to a later plugin version: after the last phase, stop and tell the user.
+Runs only in upgrade mode, after gate 3 passed and the user approved the plan. After the last phase comes gate 5 (final verification and report), through the `umbraco-upgrade:verification` skill.
 
 Scripts run as `powershell -NoProfile -ExecutionPolicy Bypass -File "${CLAUDE_PLUGIN_ROOT}/scripts/<Script>" ...`. Read `ok` and the messages of every script; never guess at results.
 
@@ -37,7 +37,7 @@ Scripts run as `powershell -NoProfile -ExecutionPolicy Bypass -File "${CLAUDE_PL
    | Write outside the project (user secrets, tool installs) | `outside-project-path` | `Copy-ConfigValue.ps1 -ToUserSecrets`; the safety hook asks for file writes |
    | Remove or retire a custom feature, or delete files a finished port replaced | `remove-custom-feature` (scope: the paths) | `New-Checkpoint.ps1`; the safety hook asks before shell deletes |
 
-4. **Independent check.** For a phase with a high-difficulty pattern, or more than five criteria, delegate to the `umbraco-upgrade:independent-verifier` agent: give it the project root and the phase id only, not your narrative. Save its report with `Write-Evidence.ps1 -Folder <P> -Name verifier.md -SourceFile <file>` and act on every criterion it does not confirm.
+4. **Independent check.** For a phase with a high-difficulty pattern, or more than five criteria, delegate to the `umbraco-upgrade:independent-verifier` agent: give it the project root and the phase id only, not your narrative. Wait for its report before you record the phase's criteria: when it runs in the background, its result arrives as a notification in a later turn, so tell the user and continue from here then. Save its report with `Write-Evidence.ps1 -Folder <P> -Name verifier.md -SourceFile <file>` and act on every criterion it does not confirm.
 5. **Criteria.** Record each one with `state.ps1 criterion` and its evidence. Manual criteria need the user's confirmation; ask for it in one message that lists them.
 6. **Checkpoint.** `New-Checkpoint.ps1 -ProjectRoot "<root>" -PhaseId <P>`. If it refuses, fix the cause (restore a deleted file, replace a stub with real code or an unresolved item, move a secret out of the tracked file). Never work around it. Review every warning it reports.
 7. **Done.** `state.ps1 phase -ProjectRoot "<root>" -PhaseId <P> -Status done`. Tell the user: the phase, its commit, what changed, the open items, and the next phase. Continue with the next phase unless the user asked to pause after each one.
@@ -50,4 +50,4 @@ Scripts run as `powershell -NoProfile -ExecutionPolicy Bypass -File "${CLAUDE_PL
 
 ## After the last phase
 
-Tell the user that every phase is done or deferred, list the open unresolved items and the evidence folder, and say that final verification and the report (gate 5) come in a later plugin version. Stop.
+Tell the user that every phase is done or deferred and list the open unresolved items. Then run gate 5: load the `umbraco-upgrade:verification` skill and follow it.

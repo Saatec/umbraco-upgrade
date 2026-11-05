@@ -27,7 +27,7 @@ Summarize for the user, from the script output (the full report is in `report`):
 
 - `valueChanges`: each fact whose value changed, old and new value, source
 - `newMajors`: majors added from NuGet. Say clearly that their LTS status, support dates, minimum upgrade-from version, data migrations, and path rules are **unverified**
-- `upcoming`: majors with prereleases only (not added)
+- `upcoming`: majors that are not released yet (not added): prereleases only on NuGet, or a pre-release documentation space (`docsSpace`, for example a `<n>.latest` space for the next major)
 - `needsReview`: facts whose evidence was not found on the source page any more, or that a source now contradicts
 - `unreachable`: sources that could not be fetched (those facts kept their previous values and dates)
 - `refreshedDataInUse`: whether upgrades will use the refreshed data now. The refreshed copy is used only when it is newer than the knowledge shipped with the plugin

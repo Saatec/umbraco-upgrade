@@ -1,0 +1,262 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "verification-rules",
+  "note": "Design rules for gate 5 (final verification): which checks apply to a project, and whether each is verified by a script or by the user. They are rules of this plugin, not version facts: version-specific steps come from the documentation cited in compatibility.md. A check that cannot be done is recorded as not verified with its reason; it is never counted as verified.",
+  "categories": [
+    { "id": "build-packages", "title": "Build and package compatibility" },
+    { "id": "automated-tests", "title": "Automated tests" },
+    { "id": "database-content", "title": "Database schema and migrated content" },
+    { "id": "content-model", "title": "Document types, templates, media, and relationships" },
+    { "id": "backoffice", "title": "Backoffice login and administrative workflows" },
+    { "id": "backoffice-extensions", "title": "Custom backoffice extensions" },
+    { "id": "auth", "title": "Authentication, authorization, and permissions" },
+    { "id": "integrations-jobs", "title": "External integrations and scheduled jobs" },
+    { "id": "frontend", "title": "Frontend routes, rendering, and forms" },
+    { "id": "logs", "title": "Logs and runtime errors" },
+    { "id": "deployment-rollback", "title": "Deployment and rollback rehearsal" },
+    { "id": "upgrade-integrity", "title": "Upgrade integrity (checkpoints, no removed functionality, no secrets, open items)" }
+  ],
+  "checks": [
+    {
+      "rule": "build",
+      "category": "build-packages",
+      "title": "The solution builds on the upgrade branch with views compiled at build time",
+      "method": "automated",
+      "appliesWhen": { "always": true },
+      "how": "Test-Build.ps1 -PhaseId final -Precompile (with -Test when the solution has test projects); Invoke-Verification.ps1 reads the newest build evidence of gate 5",
+      "risk": "Code or views that do not compile on the target fail when the site runs.",
+      "nextStep": "Fix the build errors in a follow-up phase. Never remove, stub, or disable code to make it build."
+    },
+    {
+      "rule": "cms-version",
+      "category": "build-packages",
+      "title": "The project references the target CMS version and the target framework",
+      "method": "automated",
+      "appliesWhen": { "always": true },
+      "how": "Invoke-Verification.ps1 compares the version detected in the project files and their target frameworks with target.resolved and target.dotnet in state",
+      "risk": "A project still on an intermediate version, or on the wrong framework, is not the upgrade the plan describes.",
+      "nextStep": "Update the package references or the target framework in a follow-up phase."
+    },
+    {
+      "rule": "package-ranges",
+      "category": "build-packages",
+      "title": "Every CMS-specific package reference declares a CMS dependency range that includes the target major",
+      "method": "automated",
+      "appliesWhen": { "always": true },
+      "how": "Invoke-Verification.ps1 reads the nuspec of each referenced package version from NuGet (through the plugin cache) and checks its CMS dependency ranges",
+      "risk": "A package built for an older major can fail at runtime even when the solution builds.",
+      "nextStep": "Move each such package to a release built for the target, or record it as an unresolved item with the options."
+    },
+    {
+      "rule": "tests",
+      "category": "automated-tests",
+      "title": "The automated tests of the solution pass",
+      "method": "automated",
+      "appliesWhen": { "always": true },
+      "how": "Test-Build.ps1 -PhaseId final -Precompile -Test runs dotnet test; Invoke-Verification.ps1 reads its result. A solution without test projects is recorded as not verified",
+      "risk": "Without automated tests, regressions show up only in the manual checks or in production.",
+      "nextStep": "Fix failing tests in a follow-up phase; consider adding tests for the custom code the upgrade ported."
+    },
+    {
+      "rule": "phase-criteria",
+      "category": "upgrade-integrity",
+      "title": "Every phase is done with each acceptance criterion met or waived by the user",
+      "method": "automated",
+      "appliesWhen": { "always": true },
+      "how": "Invoke-Verification.ps1 reads the phases from state; deferred phases make this check not verified",
+      "risk": "A deferred phase or a waived criterion is work the upgrade did not prove.",
+      "nextStep": "Finish deferred phases in a follow-up phase, or list them as open work in the report."
+    },
+    {
+      "rule": "checkpoints",
+      "category": "upgrade-integrity",
+      "title": "The upgrade branch holds every checkpoint commit and has no uncommitted changes outside .umbraco-upgrade/",
+      "method": "automated",
+      "appliesWhen": { "always": true },
+      "how": "Invoke-Verification.ps1 checks the branch, each phase's checkpoint commit, and git status (read-only)",
+      "risk": "Work outside the checkpoints is not covered by the phases, their criteria, or the rollback plan.",
+      "nextStep": "Run /umbraco-upgrade:resume to see what differs, and decide with the user how to record it."
+    },
+    {
+      "rule": "no-removal",
+      "category": "upgrade-integrity",
+      "title": "Across the upgrade branch, no project file was deleted without a remove-custom-feature approval that names it, and no stub was added",
+      "method": "automated",
+      "appliesWhen": { "always": true },
+      "how": "Invoke-Verification.ps1 scans git diff from the base commit to HEAD: deleted files against the approvals, added lines for NotImplementedException and #if false; commented-out code and <Compile Remove> are listed for review",
+      "risk": "Custom functionality removed or stubbed to make the build pass is lost behavior.",
+      "nextStep": "Restore what was removed, and record an unresolved item with a proposed approach and the user's decision."
+    },
+    {
+      "rule": "no-secrets",
+      "category": "upgrade-integrity",
+      "title": "No secret-looking value was added on the upgrade branch or written under .umbraco-upgrade/",
+      "method": "automated",
+      "appliesWhen": { "always": true },
+      "how": "Invoke-Verification.ps1 runs the plugin's redaction over the lines added since the base commit and over the text files of .umbraco-upgrade/; it reports files, never values",
+      "risk": "A committed secret is exposed to everyone with access to the repository.",
+      "nextStep": "Move the value to user secrets or environment variables (Copy-ConfigValue.ps1), and rotate it if it was ever pushed."
+    },
+    {
+      "rule": "unresolved",
+      "category": "upgrade-integrity",
+      "title": "No unresolved item is still open (awaiting the user, or decided but not done)",
+      "method": "automated",
+      "appliesWhen": { "always": true },
+      "how": "Invoke-Verification.ps1 reads the unresolved items from state; deferred items are listed in the report",
+      "risk": "An open item is custom functionality whose migration nobody decided or finished.",
+      "nextStep": "Ask the user to decide each open item; a decided item is finished in a follow-up phase, or deferred by the user."
+    },
+    {
+      "rule": "database-content",
+      "category": "database-content",
+      "title": "The local database copy runs on the target version and its content is intact",
+      "method": "manual",
+      "appliesWhen": { "always": true },
+      "steps": [
+        "Use only the restored local copy that the project's local configuration points to. Never a shared, staging, or production database.",
+        "Start the site locally (the safety hook asks before it starts). If the CMS reports that the database must be upgraded, follow the upgrade steps of the target version's documentation listed in compatibility.md, and confirm that they finish without errors.",
+        "In the backoffice, open the content tree: the root nodes, a sample of pages of every document type, and the recycle bin are there.",
+        "Where you have counts from before the upgrade, compare them (Test-DatabaseHealth.ps1 -Folder final gives read-only counts for SQL Server and LocalDB)."
+      ],
+      "risk": "A migration that stopped part way, or content that did not convert, may only show on some pages.",
+      "nextStep": "Record what is wrong as a failed check with the steps to reproduce it."
+    },
+    {
+      "rule": "content-model",
+      "category": "content-model",
+      "title": "Document types, data types, templates, media, and relationships survived the upgrade",
+      "method": "manual",
+      "appliesWhen": { "always": true },
+      "steps": [
+        "In the settings section, every document type, data type, and template is listed and opens without an error.",
+        "In the media section, folders and a sample of images and files open; image crops still show where the site uses them.",
+        "On a sample of pages, pickers and links point to the right items, and content that the data migrations of the path changed (listed in compatibility.md) shows correctly."
+      ],
+      "risk": "Data types whose editor changed between versions can lose or misread stored values.",
+      "nextStep": "Record each problem with the document type or data type it affects."
+    },
+    {
+      "rule": "backoffice-workflows",
+      "category": "backoffice",
+      "title": "Backoffice login and administrative workflows work for each user group",
+      "method": "manual",
+      "appliesWhen": { "always": true },
+      "steps": [
+        "Log in to the backoffice with an account of each user group the site relies on.",
+        "On the local copy, create, edit, save, publish, and unpublish a test page; roll back to an earlier version; move it to the recycle bin and restore it.",
+        "Check that each group still sees the sections, start nodes, and permissions it had before."
+      ],
+      "risk": "Editors who cannot log in or publish block the site after go-live.",
+      "nextStep": "Record each workflow that fails, with the user group."
+    },
+    {
+      "rule": "backoffice-extensions",
+      "category": "backoffice-extensions",
+      "title": "Every custom backoffice extension loads and works",
+      "method": "manual",
+      "appliesWhen": { "patternPrefixes": ["backoffice."] },
+      "steps": [
+        "For each extension listed under 'Applies because', open the place where it appears (section, tree, dashboard, property editor, or action) and use it once.",
+        "Keep the browser's developer console open while you do, and note any error.",
+        "For property editors, open a page that uses the editor, change a value, save, and reload the page."
+      ],
+      "risk": "Extensions written for an older backoffice can fail without breaking the build.",
+      "nextStep": "Record each extension that fails as a failed check; its port belongs in a follow-up phase."
+    },
+    {
+      "rule": "auth",
+      "category": "auth",
+      "title": "Authentication, authorization, and permissions behave as before",
+      "method": "manual",
+      "appliesWhen": { "patternPrefixes": ["auth."] },
+      "steps": [
+        "With test accounts only: register, log in, log out, and reset a password on the frontend where the site offers it.",
+        "Visit a protected page or file as a visitor without access (refused) and as a member with access (allowed).",
+        "Sign in through each configured external provider with a test account, and check the roles or groups it receives."
+      ],
+      "risk": "A broken access rule can expose protected content or lock members out.",
+      "nextStep": "Record each failing flow; never test with real member accounts or production identity settings."
+    },
+    {
+      "rule": "integrations",
+      "category": "integrations-jobs",
+      "title": "External integrations, scheduled jobs, search, and caches work",
+      "method": "manual",
+      "appliesWhen": { "patternPrefixes": ["ext.", "jobs."] },
+      "steps": [
+        "Call each integration listed under 'Applies because' against a test or sandbox endpoint, never a production system.",
+        "Let each scheduled or background job run once, or start it, and check its result and the log.",
+        "Where the site uses search, rebuild the indexes from the backoffice and run a search on the frontend.",
+        "Publish a page and check that caches and any purge hooks show the change."
+      ],
+      "risk": "Integrations that fail quietly stop orders, emails, or data exchange after go-live.",
+      "nextStep": "Record each integration that fails, and whether it can be tested locally at all."
+    },
+    {
+      "rule": "frontend",
+      "category": "frontend",
+      "title": "Frontend routes and rendering match the site before the upgrade",
+      "method": "manual",
+      "appliesWhen": { "always": true },
+      "steps": [
+        "Request the home page and a sample of pages for every template, and compare them with the site before the upgrade.",
+        "Check custom routes, redirects, the not-found page, and any API endpoints the site serves."
+      ],
+      "risk": "Rendering changes and broken routes reach visitors first.",
+      "nextStep": "Record each page or route that differs, with what changed."
+    },
+    {
+      "rule": "forms",
+      "category": "frontend",
+      "title": "Forms submit, store their entries, and send their notifications",
+      "method": "manual",
+      "appliesWhen": { "patterns": ["content.forms", "code.surface-controller", "auth.member-flows"] },
+      "steps": [
+        "Submit each form on the local copy with test data.",
+        "Check that the entries are stored and that notification emails reach a test mailbox only."
+      ],
+      "risk": "Lost form posts are lost enquiries or orders.",
+      "nextStep": "Record each form that fails."
+    },
+    {
+      "rule": "logs",
+      "category": "logs",
+      "title": "No new errors or warnings in the logs during startup and the checks",
+      "method": "manual",
+      "appliesWhen": { "always": true },
+      "steps": [
+        "After the checks above, open the log viewer in the backoffice, or the log files of the local site.",
+        "Note every error and warning that appeared during startup and the checks, with its cause or as an open item."
+      ],
+      "risk": "Errors the pages hide still point to broken behavior.",
+      "nextStep": "Record each error as a failed check or as an open item."
+    },
+    {
+      "rule": "deployment",
+      "category": "deployment-rollback",
+      "title": "The deployment was rehearsed on a non-production environment",
+      "method": "manual",
+      "appliesWhen": { "always": true },
+      "steps": [
+        "Deploy the upgrade branch to a non-production environment with your own process. The plugin never deploys.",
+        "Repeat the manual checks there, and write down the production cutover: content freeze, database backup, and the configuration the target needs."
+      ],
+      "risk": "Hosting, configuration, and pipeline differences show up only on a real environment.",
+      "nextStep": "Record the rehearsal result; an upgrade without one is not ready for production."
+    },
+    {
+      "rule": "rollback",
+      "category": "deployment-rollback",
+      "title": "The rollback in rollback.md was rehearsed",
+      "method": "manual",
+      "appliesWhen": { "always": true },
+      "steps": [
+        "Follow rollback.md on a copy: return to the base branch, and restore the database copy from its backup.",
+        "Confirm that the site before the upgrade starts again from that state."
+      ],
+      "risk": "An untested rollback may not work when it is needed.",
+      "nextStep": "Record the result, or why the rollback could not be rehearsed."
+    }
+  ]
+}

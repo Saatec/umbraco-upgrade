@@ -24,7 +24,10 @@
       ],
       "excludeFiles": [
         "**/umbraco/**",
-        "**/umbraco_client/**"
+        "**/umbraco_client/**",
+        "**/config/splashes/**",
+        "default.aspx",
+        "*/default.aspx"
       ],
       "generations": [
         "v7",

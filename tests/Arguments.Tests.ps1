@@ -116,4 +116,44 @@ Describe 'Resolve-UpgradeArguments' -Tag 'fixture-based' {
             $r.Json.usage | Should -Match '/umbraco-upgrade:plan'
         }
     }
+
+    Context 'resume, verify, and report take only a path and need state' {
+        It '<command> accepts a project with upgrade state' -ForEach @(@{ command = 'resume' }, @{ command = 'verify' }, @{ command = 'report' }) {
+            $dir = New-UpgradeProject -Baseline 'gen.v13'
+            try {
+                $r = Invoke-Args '' $dir $command
+                $r.ExitCode | Should -Be 0 -Because $r.StdOut
+                $r.Json.stateExists | Should -BeTrue
+                $r.Json.usage | Should -Match ([regex]::Escape("/umbraco-upgrade:$command [project-path]"))
+            } finally { Remove-TestDirectory $dir }
+        }
+        It '<command> refuses a project without state' -ForEach @(@{ command = 'resume' }, @{ command = 'verify' }, @{ command = 'report' }) {
+            $r = Invoke-Args '' (Get-FixturePath 'gen.v13') $command
+            $r.ExitCode | Should -Be 1
+            @($r.Json.errors | ForEach-Object { $_.code }) | Should -Contain 'no-state'
+        }
+        It 'refuses a target argument' {
+            $dir = New-UpgradeProject -Baseline 'gen.v13'
+            try {
+                $r = Invoke-Args '17' $dir 'resume'
+                @($r.Json.errors | ForEach-Object { $_.code }) | Should -Contain 'unexpected-argument'
+            } finally { Remove-TestDirectory $dir }
+        }
+        It 'only warns when the project files are no longer recognized, so reconciliation can report it' {
+            $dir = New-UpgradeProject -Baseline 'gen.v13'
+            try {
+                Remove-Item -LiteralPath (Join-Path $dir 'SampleSite.Web.csproj'), (Join-Path $dir 'appsettings.json')
+                $r = Invoke-Args '' $dir 'resume'
+                $r.ExitCode | Should -Be 0 -Because $r.StdOut
+                @($r.Json.warnings | ForEach-Object { $_.code }) | Should -Contain 'not-umbraco'
+            } finally { Remove-TestDirectory $dir }
+        }
+        It 'start points to resume when state exists' {
+            $dir = New-UpgradeProject -Baseline 'gen.v13'
+            try {
+                $r = Invoke-Args '17' $dir
+                (@($r.Json.errors | Where-Object { $_.code -eq 'state-exists' })[0]).message | Should -Match '/umbraco-upgrade:resume'
+            } finally { Remove-TestDirectory $dir }
+        }
+    }
 }

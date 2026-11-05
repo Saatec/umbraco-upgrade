@@ -18,7 +18,7 @@
       "files": [
         "**/*.cs"
       ],
-      "regex": "\\[\\s*(?:DocumentType|MediaType|MemberType)\\s*\\(",
+      "regex": "\\[\\s*(?:DocumentType|MediaType|MemberType|UmbracoContentType)\\s*\\(",
       "generations": [
         "v7",
         "v8"

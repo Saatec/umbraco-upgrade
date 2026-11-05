@@ -2,7 +2,7 @@
   "schemaVersion": "1.1.0",
   "id": "backoffice.orphan-plugin-folder",
   "title": "Orphan App_Plugins folders",
-  "description": "An App_Plugins folder that matches no package reference and holds no manifest of either generation, often left over from a removed package.",
+  "description": "An App_Plugins folder that matches no package reference and that no other detector explains: it holds no manifest of either generation, or only a manifest that declares nothing the registry recognizes. Often left over from a removed or renamed package; it can also be an extension the user must classify.",
   "kind": "customization",
   "area": "packages-backoffice",
   "owner": "migrate-packages-backoffice",

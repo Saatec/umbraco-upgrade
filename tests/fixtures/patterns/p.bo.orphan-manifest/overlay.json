@@ -1,0 +1,8 @@
+{
+  "id": "p.bo.orphan-manifest",
+  "baseline": "gen.v13",
+  "expects": [
+    "backoffice.orphan-plugin-folder"
+  ],
+  "description": "An App_Plugins folder whose manifest declares only a stylesheet and matches no package: the leftover of a removed package."
+}

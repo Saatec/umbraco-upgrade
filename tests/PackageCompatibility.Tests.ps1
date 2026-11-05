@@ -91,6 +91,53 @@ Describe 'Test-PackageCompatibility.ps1' -Tag 'mocked' {
         (@(Get-PatternPackages $r.Json 'pkg.no-target-version') -join ',') | Should -Be 'Sample.Old.Widgets'
     }
 
+    It 'claims nothing from a range on a core package of an earlier generation, and applies the package knowledge' {
+        $script:d = Copy-Fixture -Baseline 'gen.v8'
+        $pc = Join-Path $script:d 'packages.config'
+        $more = '  <package id="Sample.Legacy.Mapper" version="1.0.0" targetFramework="net472" />' + "`n" +
+            '  <package id="UmbracoForms" version="8.5.0" targetFramework="net472" />' + "`n" +
+            '  <package id="Umbraco.ModelsBuilder" version="8.1.6" targetFramework="net472" />' + "`n</packages>"
+        [System.IO.File]::WriteAllText($pc, [System.IO.File]::ReadAllText($pc).Replace('</packages>', $more))
+        $r = Invoke-Compatibility $script:d @('-TargetMajor', '13', '-SourceMajor', '8')
+        $r.ExitCode | Should -Be 0 -Because $r.StdOut
+        # Its only release depends on UmbracoCms.Core 7.3.2 or later, and that package has no 13 release.
+        $mapper = Get-Row $r.Json 'Sample.Legacy.Mapper'
+        $mapper.class | Should -Be 'no-target-version'
+        (@($mapper.notes) -join ' ') | Should -Match 'UmbracoCms\.Core has no 13 release'
+        $forms = Get-Row $r.Json 'UmbracoForms'
+        $forms.class | Should -Be 'renamed'
+        $forms.successor | Should -Be 'Umbraco.Forms'
+        $mb = Get-Row $r.Json 'Umbraco.ModelsBuilder'
+        $mb.class | Should -Be 'no-target-version'
+        (@($mb.notes) -join ' ') | Should -Match 'No release after 8'
+        @(Get-PatternPackages $r.Json 'pkg.renamed-community') | Should -Contain 'UmbracoForms'
+        @(Get-PatternPackages $r.Json 'pkg.no-target-version') | Should -Contain 'Sample.Legacy.Mapper'
+    }
+
+    It 'does not take an old release without an upper bound as support when newer releases exclude the target' {
+        $script:d = Copy-Fixture -Baseline 'gen.v13'
+        $proj = Join-Path $script:d 'SampleSite.Web.csproj'
+        [System.IO.File]::WriteAllText($proj, [System.IO.File]::ReadAllText($proj).Replace('<PackageReference Include="Umbraco.Cms" Version="13.10.1" />', '<PackageReference Include="Umbraco.Cms" Version="13.10.1" /><PackageReference Include="Sample.Stale.Range" Version="2.0.0" />'))
+        # 2.0.0 depends on Umbraco.Cms.Core [13.0.0, 14.0.0); 1.0.0 on 10.0.0 or later, without an upper bound.
+        $row = Get-Row (Invoke-Compatibility $script:d @('-TargetMajor', '17', '-SourceMajor', '13')).Json 'Sample.Stale.Range'
+        $row.class | Should -Be 'no-target-version'
+        (@($row.notes) -join ' ') | Should -Match 'Release 1\.0\.0 declares a CMS range without an upper bound'
+        $row13 = Get-Row (Invoke-Compatibility $script:d @('-TargetMajor', '13', '-SourceMajor', '13')).Json 'Sample.Stale.Range'
+        $row13.class | Should -Be 'compatible'
+        $row13.compatibleVersion | Should -Be '2.0.0'
+    }
+
+    It 'follows the dependencies of a product package to its own core package to find the CMS range' {
+        $script:d = Copy-Fixture -Baseline 'gen.v13'
+        $proj = Join-Path $script:d 'SampleSite.Web.csproj'
+        [System.IO.File]::WriteAllText($proj, [System.IO.File]::ReadAllText($proj).Replace('<PackageReference Include="Umbraco.Cms" Version="13.10.1" />', '<PackageReference Include="Umbraco.Cms" Version="13.10.1" /><PackageReference Include="Sample.Suite" Version="17.1.0" />'))
+        # Sample.Suite depends only on Sample.Suite.Core, which depends on Umbraco.Cms.Core.
+        $row = Get-Row (Invoke-Compatibility $script:d @('-TargetMajor', '17', '-SourceMajor', '13')).Json 'Sample.Suite'
+        $row.class | Should -Be 'compatible'
+        $row.compatibleVersion | Should -Be '17.1.0'
+        (@($row.notes) -join ' ') | Should -Match 'through packages of its own family'
+    }
+
     It 'marks ASP.NET packages of a 7 or 8 source as platform, and an unrecorded lookup as unreachable' {
         $script:d = Copy-Fixture -Baseline 'gen.v8'
         $r = Invoke-Compatibility $script:d @('-TargetMajor', '17', '-SourceMajor', '8')

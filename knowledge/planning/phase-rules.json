@@ -5,8 +5,11 @@
   "split": {
     "maxOccurrences": 25,
     "maxFiles": 15,
+    "maxPartsPerPattern": 3,
+    "volumeExcludeFiles": ["**/uSync/**", "**/*.uda", "**/App_Data/**", "**/umbraco/Data/**", "**/umbraco/models/**", "**/*.generated.cs"],
     "highDifficultyOwnPhase": true,
-    "reason": "A phase should stay reviewable in one sitting and end in one checkpoint commit. More than about 25 changed call sites or 15 files makes a phase hard to verify, and a high-difficulty pattern needs its own acceptance criteria and checkpoint."
+    "reason": "A phase should stay reviewable in one sitting and end in one checkpoint commit. More than about 25 changed call sites or 15 files makes a phase hard to verify, and a high-difficulty pattern needs its own acceptance criteria and checkpoint.",
+    "volumeReason": "Hits in content-model serialization files (uSync, Deploy), application data folders, and generated model files are listed but do not count toward the thresholds: migrations or tools convert them, or they are regenerated, so they are not edited one by one. A pattern above the thresholds is split into at most maxPartsPerPattern parts, so the plan of a heavily customized project stays reviewable."
   },
   "codePort": {
     "rule": "When the path builds a new codebase at some step (generation boundary from 8 or earlier), custom code is ported once, onto the final codebase; intermediate stops serve the database migration only. When every step keeps the existing codebase (in place or staged), each pattern is handled at every step whose crossing breaks it, because the code must build at every stop. Content conversions are placed at each step whose crossing needs them.",
@@ -28,6 +31,6 @@
     "cmsDependencyIdPattern": "^(?:Umbraco\\.Cms|UmbracoCms)",
     "platformPackagePrefixes": ["Microsoft.AspNet.", "Microsoft.Owin", "Owin", "Microsoft.Web.Infrastructure", "Microsoft.CodeDom.Providers.", "Microsoft.Net.Compilers", "System.Web."],
     "platformReason": "Packages of the ASP.NET (System.Web) stack are replaced by ASP.NET Core itself when a 7 or 8 source moves to 9 or later.",
-    "maxNuspecLookupsPerPackage": 6
+    "maxNuspecLookupsPerPackage": 10
   }
 }

@@ -1,0 +1,8 @@
+{
+  "id": "p.content.code-first-content-type",
+  "baseline": "gen.v7",
+  "expects": [
+    "content.code-first-doctypes"
+  ],
+  "description": "A document type declared in code with a code-first library's content type attribute."
+}

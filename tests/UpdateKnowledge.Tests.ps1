@@ -121,6 +121,39 @@ Describe 'Refresh with a new major on NuGet' -Tag 'mocked' {
     }
 }
 
+Describe 'Refresh with a pre-release major' -Tag 'mocked' {
+    It 'reports its prerelease and its pre-release docs space as upcoming and adds nothing' {
+        $dd = New-TestDirectory -Prefix 'uud'
+        try {
+            $r = Invoke-Update $dd @('m.docs.future-space', 'm.nuget.future-prerelease', 'm.docs', 'm.nuget')
+            $r.ExitCode | Should -Be 0
+            $up = @($r.Json.upcoming | Where-Object { $_.major -eq 25 })
+            $up.Count | Should -Be 1
+            $up[0].latestPrerelease | Should -Be '25.0.0-rc1'
+            $up[0].docsSpace | Should -Be '25.latest'
+            @($r.Json.newMajors).Count | Should -Be 0
+            $v = Read-Refreshed $dd 'versions'
+            Get-MajorEntry $v 25 | Should -BeNullOrEmpty
+            (Get-MajorEntry $v 18).docsSpace.value | Should -Be 'latest'
+            @($r.Json.valueChanges | Where-Object { $_.fact -like '*docsSpace' }).Count | Should -Be 0
+            (Get-Content -Raw (Join-Path $dd 'knowledge/refresh-report.md')) | Should -Match '(?m)^- 25: prereleases only on NuGet \(latest 25\.0\.0-rc1\); docs space 25\.latest \(pre-release documentation\)\. Not added'
+        } finally { Remove-TestDirectory $dd }
+    }
+
+    It 'reports a pre-release docs space on its own when NuGet has no release of that major' {
+        $dd = New-TestDirectory -Prefix 'uud'
+        try {
+            $r = Invoke-Update $dd @('m.docs.future-space', 'm.docs', 'm.nuget')
+            $r.ExitCode | Should -Be 0
+            $up = @($r.Json.upcoming | Where-Object { $_.major -eq 25 })
+            $up.Count | Should -Be 1
+            $up[0].docsSpace | Should -Be '25.latest'
+            $up[0].latestPrerelease | Should -BeNullOrEmpty
+            Get-MajorEntry (Read-Refreshed $dd 'versions') 25 | Should -BeNullOrEmpty
+        } finally { Remove-TestDirectory $dd }
+    }
+}
+
 Describe 'Refresh when a source page changed' -Tag 'mocked' {
     It 'marks the fact needs-review and keeps its value' {
         $dd = New-TestDirectory -Prefix 'uud'

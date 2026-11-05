@@ -35,7 +35,7 @@
     },
     {
       "id": "grid-editor-config",
-      "weight": "strong",
+      "weight": "supporting",
       "files": [
         "**/config/grid.editors.config.js"
       ],

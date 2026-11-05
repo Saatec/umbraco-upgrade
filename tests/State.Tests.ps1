@@ -36,7 +36,7 @@ Describe 'Initialization' -Tag 'fixture-based' {
     It 'creates the state folder, README, git snapshot, and a valid state' {
         $script:d = New-Project
         $s = Read-UpgradeState $script:d
-        $s.schemaVersion | Should -Be '1.0.0'
+        $s.schemaVersion | Should -Be '1.1.0'
         $s.mode | Should -Be 'upgrade'
         $s.target.requested | Should -Be '17'
         $s.gitBaseline.isRepo | Should -BeTrue
@@ -115,15 +115,25 @@ Describe 'Read, write, and validation' -Tag 'fixture-based' {
 
     It 'refuses a newer major schema version' {
         $p = Join-Path $script:d '.umbraco-upgrade/state.json'
-        [System.IO.File]::WriteAllText($p, ((Get-Content -Raw $p) -replace '"schemaVersion":\s*"1\.0\.0"', '"schemaVersion": "2.0.0"'))
+        [System.IO.File]::WriteAllText($p, ((Get-Content -Raw $p) -replace '"schemaVersion":\s*"1\.\d+\.\d+"', '"schemaVersion": "2.0.0"'))
         { Read-UpgradeState $script:d } | Should -Throw '*Unsupported state schema version*'
     }
 
     It 'migrate is a no-op on the current version and refuses a newer minor' {
         (Update-StateSchemaVersion -ProjectRoot $script:d).changed | Should -BeFalse
         $p = Join-Path $script:d '.umbraco-upgrade/state.json'
-        [System.IO.File]::WriteAllText($p, ((Get-Content -Raw $p) -replace '"schemaVersion":\s*"1\.0\.0"', '"schemaVersion": "1.9.0"'))
+        [System.IO.File]::WriteAllText($p, ((Get-Content -Raw $p) -replace '"schemaVersion":\s*"1\.\d+\.\d+"', '"schemaVersion": "1.9.0"'))
         { Update-StateSchemaVersion -ProjectRoot $script:d } | Should -Throw '*newer than this plugin supports*'
+    }
+
+    It 'migrate raises a 1.0.0 state to 1.1.0 and keeps it valid' {
+        $p = Join-Path $script:d '.umbraco-upgrade/state.json'
+        [System.IO.File]::WriteAllText($p, ((Get-Content -Raw $p) -replace '"schemaVersion":\s*"1\.\d+\.\d+"', '"schemaVersion": "1.0.0"'))
+        (Test-UpgradeState -State (Read-UpgradeState $script:d)).Count | Should -Be 0
+        $m = Update-StateSchemaVersion -ProjectRoot $script:d
+        $m.from | Should -Be '1.0.0'
+        $m.to | Should -Be '1.1.0'
+        (Read-UpgradeState $script:d).schemaVersion | Should -Be '1.1.0'
     }
 
     It 'merges sections and keeps statusAtStart fixed' {
@@ -335,7 +345,7 @@ Describe 'state.ps1 CLI' -Tag 'fixture-based' {
 }
 
 Describe 'Schema file' -Tag 'fixture-based' {
-    It 'parses and declares version 1.0.0 enums used by the module' {
+    It 'parses and declares the enums used by the module' {
         $schema = Get-Content -Raw (Join-Path (Get-RepoRoot) 'schemas/state.schema.json') | ConvertFrom-Json
         $schema.'$defs'.gate.properties.status.enum | Should -Contain 'awaiting-approval'
         $schema.properties.mode.enum | Should -Be @('upgrade', 'plan')

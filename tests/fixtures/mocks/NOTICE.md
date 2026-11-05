@@ -9,7 +9,8 @@ The mock sets in this folder hold HTTP responses recorded on 2026-10-14 for the 
 | `m.nuget.future-major` | Derived: an Umbraco.Cms index with a synthetic major 25 and its nuspec |
 | `m.nuget.future-prerelease` | Derived: an Umbraco.Cms index with a synthetic 25.0.0-rc1 only |
 | `m.docs.changed` | Derived: an upgrade page with one sentence removed |
-| `m.nuget.synthetic` | Synthetic: invented `Sample.*` packages (versions, nuspec files, one registration entry) for the package compatibility tests; nothing recorded from nuget.org |
+| `m.docs.future-space` | Derived: the docs index with one line added for a synthetic `25.latest` space |
+| `m.nuget.synthetic` | Synthetic: invented `Sample.*` packages (versions, nuspec files, one registration entry) for the package compatibility tests, and minimal synthetic version lists of three core package ids for the dependency check; nothing recorded from nuget.org |
 
 The scripts use these sets only when the environment variable `UMBRACO_UPGRADE_HTTP_MOCK` names them; then no request leaves the machine.
 

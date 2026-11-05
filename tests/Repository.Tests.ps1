@@ -33,6 +33,13 @@ Describe 'Repository files' -Tag 'fixture-based' {
             $text | Should -Match '(?m)^argument-hint: <target-version> \[project-path\]$'
             $text | Should -Match '(?m)^arguments: \[target, path\]$'
         }
+        foreach ($name in @('resume', 'verify', 'report')) {
+            $text = Get-Content -Raw (Join-Path $script:root "skills/$name/SKILL.md")
+            $text | Should -Match '(?m)^disable-model-invocation: true$'
+            $text | Should -Match '(?m)^argument-hint: \[project-path\]$'
+            $text | Should -Match '(?m)^arguments: \[path\]$'
+            $text | Should -Match ([regex]::Escape("Resolve-UpgradeArguments.ps1`" -Command $name -Path"))
+        }
     }
     It 'update-knowledge is a command that only the user can start' {
         $text = Get-Content -Raw (Join-Path $script:root 'skills/update-knowledge/SKILL.md')
@@ -44,7 +51,7 @@ Describe 'Repository files' -Tag 'fixture-based' {
         foreach ($dir in (Get-ChildItem -LiteralPath (Join-Path $script:root 'skills') -Directory)) {
             $text = Get-Content -Raw (Join-Path $dir.FullName 'SKILL.md')
             ($text -split "`n").Count | Should -BeLessThan 500
-            if ($dir.Name -notin @('start', 'plan', 'update-knowledge')) { $text | Should -Match '(?m)^user-invocable: false$' }
+            if ($dir.Name -notin @('start', 'plan', 'resume', 'verify', 'report', 'update-knowledge')) { $text | Should -Match '(?m)^user-invocable: false$' }
         }
     }
     It 'every script a skill or an agent references exists' {

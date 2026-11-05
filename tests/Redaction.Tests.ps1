@@ -24,6 +24,8 @@ Describe 'Protect-Text' -Tag 'mocked' {
         @{ name = 'an account key'; text = 'DefaultEndpointsProtocol=https;AccountName=a;AccountKey=FAKE-SECRET-FOR-TESTS-13;EndpointSuffix=core.example.invalid' }
         @{ name = 'an unquoted YAML value'; text = "variables:`r`n  SA_PASSWORD: FAKE-SECRET-FOR-TESTS-17   # local only`r`n  other: 1" }
         @{ name = 'a user-secrets list line'; text = 'Maps:ApiKey = FAKE-SECRET-FOR-TESTS-18' }
+        @{ name = 'an unquoted assignment inside a sentence'; text = '- Decision: keep ApiKey=FAKE-SECRET-FOR-TESTS-19x in user secrets' }
+        @{ name = 'a token query parameter in prose'; text = 'The purge URL https://cdn.example.invalid/purge?token=FAKE-SECRET-FOR-TESTS-20 is configured.' }
     ) {
         $out = Protect-Text $text
         $out | Should -Not -Match $script:Marker
@@ -52,6 +54,7 @@ Describe 'Protect-Text' -Tag 'mocked' {
         @{ name = 'YAML variable references'; text = "token: `${{ secrets.DEPLOY_TOKEN }}`npassword: `$(DbPassword)" }
         @{ name = 'prose after a sensitive word'; text = '- Credentials: stored in user secrets' }
         @{ name = 'a build error line'; text = 'MSBUILD : error MSB1009: Project file does not exist.' }
+        @{ name = 'short or word values after a sensitive key in prose'; text = 'Notes: ApiKey=required for members; token: none; secretsFile=appsettings.Development.json; token=12345678' }
     ) {
         (Protect-Text $text) | Should -Be $text
     }

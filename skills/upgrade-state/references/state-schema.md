@@ -1,6 +1,6 @@
-# state.json, schema version 1.0.0
+# state.json, schema version 1.1.0
 
-Readers accept the same major version. `state.ps1 migrate` upgrades older minors. The machine-readable schema is `schemas/state.schema.json`.
+Readers accept the same major version. `state.ps1 migrate` upgrades older minors; 1.1.0 adds the optional `verification` section, so a 1.0.0 file only gets its version raised (gate 5 does this itself when it records its checklist). The machine-readable schema is `schemas/state.schema.json`.
 
 | Field | Meaning |
 |---|---|
@@ -19,6 +19,7 @@ Readers accept the same major version. `state.ps1 migrate` upgrades older minors
 | `decisions` | Decision ids; the text and sources are in `decisions.md` |
 | `unresolved` | `id` (`U-001`...), `pattern`, `item`, `proposal` (undecided, port, replace, redesign), `status` (awaiting-user, decided, resolved, deferred) |
 | `knowledge` | `baselineVersion` (knowledgeVersion of the versions file used), `refreshedAt` (its verifiedAt when the refreshed copy from the plugin data directory was used, else null) |
+| `verification` | Gate 5 only (1.1.0): `composedAt` and `checks`, each with `id` (`V-01`...), `rule`, `category` (build-packages, automated-tests, database-content, content-model, backoffice, backoffice-extensions, auth, integrations-jobs, frontend, logs, deployment-rollback, upgrade-integrity), `title`, `method` (automated or manual), `how`, `steps`, `appliesBecause`, `risk`, `nextStep`, `result` (pending, verified, failed, not-verified), `evidence`, `note`, `recovery`, `recordedAt` |
 | `history` | Append-only list of `at`, `event`, `detail` |
 
 ## Gate statuses
@@ -33,3 +34,5 @@ Readers accept the same major version. `state.ps1 migrate` upgrades older minors
 - Phases are frozen once the plan is approved. A phase starts (`in-progress`) only while the approved plan is unchanged, after gate 3 passed, and when every earlier phase is `done` or `deferred`.
 - An acceptance criterion is `met` only with evidence files under `.umbraco-upgrade/`, and `waived` only with the user's words. A phase is `done` only when every acceptance criterion is met or waived and a checkpoint commit is recorded.
 - An unresolved item moves to `decided` or `resolved` only with the id of the decision that records the user's answer.
+- After execution has started, a new phase list (an amended plan, before its new approval) must keep every phase that has run exactly as recorded and in the same order; only phases that never started may change, and new ones go after them.
+- Gate 5 (`final`) starts only in upgrade mode when every phase is `done` or `deferred`, and no phase can start while gate 5 is in progress or passed (set it to `failed` with the reason first, for a follow-up phase). Its checklist is recorded with `verification` while it is in progress. An automated check is `verified` only through `Invoke-Verification.ps1`; a manual check only with evidence and the user's words; `failed` needs the recovery steps; `not-verified` needs the reason. Gate 5 passes only with a checklist, no check `pending` or `failed`, and `report.md` written.

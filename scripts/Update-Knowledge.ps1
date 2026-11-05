@@ -18,7 +18,8 @@
       verification date; facts whose phrase is gone become needs-review (values are never guessed)
     - end-of-support and end-of-life dates: from the secondary aggregator, always labelled secondary
     - .NET channel support dates from the official release metadata
-    - docs spaces: which majors have a <n>.latest space on the docs site, and moves to the end-of-life branch
+    - docs spaces: which majors have a <n>.latest space on the docs site, and moves to the end-of-life branch;
+      a space for a major above every known major is pre-release documentation and is reported as upcoming
     - packages without a successor: flagged for review when a newer major appears
 #>
 [CmdletBinding()]
@@ -175,6 +176,16 @@ try {
         $reached++
         $vset = @{}
         foreach ($mt in [regex]::Matches([string]$llms.body, 'https://docs\.umbraco\.com/umbraco-cms/(\d+)\.latest/')) { $vset[[int]$mt.Groups[1].Value] = $true }
+        # The docs site publishes a new version at the release candidate and makes it the unversioned default at the
+        # release, so a space for a major above every known major is pre-release documentation: reported, not used.
+        $knownNow = @($versions['majors'] | ForEach-Object { [int]$_['major'] })
+        $maxNow = ($knownNow | Measure-Object -Maximum).Maximum
+        foreach ($n in @($vset.Keys | Where-Object { $_ -gt $maxNow } | Sort-Object)) {
+            $up = @($report.upcoming | Where-Object { $_['major'] -eq $n }) | Select-Object -First 1
+            if ($null -eq $up) { $up = [ordered]@{ major = $n; latestPrerelease = $null; note = 'No release on NuGet; not added to the knowledge.' }; [void]$report.upcoming.Add($up) }
+            $up['docsSpace'] = "$n.latest"
+            $up['docsNote'] = "llms.txt lists a $n.latest space: pre-release documentation until $n is released, when it becomes the unversioned default and Umbraco $maxNow moves to its own space. Not used for planning."
+        }
         $eolT = Get-SpaceTemplate -Sources $sources -SpaceId 'eol'
         $mainT = Get-SpaceTemplate -Sources $sources -SpaceId 'github-main'
         foreach ($entry in @($versions['majors'])) {
@@ -329,6 +340,13 @@ try {
     foreach ($c in $report.valueChanges) { [void]$md.Append("- $($c.fact): $($c.old) -> $($c.new) ($($c.status); $($c.source))`n") }
     [void]$md.Append("`n## New majors ($($report.newMajors.Count))`n`n")
     foreach ($c in $report.newMajors) { [void]$md.Append("- $($c.major) (latest $($c.latest)): $($c.note)`n") }
+    [void]$md.Append("`n## Upcoming majors ($($report.upcoming.Count))`n`n")
+    foreach ($c in $report.upcoming) {
+        $parts = @()
+        if ($c['latestPrerelease']) { $parts += "prereleases only on NuGet (latest $($c['latestPrerelease']))" }
+        if ($c.Contains('docsSpace')) { $parts += "docs space $($c['docsSpace']) (pre-release documentation)" }
+        [void]$md.Append("- $($c['major']): $($parts -join '; '). Not added to the knowledge.`n")
+    }
     [void]$md.Append("`n## Needs review ($($report.needsReview.Count))`n`n")
     foreach ($c in $report.needsReview) { [void]$md.Append("- $($c.fact): $($c.detail) ($($c.source))`n") }
     [void]$md.Append("`n## Not reachable ($($report.unreachable.Count))`n`n")

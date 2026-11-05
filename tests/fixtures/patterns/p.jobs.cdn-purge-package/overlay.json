@@ -1,0 +1,8 @@
+{
+  "id": "p.jobs.cdn-purge-package",
+  "baseline": "gen.v13",
+  "expects": [
+    "jobs.cdn-purge"
+  ],
+  "description": "A package reference that purges a CDN cache when content is published."
+}

@@ -1,0 +1,9 @@
+{
+  "id": "p.conf.startup.v7-application-class",
+  "baseline": "gen.v7",
+  "expects": [],
+  "expectsBaseline": [
+    "config.startup-hosting"
+  ],
+  "description": "Global.asax names the project's own application class, which derives from the CMS application class."
+}

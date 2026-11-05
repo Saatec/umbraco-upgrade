@@ -28,7 +28,17 @@ try {
 
     $version = Get-UmbracoVersionInfo -Root $root
     $inventory = Get-ProjectInventoryInfo -Root $root
-    $patterns = Find-PatternHits -Root $root
+    # Files git reported as modified or untracked when the state was created (outside .umbraco-upgrade/).
+    $changed = @()
+    $statusRel = [string]$state['gitBaseline']['statusEvidence']
+    if ($statusRel) {
+        $statusPath = Join-Path (Get-StateDir $root) $statusRel
+        if ([System.IO.File]::Exists($statusPath)) {
+            $st = Read-JsonFile $statusPath
+            if ($st.PSObject.Properties['entries']) { $changed = @(@($st.entries) | Where-Object { $_ -and -not $_.inStateFolder -and ([string]$_.code -match 'M|\?\?') } | ForEach-Object { [string]$_.path }) }
+        }
+    }
+    $patterns = Find-PatternHits -Root $root -ChangedFiles $changed
 
     # Database engine and locality per configuration layer, for each web project (no connection strings).
     $dbDirs = New-Object System.Collections.ArrayList
@@ -101,6 +111,7 @@ try {
         baselineSignals = @($patterns.baselineSignals | ForEach-Object { $_.pattern })
         requiresPackageMetadata = @($patterns.requiresPackageMetadata)
         unclassifiedFiles = @($patterns.unclassified.files).Count
+        skippedFiles = @($patterns.skipped).Count
         database = [ordered]@{ engine = $engine; configuredTarget = $dbTarget; note = 'Connection strings are never printed. A local copy must be declared by the user before any database work.' }
         evidence = @($evidence)
         errors = @(@($version.errors) + @($inventory.errors))

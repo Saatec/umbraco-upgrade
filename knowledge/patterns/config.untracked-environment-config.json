@@ -28,6 +28,22 @@
         "v9-v13",
         "v14+"
       ]
+    },
+    {
+      "id": "uncommitted-config",
+      "weight": "strong",
+      "files": [
+        "**/web.config",
+        "**/web.*.config",
+        "**/appsettings*.json"
+      ],
+      "derived": "uncommitted-config",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
     }
   ],
   "impact": [

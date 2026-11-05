@@ -52,7 +52,7 @@ try {
         "An Umbraco upgrade managed by the umbraco-upgrade plugin is in progress in $root.",
         "Mode: $($s.mode). Source: $($s.source.umbraco). Target requested: $($s.target.requested). Gates: $($gates -join ', ').",
         'The umbraco-upgrade safety hooks are active in this project: prohibited operations (force push, history rewrites, branch deletion, discarding changes, non-local databases, deployments, printing secrets) are blocked.',
-        'State in .umbraco-upgrade/state.json changes only through the plugin state script. /umbraco-upgrade:resume is not available in this plugin version.'
+        'State in .umbraco-upgrade/state.json changes only through the plugin state script. To continue an interrupted upgrade, run /umbraco-upgrade:resume: it compares the state with the repository and asks before anything continues.'
     )
     if ($s.mode -eq 'upgrade') {
         $stateScript = [System.IO.Path]::Combine((Split-Path (Split-Path $PSScriptRoot -Parent) -Parent), 'scripts', 'state.ps1')

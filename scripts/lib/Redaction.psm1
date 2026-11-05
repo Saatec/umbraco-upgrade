@@ -104,7 +104,10 @@ $script:TextRules = @(
     # Configuration paths, as dotnet user-secrets list prints them: Section:ApiKey = ...
     @{ Pattern = '(?im)^(\s*([A-Za-z_][\w\.\-]*(?::[\w\.\-]+)+)\s*=\s*)([^\s#"''][^\r\n#]*)'; Kind = 'envline' },
     # YAML lines with an unquoted single-token value: password: ... (variable references such as ${{ }} and $(x) are kept)
-    @{ Pattern = '(?im)^(\s*([A-Za-z_][\w\.\-]*)\s*:[ \t]+)([^\s#"''\[\{\|>\$%&\*!@`][^\s#]*)(?=[ \t]*(?:#[^\r\n]*)?\r?$)'; Kind = 'envline' }
+    @{ Pattern = '(?im)^(\s*([A-Za-z_][\w\.\-]*)\s*:[ \t]+)([^\s#"''\[\{\|>\$%&\*!@`][^\s#]*)(?=[ \t]*(?:#[^\r\n]*)?\r?$)'; Kind = 'envline' },
+    # Unquoted assignments inside a line of free text: "keep ApiKey=abc123... in user secrets". Only token-like
+    # values (8 or more characters with a digit, no spaces) under a sensitive key name.
+    @{ Pattern = '(?i)(\b([A-Za-z_][\w\.\-]*)\s*[:=]\s*)([A-Za-z0-9+/_\-\.~]*[0-9][A-Za-z0-9+/=_\-\.~]*)'; Kind = 'inline' }
 )
 
 function Protect-Text {
@@ -151,6 +154,14 @@ function Protect-Text {
                     param($m)
                     $v = Protect-Value -Key $m.Groups[2].Value -Value $m.Groups[3].Value.TrimEnd()
                     $m.Groups[1].Value + $v
+                })
+            }
+            'inline' {
+                $t = [regex]::Replace($t, $rule.Pattern, {
+                    param($m)
+                    $v = $m.Groups[3].Value
+                    if ($v.Length -ge 8 -and (Test-SensitiveKey $m.Groups[2].Value) -and $v -notmatch '^-?\d+$') { return $m.Groups[1].Value + $script:Mask }
+                    return $m.Value
                 })
             }
         }

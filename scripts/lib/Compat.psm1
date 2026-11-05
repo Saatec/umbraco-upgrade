@@ -5,10 +5,26 @@ Set-StrictMode -Version 2.0
 
 $script:Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
+function ConvertTo-IoPath {
+    # Windows PowerShell 5.1 cannot open a file or folder whose full path has about 260 characters or more unless the
+    # path carries the \\?\ prefix. Long full paths get the prefix on Windows; every other path is returned unchanged.
+    param([Parameter(Mandatory)][string]$Path)
+    if ([System.IO.Path]::DirectorySeparatorChar -ne [char]'\' -or $Path.Length -lt 240 -or $Path.StartsWith('\\?\')) { return $Path }
+    if ($Path.StartsWith('\\')) { return '\\?\UNC\' + $Path.Substring(2) }
+    return '\\?\' + $Path
+}
+
+function ConvertFrom-IoPath {
+    param([Parameter(Mandatory)][string]$Path)
+    if ($Path.StartsWith('\\?\UNC\')) { return '\\' + $Path.Substring(8) }
+    if ($Path.StartsWith('\\?\')) { return $Path.Substring(4) }
+    return $Path
+}
+
 function Read-TextFile {
     param([Parameter(Mandatory)][string]$Path)
     # Detects a UTF-8 or UTF-16 BOM; otherwise reads as UTF-8.
-    return [System.IO.File]::ReadAllText((Resolve-FullPath $Path), $script:Utf8NoBom)
+    return [System.IO.File]::ReadAllText((ConvertTo-IoPath (Resolve-FullPath $Path)), $script:Utf8NoBom)
 }
 
 function Write-TextFile {
@@ -189,7 +205,7 @@ function Get-FileSha256 {
     param([Parameter(Mandatory)][string]$Path)
     $sha = [System.Security.Cryptography.SHA256]::Create()
     try {
-        $bytes = [System.IO.File]::ReadAllBytes((Resolve-FullPath $Path))
+        $bytes = [System.IO.File]::ReadAllBytes((ConvertTo-IoPath (Resolve-FullPath $Path)))
         return (($sha.ComputeHash($bytes) | ForEach-Object { $_.ToString('x2') }) -join '')
     } finally { $sha.Dispose() }
 }
@@ -205,7 +221,9 @@ function Get-ProjectFiles {
     param(
         [Parameter(Mandatory)][string]$Root,
         [string[]]$ExcludeDirs = $script:DefaultExcludedDirs,
-        [string[]]$ExcludeRelative = @('App_Data/TEMP', 'umbraco/Data/TEMP', 'umbraco/Logs', 'App_Data/Logs')
+        # Matched at the root and below it (a web project in a subfolder). App_Data/NuGetBackup holds the copies of
+        # configuration and backoffice folders that the Umbraco 7 core package's install script makes on each update.
+        [string[]]$ExcludeRelative = @('App_Data/TEMP', 'umbraco/Data/TEMP', 'umbraco/Logs', 'App_Data/Logs', 'App_Data/NuGetBackup')
     )
     $rootFull = (Resolve-FullPath $Root).TrimEnd('\', '/')
     $stack = New-Object System.Collections.Stack
@@ -213,20 +231,22 @@ function Get-ProjectFiles {
     $result = New-Object System.Collections.Generic.List[string]
     while ($stack.Count -gt 0) {
         $dir = [string]$stack.Pop()
+        $io = ConvertTo-IoPath $dir
         try {
-            foreach ($f in [System.IO.Directory]::GetFiles($dir)) { $result.Add($f) }
-            foreach ($d in [System.IO.Directory]::GetDirectories($dir)) {
+            foreach ($f in [System.IO.Directory]::GetFiles($io)) { $result.Add((ConvertFrom-IoPath $f)) }
+            foreach ($d0 in [System.IO.Directory]::GetDirectories($io)) {
+                $d = ConvertFrom-IoPath $d0
                 $name = [System.IO.Path]::GetFileName($d)
                 if ($ExcludeDirs -contains $name) { continue }
                 $rel = $d.Substring($rootFull.Length).TrimStart('\', '/') -replace '\\', '/'
                 $skip = $false
-                foreach ($x in $ExcludeRelative) { if ($rel -ieq $x) { $skip = $true; break } }
+                foreach ($x in $ExcludeRelative) { if ($rel -ieq $x -or $rel.EndsWith('/' + $x, [System.StringComparison]::OrdinalIgnoreCase)) { $skip = $true; break } }
                 if ($skip) { continue }
-                $attr = [System.IO.File]::GetAttributes($d)
+                $attr = [System.IO.File]::GetAttributes((ConvertTo-IoPath $d))
                 if (($attr -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) { continue }
                 $stack.Push($d)
             }
-        } catch [System.UnauthorizedAccessException] { continue }
+        } catch [System.UnauthorizedAccessException] { continue } catch [System.IO.IOException] { continue }
     }
     return ,($result.ToArray())
 }

@@ -4,10 +4,12 @@
 
 .DESCRIPTION
   Read-only on the project; network reads go through the plugin cache (-DataDir). Classes: core, cms-dependency,
-  platform, compatible (a release declares a CMS dependency range that includes the target major), no-target-version,
+  platform, renamed (the package knowledge names its successor for the target), compatible (a release declares a CMS
+  dependency range that includes the target major, on a dependency package that has a release of that major, directly
+  or through packages of its own id family), no-target-version (also from the package knowledge's no-successor facts),
   framework-only, not-cms-specific, not-found (not on nuget.org), unreachable (metadata of a release line it needed
-  could not be read, so it makes no claim). Reports the package-metadata patterns
-  pkg.no-target-version, pkg.framework-only-libs, and pkg.renamed-community (deprecated with an alternate package).
+  could not be read, so it makes no claim). Reports the package-metadata patterns pkg.no-target-version,
+  pkg.framework-only-libs, and pkg.renamed-community (renamed, or deprecated with an alternate package).
   With a state file in the project, the target and source majors come from state and the result is written to
   .umbraco-upgrade/evidence/planning/package-compatibility.json. Prints one JSON object.
 #>

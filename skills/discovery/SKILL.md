@@ -12,10 +12,10 @@ Scripts are run as `powershell -NoProfile -ExecutionPolicy Bypass -File "${CLAUD
 
 ## Steps
 
-1. **Create the state.** `state.ps1 init -ProjectRoot "<root>" -Mode <upgrade|plan> -Target "<target>"`. It records `git status` before writing anything. If it reports that state exists, stop and tell the user (resume is not available in this version).
+1. **Create the state.** `state.ps1 init -ProjectRoot "<root>" -Mode <upgrade|plan> -Target "<target>"`. It records `git status` before writing anything. If it reports that state exists, stop and tell the user: `/umbraco-upgrade:resume` continues that upgrade.
 2. **Activate the hooks for an outside project.** If the project root is not the session's working directory or below it, run `state.ps1 session-marker -ProjectRoot "<root>" -SessionId "<session id>" -DataDir "<plugin data dir>"`. Without the marker the safety hooks would not see this project.
 3. **Explain the state folder** and ask for the folder policy (see the workflow skill, "First run").
-4. **Run discovery.** `Invoke-Discovery.ps1 -ProjectRoot "<root>"`. It writes redacted evidence to `.umbraco-upgrade/evidence/discovery/` (`version.json`, `inventory.json`, `patterns.json`, `database.json`) and updates the state's `source` and `project` sections. Read the summary it prints. For detail, read the evidence files; they contain no secrets.
+4. **Run discovery.** `Invoke-Discovery.ps1 -ProjectRoot "<root>"`. It writes redacted evidence to `.umbraco-upgrade/evidence/discovery/` (`version.json`, `inventory.json`, `patterns.json`, `database.json`) and updates the state's `source` and `project` sections. Read the summary it prints. For detail, read the evidence files; they contain no secrets. If `skippedFiles` is not zero, some files could not be read (for example locked files): tell the user which (`skipped` in `patterns.json`) and that they were not scanned.
 5. **Review the version signals** in `evidence/discovery/version.json`:
    - If `version.needsConfirmation` is true or `conflicts` is not empty, show the user each signal (kind, file, version) and ask which version is installed. Record the answer in gate 2.
    - A configuration status key that differs from the package version can mean the database was not upgraded with the code. Point this out.

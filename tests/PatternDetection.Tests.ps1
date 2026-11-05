@@ -114,6 +114,44 @@ Describe 'Find-PatternHits on baselines' -Tag 'fixture-based' {
         } finally { Remove-TestDirectory $d }
     }
 
+    It 'does not report files that the core packages of 7 and 8 ship' {
+        # The core packages install default.aspx, the splash pages, the grid editor configuration and grid partial
+        # views, and depend on the cookie and OAuth security packages; none of them is a customization.
+        $d = Copy-Fixture -Baseline 'gen.v8'
+        try {
+            foreach ($rel in @('config/splashes', 'Views/Partials/Grid')) { [void][System.IO.Directory]::CreateDirectory((Join-Path $d $rel)) }
+            [System.IO.File]::WriteAllText((Join-Path $d 'default.aspx'), '<%@ Page Language="C#" %>')
+            [System.IO.File]::WriteAllText((Join-Path $d 'config/splashes/noNodes.aspx'), '<%@ Page Language="C#" %>')
+            [System.IO.File]::WriteAllText((Join-Path $d 'config/grid.editors.config.js'), '[ { "name": "Rich text editor", "alias": "rte" } ]')
+            [System.IO.File]::WriteAllText((Join-Path $d 'Views/Partials/Grid/Bootstrap3.cshtml'), '@inherits UmbracoViewPage<dynamic>')
+            $pc = Join-Path $d 'packages.config'
+            $more = '  <package id="Microsoft.Owin.Security.Cookies" version="4.0.1" targetFramework="net472" />' + "`n" + '  <package id="Microsoft.Owin.Security.OAuth" version="4.0.1" targetFramework="net472" />' + "`n</packages>"
+            [System.IO.File]::WriteAllText($pc, [System.IO.File]::ReadAllText($pc).Replace('</packages>', $more))
+            $r = Find-PatternHits -Root $d
+            (@($r.patterns | ForEach-Object { $_.pattern }) -join ',') | Should -Be ''
+            # An external identity provider package is still reported.
+            [System.IO.File]::WriteAllText($pc, [System.IO.File]::ReadAllText($pc).Replace('</packages>', '  <package id="Microsoft.Owin.Security.OpenIdConnect" version="4.0.1" targetFramework="net472" />' + "`n</packages>"))
+            @((Find-PatternHits -Root $d).patterns | ForEach-Object { $_.pattern }) | Should -Be @('auth.external-member-login')
+        } finally { Remove-TestDirectory $d }
+    }
+
+    It 'recognizes backoffice files that a referenced package ships under another folder name' {
+        $d = Copy-Fixture -Baseline 'gen.v8'
+        try {
+            $pc = Join-Path $d 'packages.config'
+            [System.IO.File]::WriteAllText($pc, [System.IO.File]::ReadAllText($pc).Replace('</packages>', '  <package id="Sample.Icon.Picker" version="1.2.0" targetFramework="net472" />' + "`n</packages>"))
+            $manifest = '{ "propertyEditors": [ { "alias": "Sample.IconPicker", "name": "Icon picker", "editor": { "view": "~/App_Plugins/SampleIconUi/picker.html" } } ] }'
+            foreach ($rel in @('App_Plugins/SampleIconUi', 'packages/Sample.Icon.Picker.1.2.0/content/App_Plugins/SampleIconUi')) {
+                [void][System.IO.Directory]::CreateDirectory((Join-Path $d $rel))
+                [System.IO.File]::WriteAllText((Join-Path $d "$rel/package.manifest"), $manifest)
+            }
+            @((Find-PatternHits -Root $d).patterns | ForEach-Object { $_.pattern }) | Should -Be @('backoffice.package-copied-assets')
+            # Without the restored packages folder, the folder name alone does not explain it.
+            Remove-Item -LiteralPath (Join-Path $d 'packages') -Recurse -Force
+            @((Find-PatternHits -Root $d).patterns | ForEach-Object { $_.pattern }) | Should -Be @('backoffice.angular-property-editor')
+        } finally { Remove-TestDirectory $d }
+    }
+
     It 'lists the patterns that need package metadata' {
         $r = Find-PatternHits -Root (Get-FixturePath 'gen.v13')
         foreach ($id in @('pkg.renamed-community', 'pkg.no-target-version', 'pkg.framework-only-libs')) { $r.requiresPackageMetadata | Should -Contain $id }
@@ -127,6 +165,57 @@ Describe 'Find-PatternHits on baselines' -Tag 'fixture-based' {
             @($r.Json.patterns | ForEach-Object { $_.pattern }) | Should -Be @('ext.http-client')
             $r.StdOut | Should -Not -Match 'FAKE-SECRET-FOR-TESTS'
         } finally { Remove-TestDirectory $d }
+    }
+}
+
+Describe 'Find-PatternHits on files that are hard to open' -Tag 'fixture-based' {
+    It 'scans a file whose full path is longer than 260 characters' {
+        $d = Copy-Fixture -Baseline 'gen.v13'
+        $top = Join-Path $d ('a' * 60)
+        try {
+            $deep = Join-Path $top (('b' * 60) + '\' + ('c' * 60))
+            $file = Join-Path $deep (('d' * 40) + '.config')
+            $file.Length | Should -BeGreaterThan 260
+            [void][System.IO.Directory]::CreateDirectory((ConvertTo-IoPath $deep))
+            [System.IO.File]::WriteAllText((ConvertTo-IoPath $file), '<dataType editorAlias="Umbraco.Grid" />')
+            $r = Find-PatternHits -Root $d
+            @($r.patterns | ForEach-Object { $_.pattern }) | Should -Be @('content.legacy-grid')
+            @($r.hits | ForEach-Object { $_.file }) | Should -Contain ($file.Substring($d.Length + 1) -replace '\\', '/')
+            @($r.skipped).Count | Should -Be 0
+        } finally {
+            if (Test-Path -LiteralPath $top) { [System.IO.Directory]::Delete('\\?\' + $top, $true) }
+            Remove-TestDirectory $d
+        }
+    }
+
+    It 'skips temporary and backup folders also when the web project is in a subfolder' {
+        $d = New-TestDirectory -Prefix 'uufx'
+        try {
+            $site = Join-Path $d 'src/SampleSite.Web'
+            [void][System.IO.Directory]::CreateDirectory($site)
+            Copy-Item -Path (Join-Path (Get-FixturePath 'gen.v7') '*') -Destination $site -Recurse -Force
+            foreach ($rel in @('App_Data/NuGetBackup/20240101-120000/Config', 'App_Data/TEMP')) {
+                $dir = Join-Path $site $rel
+                [void][System.IO.Directory]::CreateDirectory($dir)
+                [System.IO.File]::WriteAllText((Join-Path $dir 'grid.copy.config'), '<dataType editorAlias="Umbraco.Grid" />')
+            }
+            $r = Find-PatternHits -Root $d
+            @($r.patterns | ForEach-Object { $_.pattern }) | Should -Not -Contain 'content.legacy-grid'
+            @($r.hits | Where-Object { $_.file -match 'NuGetBackup|TEMP' }).Count | Should -Be 0
+        } finally { Remove-TestDirectory $d }
+    }
+
+    It 'reports a file it cannot read and still scans the others' {
+        $d = Copy-Fixture -Baseline 'gen.v13' -Overlay 'p.ext.http-client'
+        $locked = Join-Path $d 'Locked.config'
+        [System.IO.File]::WriteAllText($locked, '<dataType editorAlias="Umbraco.Grid" />')
+        $fs = [System.IO.File]::Open($locked, [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+        try {
+            $r = Find-PatternHits -Root $d
+            @($r.patterns | ForEach-Object { $_.pattern }) | Should -Be @('ext.http-client')
+            @($r.skipped | ForEach-Object { $_.file }) | Should -Be @('Locked.config')
+            @($r.skipped)[0].reason | Should -Be 'IOException'
+        } finally { $fs.Dispose(); Remove-TestDirectory $d }
     }
 }
 

@@ -18,7 +18,8 @@ function Get-CurrentBranchName {
 
 function Assert-ExecutionAllowed {
     # Throws unless the plan is approved and unchanged, gate 3 passed, the project is on the upgrade branch, and
-    # (with -PhaseId) the phase exists and is in progress. Returns the state.
+    # (with -PhaseId) the phase exists and is in progress. -PhaseId final stands for gate 5, which must be in
+    # progress (its builds write evidence/final/). Returns the state.
     param([Parameter(Mandatory)][string]$ProjectRoot, [string]$PhaseId = '', [switch]$AllowAnyPhaseStatus)
     if (-not (Test-StateExists $ProjectRoot)) { throw 'No upgrade state in this project. Run /umbraco-upgrade:start first.' }
     $state = Read-UpgradeState $ProjectRoot
@@ -31,6 +32,10 @@ function Assert-ExecutionAllowed {
     $expected = [string]$state['gitBaseline']['upgradeBranch']
     if (-not $expected) { throw 'No upgrade branch is recorded.' }
     if ($branch -ne $expected) { throw "The project is on branch '$branch', not on the upgrade branch '$expected'." }
+    if ($PhaseId -eq 'final') {
+        if ($state['gates']['final']['status'] -ne 'in-progress') { throw "Gate 5 is '$($state['gates']['final']['status'])'. Start it first: state.ps1 gate -Gate final -Status in-progress." }
+        return $state
+    }
     if ($PhaseId) {
         $phase = @($state['phases']) | Where-Object { $_['id'] -eq $PhaseId } | Select-Object -First 1
         if ($null -eq $phase) { throw "Unknown phase '$PhaseId'." }

@@ -79,7 +79,7 @@ See `risks.md`. The main ones: <three to five, one line each>.
 - Approval-tier actions (database snapshot and migration on the local copy, package removal or replacement, CI or deployment changes, writes outside the project, removing a feature) are asked for one by one and recorded.
 - Custom functionality is never removed, stubbed, or disabled to make the project build. What cannot be migrated directly becomes an unresolved item with a proposal and a question.
 - Nothing is deployed, force-pushed, or run against a non-local database.
-- Final verification and the report (gate 5) come in a later plugin version.
+- After the last phase, gate 5 runs the final verification (automated checks, an independent review, and a manual checklist for you) and writes `report.md`, which separates what was verified automatically, what you verified manually, and what was not verified.
 
 ## On approval
 

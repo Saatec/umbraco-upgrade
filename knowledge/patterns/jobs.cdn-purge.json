@@ -28,6 +28,23 @@
         "v9-v13",
         "v14+"
       ]
+    },
+    {
+      "id": "cdn-purge-package",
+      "weight": "strong",
+      "files": [
+        "**/*.csproj",
+        "**/*.vbproj",
+        "**/packages.config",
+        "**/Directory.Packages.props"
+      ],
+      "regex": "(?i)(?:\\bid|\\bInclude)\\s*=\\s*\"[^\"]*(?:\\bpurge|\\bcdn)[^\"]*\"",
+      "generations": [
+        "v7",
+        "v8",
+        "v9-v13",
+        "v14+"
+      ]
     }
   ],
   "impact": [

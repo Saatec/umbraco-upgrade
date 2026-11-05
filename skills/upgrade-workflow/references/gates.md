@@ -7,7 +7,7 @@
 | 3 Safety | Gate 2 passed; upgrade mode only | Git checks; state folder policy; upgrade branch; backup and local database plan; rollback document; guard self-test | Clean tree outside `.umbraco-upgrade/`, branch created, guard proven active, rollback documented | branch, `rollback.md`, state |
 | 4 Plan approval | Gate 3 passed (or skipped in plan mode) | Package compatibility from NuGet metadata; phases composed from discovery and the selected path; acceptance criteria, risks, decisions, unresolved items | Plan written; approval requested; **stop and wait** | `plan.md`, `inventory.md`, `compatibility.md`, `risks.md`, `evidence/planning/`, state |
 | Execution | Gate 4 approved; upgrade mode only | Phases in plan order through their `migrate-*` skills ([phase-execution.md](phase-execution.md)) | Each phase: criteria met or waived with evidence, checkpoint commit recorded | project files on the upgrade branch, `evidence/<phase>/`, state |
-| 5 Final verification | Later plugin version | | | |
+| 5 Final verification and report | Every phase done or deferred; upgrade mode only | Reconciliation; checklist from discovery and the path (`Get-VerificationPlan.ps1`); gate 5 build and tests; automated checks (`Invoke-Verification.ps1`); independent verifier; manual checklist answered by the user; report (`New-Report.ps1`) | Every check verified, or not verified with its reason; none open or failed; `report.md` written; the report separates verified automatically, verified manually, and not verified | `evidence/final/`, `report.md`, state |
 
 ## Git status ordering
 
@@ -23,3 +23,4 @@ Gate 1 writes into `.umbraco-upgrade/` before gate 3 checks git status. To keep 
 - Gate 3: stash, reset, checkout, clean, or commit the user's changes; create a branch when the tree is dirty.
 - Gate 4: start executing the plan before the user approves it.
 - Execution: remove, stub, or disable custom functionality; run an approval-tier action without a recorded approval; touch any database except the declared local copy.
+- Gate 5: count a build as verification of behavior; record a manual check as verified without the user's words; verify an automated check by hand; fix code outside a follow-up phase; test against a shared, staging, or production system.

@@ -1,5 +1,5 @@
 {
-  "description": "Synthetic NuGet responses written for the package compatibility tests. Package ids, versions, and metadata are invented (Sample.* names); nothing here was recorded from nuget.org.",
+  "description": "Synthetic NuGet responses written for the package compatibility tests. Package ids, versions, and metadata are invented (Sample.* names); nothing here was recorded from nuget.org. The version lists of Umbraco.Cms.Core, Umbraco.Cms.Web.BackOffice, and UmbracoCms.Core are minimal synthetic lists (one or two versions per major) for the dependency check, not the real lists.",
   "recordedAt": "2026-10-23",
   "entries": [
     {
@@ -90,6 +90,87 @@
       "url": "https://api.nuget.org/v3-flatcontainer/sample.private.toolkit/index.json",
       "status": 404,
       "contentType": "application/xml"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms.core/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "umbraco.cms.core.index.json",
+      "derived": "synthetic: one version per major, 9 to 18"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbracocms.core/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "umbracocms.core.index.json",
+      "derived": "synthetic: two versions per major, 7 and 8"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.legacy.mapper/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "sample.legacy.mapper.index.json"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.legacy.mapper/1.0.0/sample.legacy.mapper.nuspec",
+      "status": 200,
+      "contentType": "application/xml",
+      "file": "sample.legacy.mapper.1.0.0.nuspec"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/umbraco.cms.web.backoffice/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "umbraco.cms.web.backoffice.index.json",
+      "derived": "synthetic: one version per major, 9 to 13"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.stale.range/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "sample.stale.range.index.json"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.stale.range/2.0.0/sample.stale.range.nuspec",
+      "status": 200,
+      "contentType": "application/xml",
+      "file": "sample.stale.range.2.0.0.nuspec"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.stale.range/1.0.0/sample.stale.range.nuspec",
+      "status": 200,
+      "contentType": "application/xml",
+      "file": "sample.stale.range.1.0.0.nuspec"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.suite/index.json",
+      "status": 200,
+      "contentType": "application/json",
+      "file": "sample.suite.index.json"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.suite/18.0.0/sample.suite.nuspec",
+      "status": 200,
+      "contentType": "application/xml",
+      "file": "sample.suite.18.0.0.nuspec"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.suite/17.1.0/sample.suite.nuspec",
+      "status": 200,
+      "contentType": "application/xml",
+      "file": "sample.suite.17.1.0.nuspec"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.suite.core/18.0.0/sample.suite.core.nuspec",
+      "status": 200,
+      "contentType": "application/xml",
+      "file": "sample.suite.core.18.0.0.nuspec"
+    },
+    {
+      "url": "https://api.nuget.org/v3-flatcontainer/sample.suite.core/17.1.0/sample.suite.core.nuspec",
+      "status": 200,
+      "contentType": "application/xml",
+      "file": "sample.suite.core.17.1.0.nuspec"
     }
   ]
 }

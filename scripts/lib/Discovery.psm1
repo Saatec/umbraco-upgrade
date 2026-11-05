@@ -315,6 +315,31 @@ function Get-UmbracoVersionInfo {
     }
 }
 
+function Get-PackageShippedPluginFolders {
+    # App_Plugins folder names that referenced packages ship as content. A packages.config project restores its
+    # packages into a packages folder next to the solution (packages/<id>.<version>/content/App_Plugins/<name>),
+    # so the folder name of a package's backoffice files can differ from the package id. Returns an empty set
+    # when no packages folder is present (it is usually not committed).
+    param([Parameter(Mandatory)][string]$Root, $PackageIds)
+    $names = New-Object System.Collections.Generic.HashSet[string]([System.StringComparer]::OrdinalIgnoreCase)
+    $candidates = @(Join-Path $Root 'packages')
+    try { foreach ($d in [System.IO.Directory]::GetDirectories((ConvertTo-IoPath $Root))) { $candidates += (Join-Path (ConvertFrom-IoPath $d) 'packages') } } catch { }
+    foreach ($pkgRoot in $candidates) {
+        try {
+            if (-not [System.IO.Directory]::Exists((ConvertTo-IoPath $pkgRoot))) { continue }
+            foreach ($pd in [System.IO.Directory]::GetDirectories((ConvertTo-IoPath $pkgRoot))) {
+                $id = ([System.IO.Path]::GetFileName($pd)) -replace '\.\d+(?:\.\d+){1,3}(?:-[0-9A-Za-z\.\-]+)?$', ''
+                if (-not $PackageIds.Contains($id)) { continue }
+                foreach ($c in @('content', 'Content')) {
+                    $ap = Join-Path (Join-Path $pd $c) 'App_Plugins'
+                    if ([System.IO.Directory]::Exists($ap)) { foreach ($n in [System.IO.Directory]::GetDirectories($ap)) { [void]$names.Add([System.IO.Path]::GetFileName($n)) } }
+                }
+            }
+        } catch { continue }
+    }
+    return ,$names
+}
+
 function Test-PluginFolderMatchesPackage {
     # True when an App_Plugins folder name matches a referenced package ID (ignoring dots, dashes, underscores).
     param([string]$Name, $PackageIds)
@@ -410,9 +435,10 @@ function Get-ProjectInventoryInfo {
             [void]$errs.Add([ordered]@{ file = $rel; error = (Protect-Text $_.Exception.Message) })
         }
     }
+    $shipped = Get-PackageShippedPluginFolders -Root $Root -PackageIds $packageIds
     $plugins = foreach ($k in ($pluginDirs.Keys | Sort-Object)) {
         $p = $pluginDirs[$k]
-        $p['matchesPackageReference'] = (Test-PluginFolderMatchesPackage -Name $p.name -PackageIds $packageIds)
+        $p['matchesPackageReference'] = ((Test-PluginFolderMatchesPackage -Name $p.name -PackageIds $packageIds) -or $shipped.Contains([string]$p.name))
         $p
     }
     $inv.solutions = @($solutions); $inv.projects = @($projects); $inv.packagesConfig = @($pc)
@@ -448,14 +474,17 @@ function Find-PatternHits {
     # Runs the detector registry. Customization patterns go to "patterns"; patterns of kind "baseline" (present in
     # default installations of some generation) go to "baselineSignals" and never count as customizations.
     # Detector forms: a regex over files matching globs; file presence (no regex); and derived detectors
-    # (app-plugin-orphan, implicit-namespace). Patterns that need package metadata are listed for the planning step.
-    param([Parameter(Mandatory)][string]$Root, $Registry = (Get-PatternRegistry))
+    # (app-plugin-orphan, implicit-namespace, uncommitted-config). Patterns that need package metadata are listed for
+    # the planning step. -ChangedFiles: paths (relative to the root) that git reported as modified or untracked when
+    # the upgrade started.
+    param([Parameter(Mandatory)][string]$Root, $Registry = (Get-PatternRegistry), [string[]]$ChangedFiles = @())
     $Root = Resolve-FullPath $Root
     $files = Get-ProjectFiles -Root $Root
     $rels = @{}
     foreach ($f in $files) { $rels[$f] = (Get-RelPath $Root $f) }
     $opts = [System.Text.RegularExpressions.RegexOptions]::Multiline
     $packageIds = Get-PackageReferenceIds -Root $Root -Files $files
+    $shippedFolders = Get-PackageShippedPluginFolders -Root $Root -PackageIds $packageIds
     $kinds = @{}
     $detectors = New-Object System.Collections.ArrayList
     $derived = New-Object System.Collections.ArrayList
@@ -483,13 +512,17 @@ function Find-PatternHits {
     $pluginMatch = @{}
     $hits = New-Object System.Collections.ArrayList
     $catchCandidates = New-Object System.Collections.ArrayList
+    # A file that cannot be read (locked, access denied) is reported and skipped; it never stops discovery.
+    $skipped = New-Object System.Collections.ArrayList
     foreach ($f in $files) {
         $rel = $rels[$f]
         $content = $null
-        $len = (New-Object System.IO.FileInfo($f)).Length
+        try { $len = (New-Object System.IO.FileInfo((ConvertTo-IoPath $f))).Length }
+        catch { [void]$skipped.Add([ordered]@{ file = $rel; reason = (Get-ReadFailureReason $_) }); continue }
         if ($len -gt $script:MaxFileBytes) { continue }
+        $unreadable = $false
         $plugin = Get-PluginFolderName $rel
-        if ($plugin -and -not $pluginMatch.ContainsKey($plugin)) { $pluginMatch[$plugin] = (Test-PluginFolderMatchesPackage -Name $plugin -PackageIds $packageIds) }
+        if ($plugin -and -not $pluginMatch.ContainsKey($plugin)) { $pluginMatch[$plugin] = ((Test-PluginFolderMatchesPackage -Name $plugin -PackageIds $packageIds) -or $shippedFolders.Contains($plugin)) }
         foreach ($d in $detectors) {
             if (-not $d.glob -or -not $d.glob.IsMatch($rel)) { continue }
             if ($d.exclude -and $d.exclude.IsMatch($rel)) { continue }
@@ -502,7 +535,10 @@ function Find-PatternHits {
                 [void]$hits.Add([ordered]@{ pattern = $d.pattern; detector = $d.id; weight = $d.weight; file = $rel; line = 1; count = 1; snippet = (Protect-Text $rel) })
                 continue
             }
-            if ($null -eq $content) { $content = Read-TextFile $f }
+            if ($null -eq $content) {
+                try { $content = Read-TextFile $f }
+                catch { [void]$skipped.Add([ordered]@{ file = $rel; reason = (Get-ReadFailureReason $_) }); $unreadable = $true; break }
+            }
             $ms = $d.regex.Matches($content)
             if ($ms.Count -eq 0) { continue }
             $first = $ms[0]
@@ -511,13 +547,16 @@ function Find-PatternHits {
             if ($lineText.Length -gt 200) { $lineText = $lineText.Substring(0, 200) }
             [void]$hits.Add([ordered]@{ pattern = $d.pattern; detector = $d.id; weight = $d.weight; file = $rel; line = $line; count = $ms.Count; snippet = (Protect-Text $lineText) })
         }
-        if ($catchAll -and $catchAll.glob -and $catchAll.glob.IsMatch($rel)) {
-            if ($null -eq $content) { $content = Read-TextFile $f }
+        if (-not $unreadable -and $catchAll -and $catchAll.glob -and $catchAll.glob.IsMatch($rel)) {
+            if ($null -eq $content) {
+                try { $content = Read-TextFile $f }
+                catch { [void]$skipped.Add([ordered]@{ file = $rel; reason = (Get-ReadFailureReason $_) }); continue }
+            }
             if ($catchAll.regex.IsMatch($content)) { [void]$catchCandidates.Add($rel) }
         }
     }
     foreach ($dd in $derived) {
-        $derivedHits = Find-DerivedHits -Root $Root -Files $files -Rels $rels -Definition $dd.def -PackageIds $packageIds -PluginMatch $pluginMatch
+        $derivedHits = Find-DerivedHits -Root $Root -Files $files -Rels $rels -Definition $dd.def -PackageIds $packageIds -PluginMatch $pluginMatch -Hits $hits -ChangedFiles $ChangedFiles
         foreach ($h in $derivedHits) {
             $h['pattern'] = $dd.pattern
             [void]$hits.Add($h)
@@ -539,7 +578,16 @@ function Find-PatternHits {
         baselineHits = @($keptBaseline)
         requiresPackageMetadata = @($metadataPatterns)
         unclassified = [ordered]@{ pattern = $(if ($catchAll) { $catchAll.pattern } else { $null }); files = $unclassified }
+        skipped = @($skipped)
     }
+}
+
+function Get-ReadFailureReason {
+    # The .NET exception type behind a failed read (PowerShell wraps it in MethodInvocationException).
+    param($ErrorRecord)
+    $e = $ErrorRecord.Exception
+    while ($e -is [System.Management.Automation.MethodInvocationException] -and $e.InnerException) { $e = $e.InnerException }
+    return $e.GetType().Name
 }
 
 function Get-PatternSummary {
@@ -561,23 +609,37 @@ function Get-PatternSummary {
 function Find-DerivedHits {
     # Detectors that need more than one file: plugin folders without a package or a manifest, and namespaces used
     # in SDK-style projects that no direct package reference provides.
-    param([string]$Root, [string[]]$Files, $Rels, $Definition, $PackageIds, $PluginMatch)
+    param([string]$Root, [string[]]$Files, $Rels, $Definition, $PackageIds, $PluginMatch, $Hits = @(), [string[]]$ChangedFiles = @())
     $out = New-Object System.Collections.ArrayList
     switch ([string]$Definition.derived) {
+        'uncommitted-config' {
+            # Configuration files that had uncommitted changes, or were untracked, when the upgrade started: settings
+            # edited in place per environment, or kept outside source control.
+            $globs = New-GlobRegex @($Definition.files)
+            foreach ($c in @($ChangedFiles | Where-Object { $_ } | Sort-Object -Unique)) {
+                $rel = ([string]$c) -replace '\\', '/'
+                if ($globs -and $globs.IsMatch($rel)) { [void]$out.Add([ordered]@{ pattern = $null; detector = $Definition.id; weight = $Definition.weight; file = $rel; line = 1; count = 1; snippet = (Protect-Text ('uncommitted change: ' + $rel)) }) }
+            }
+        }
         'app-plugin-orphan' {
-            # An App_Plugins folder that matches no package reference and has no manifest of either generation.
+            # An App_Plugins folder that matches no package reference and that nothing else explains: it has no
+            # manifest of either generation, or its manifest gave no strong detector hit in the folder (the leftover
+            # manifest of a removed package, or an extension the registry does not recognize).
+            $explained = @{}
+            foreach ($h in @($Hits)) { if ($h.weight -eq 'strong') { $hn = Get-PluginFolderName ([string]$h.file); if ($hn) { $explained[$hn] = $true } } }
             $folders = @{}
             foreach ($f in $Files) {
                 $rel = $Rels[$f]; $name = Get-PluginFolderName $rel
                 if (-not $name) { continue }
-                if (-not $folders.ContainsKey($name)) { $folders[$name] = [ordered]@{ first = $rel; manifest = $false } }
+                if (-not $folders.ContainsKey($name)) { $folders[$name] = [ordered]@{ first = $rel; manifest = $null } }
                 $leaf = [System.IO.Path]::GetFileName($rel)
-                if ($leaf -ieq 'package.manifest' -or $leaf -ieq 'umbraco-package.json') { $folders[$name].manifest = $true }
+                if ($leaf -ieq 'package.manifest' -or $leaf -ieq 'umbraco-package.json') { $folders[$name].manifest = $rel }
             }
             foreach ($name in ($folders.Keys | Sort-Object)) {
                 if ($PluginMatch.ContainsKey($name) -and $PluginMatch[$name]) { continue }
-                if ($folders[$name].manifest) { continue }
-                [void]$out.Add([ordered]@{ pattern = $null; detector = $Definition.id; weight = $Definition.weight; file = $folders[$name].first; line = 1; count = 1; snippet = (Protect-Text ("App_Plugins/" + $name)) })
+                if ($folders[$name].manifest -and $explained.ContainsKey($name)) { continue }
+                $file = $(if ($folders[$name].manifest) { $folders[$name].manifest } else { $folders[$name].first })
+                [void]$out.Add([ordered]@{ pattern = $null; detector = $Definition.id; weight = $Definition.weight; file = $file; line = 1; count = 1; snippet = (Protect-Text ("App_Plugins/" + $name)) })
             }
         }
         'implicit-namespace' {
@@ -595,7 +657,7 @@ function Find-DerivedHits {
                 $dir = [System.IO.Path]::GetDirectoryName($f); $refs = $null
                 while ($dir) { if ($projDirs.ContainsKey($dir)) { $refs = $projDirs[$dir]; break }; $parent = [System.IO.Path]::GetDirectoryName($dir); if ($parent -eq $dir) { break }; $dir = $parent }
                 if ($null -eq $refs) { continue }
-                $content = Read-TextFile $f
+                try { $content = Read-TextFile $f } catch { continue }
                 foreach ($ns in @($Definition.namespaces)) {
                     $m = [regex]::Match($content, '(?m)^\s*(?:global\s+)?using\s+(?:static\s+)?' + [regex]::Escape([string]$ns.namespace) + '(?:\.[\w\.]+)?\s*;')
                     if (-not $m.Success) { continue }
@@ -612,4 +674,4 @@ function Find-DerivedHits {
     return ,($out.ToArray())
 }
 
-Export-ModuleMember -Function Get-PluginRoot, Get-PatternRegistry, Get-VersionSignalConfig, ConvertTo-VersionInfo, Get-GenerationForMajor, Get-UmbracoVersionInfo, Get-ProjectInventoryInfo, Find-PatternHits, Get-PackageReferenceIds, Test-PluginFolderMatchesPackage
+Export-ModuleMember -Function Get-PluginRoot, Get-PatternRegistry, New-GlobRegex, Get-VersionSignalConfig, ConvertTo-VersionInfo, Get-GenerationForMajor, Get-UmbracoVersionInfo, Get-ProjectInventoryInfo, Find-PatternHits, Get-PackageReferenceIds, Test-PluginFolderMatchesPackage

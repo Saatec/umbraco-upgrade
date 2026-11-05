@@ -177,6 +177,27 @@ Describe 'Phase composition on synthetic fixtures' -Tag 'fixture-based' {
         @($parts | ForEach-Object { @($_.files) } | Sort-Object -Unique).Count | Should -Be 20
     }
 
+    It 'keeps content-model serialization files out of the split volume' {
+        # Forty serialized document types and data types that use block editors: listed, but one phase, not three.
+        $prepare = {
+            param($dir)
+            foreach ($kind in @('ContentTypes', 'DataTypes')) { [void][System.IO.Directory]::CreateDirectory((Join-Path $dir "uSync/v9/$kind")) }
+            for ($i = 1; $i -le 20; $i++) {
+                [System.IO.File]::WriteAllText((Join-Path $dir "uSync/v9/ContentTypes/sample-page-$i.config"), "<ContentType Key=`"sample-page-$i`" />")
+                [System.IO.File]::WriteAllText((Join-Path $dir "uSync/v9/DataTypes/sample-blocks-$i.config"), "<DataType Key=`"sample-blocks-$i`"><EditorAlias>Umbraco.BlockList</EditorAlias></DataType>")
+            }
+        }
+        $r = New-Composition -Overlays @('p.content.usync') -Target '17' -Prepare $prepare
+        $c = $r.Composition
+        Test-PhaseShape $c
+        foreach ($id in @('content.model-source-of-truth', 'content.block-editors')) {
+            $ph = @($c.phases | Where-Object { @($_.patterns) -contains $id })
+            $ph.Count | Should -Be 1 -Because "$id hits are serialized content-model files"
+            $ph[0].title | Should -Not -Match 'part \d+ of'
+        }
+        @(@($c.phases | Where-Object { @($_.patterns) -contains 'content.model-source-of-truth' })[0].files).Count | Should -BeGreaterThan 20
+    }
+
     It 'produces a phase list that state accepts' {
         $r = $script:HeavyResult
         $d = New-UpgradeProject -Target '18'
@@ -234,6 +255,25 @@ Describe 'Split rules' -Tag 'mocked' {
         @($chunks).Count | Should -Be 3
         foreach ($ch in $chunks) { @($ch.files).Count | Should -BeLessOrEqual ([int]$script:Rules['split']['maxFiles']) }
         @($chunks | ForEach-Object { @($_.files) } | Sort-Object -Unique).Count | Should -Be 40
+    }
+
+    It 'splits a very large pattern into no more than the maximum number of parts' {
+        $max = [int]$script:Rules['split']['maxPartsPerPattern']
+        $chunks = Split-WorkItems -Items @((New-WorkItem 'huge' 'low' 200 450)) -Rules $script:Rules
+        @($chunks).Count | Should -Be $max
+        (@($chunks[0].reasons) -join ' ') | Should -Match "split into the maximum of $max parts"
+        @($chunks | ForEach-Object { @($_.files) } | Sort-Object -Unique).Count | Should -Be 200
+    }
+
+    It 'does not count content-model, data, or generated files toward the volume' {
+        $it = New-WorkItem 'model' 'low' 3 3
+        $it['files'] = @($it['files']) + @(1..60 | ForEach-Object { "uSync/v9/DataTypes/d$_.config" })
+        $it['occurrences'] = 63
+        $it['volumeFiles'] = @($it['files'] | Select-Object -First 3)
+        $it['volumeOccurrences'] = 3
+        $chunks = Split-WorkItems -Items @($it, (New-WorkItem 'small' 'low' 2 2)) -Rules $script:Rules
+        @($chunks).Count | Should -Be 1
+        @($chunks[0].files).Count | Should -Be 65
     }
 }
 

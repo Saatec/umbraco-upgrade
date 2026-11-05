@@ -8,7 +8,7 @@ Import-Module (Join-Path $PSScriptRoot 'Git.psm1') -DisableNameChecking
 Import-Module (Join-Path $PSScriptRoot 'JsonSchema.psm1') -DisableNameChecking
 
 $script:PluginRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-$script:SchemaVersion = '1.0.0'
+$script:SchemaVersion = '1.1.0'
 $script:GateOrder = @('discovery', 'versionPath', 'safety', 'planApproval', 'final')
 $script:SchemaCache = $null
 
@@ -44,6 +44,7 @@ function Test-UpgradeState {
             if (-not $g['planApproval'].Contains('approval') -or -not $g['planApproval']['approval']) { [void]$errors.Add('$.gates.planApproval: approved without an approval id') }
         }
     }
+    if ($State.Contains('verification') -and [string]$State['schemaVersion'] -match '^1\.0\.') { [void]$errors.Add('$.verification: needs schema version 1.1.0 or later') }
     $text = ConvertTo-JsonText -InputObject $State -Compress
     if ((Protect-Text $text) -ne $text) { [void]$errors.Add('$: state contains a value that looks like a secret') }
     return ,($errors.ToArray())
@@ -89,7 +90,7 @@ function New-UpgradeState {
         [Parameter(Mandatory)][string]$TargetRequested
     )
     $ProjectRoot = Resolve-FullPath $ProjectRoot
-    if (Test-StateExists $ProjectRoot) { throw "State already exists at $(Get-StatePath $ProjectRoot). Resume is not available in this version; move or remove the folder yourself to start over." }
+    if (Test-StateExists $ProjectRoot) { throw "State already exists at $(Get-StatePath $ProjectRoot). To continue that upgrade, run /umbraco-upgrade:resume; to start over, move or remove the folder yourself." }
     if ($TargetRequested -notmatch '^\d+(\.\d+){0,2}$') { throw "Invalid target version '$TargetRequested'." }
     # 1. Read-only git snapshot first.
     $repo = Get-GitRepoInfo -Root $ProjectRoot
@@ -135,8 +136,9 @@ function Get-StateFolderReadme {
 This folder holds the state of an Umbraco upgrade run by the umbraco-upgrade Claude Code plugin.
 
 - `state.json`: machine-readable progress (versions, gates, phases, approvals). Changed only through the plugin's state script.
-- `plan.md`, `inventory.md`, `compatibility.md`, `risks.md`, `decisions.md`: the upgrade plan and its supporting records.
+- `plan.md`, `inventory.md`, `compatibility.md`, `risks.md`, `decisions.md`, `rollback.md`: the upgrade plan and its supporting records.
 - `evidence/`: outputs of checks, with secrets redacted.
+- `report.md`: the upgrade report (what was verified automatically, verified manually, and not verified).
 
 Nothing in this folder should contain secrets. You decide whether to commit this folder, ignore it locally
 (through `.git/info/exclude`), or add it to `.gitignore`. The plugin records your choice in `state.json`.
@@ -180,6 +182,12 @@ function Set-UpgradeGate {
         if ($blocker) { throw "Cannot set '$Gate' to '$Status': $blocker." }
     }
     if ($Status -eq 'skipped' -and -not ($Gate -eq 'safety' -and $state['mode'] -eq 'plan')) { throw "Only the safety gate can be skipped, and only in plan mode." }
+    if ($Gate -eq 'final' -and $Status -in @('in-progress', 'passed')) {
+        if ($state['mode'] -ne 'upgrade') { throw 'Gate 5 (final verification) runs only in upgrade mode.' }
+        $open = @(@($state['phases']) | Where-Object { $_['status'] -notin @('done', 'deferred') } | ForEach-Object { "$($_['id'])=$($_['status'])" })
+        if (@($state['phases']).Count -eq 0) { throw 'Gate 5 needs an executed plan; the state has no phases.' }
+        if ($open.Count -gt 0) { throw "Gate 5 starts only when every phase is done or deferred. Open: $($open -join ', ')." }
+    }
     if ($Status -eq 'passed') {
         switch ($Gate) {
             'discovery' {
@@ -198,6 +206,15 @@ function Set-UpgradeGate {
                 if ($g['guardSelfTest'] -ne 'passed') { throw 'Safety cannot pass: the guard self-test has not passed.' }
                 if (-not $state['gitBaseline']['upgradeBranch']) { throw 'Safety cannot pass: no upgrade branch recorded.' }
                 if (-not $g['rollbackDoc']) { throw 'Safety cannot pass: no rollback document recorded.' }
+            }
+            'final' {
+                $checks = @(); if ($state.Contains('verification')) { $checks = @($state['verification']['checks']) }
+                if ($checks.Count -eq 0) { throw 'Gate 5 cannot pass without a verification checklist (Get-VerificationPlan.ps1, then state.ps1 verification).' }
+                $pending = @($checks | Where-Object { $_['result'] -eq 'pending' } | ForEach-Object { $_['id'] })
+                if ($pending.Count -gt 0) { throw "Gate 5 cannot pass while checks are pending: $($pending -join ', ')." }
+                $failed = @($checks | Where-Object { $_['result'] -eq 'failed' } | ForEach-Object { $_['id'] })
+                if ($failed.Count -gt 0) { throw "Gate 5 cannot pass while checks failed: $($failed -join ', '). Fix them through a follow-up phase, or record the user's decision to leave one unverified." }
+                if (-not [System.IO.File]::Exists((Join-Path (Get-StateDir $ProjectRoot) 'report.md'))) { throw 'Gate 5 cannot pass without report.md (New-Report.ps1).' }
             }
         }
     }
@@ -365,6 +382,19 @@ function Add-Unresolved {
     return $id
 }
 
+function ConvertTo-SortedJson {
+    # Compact JSON with dictionary keys sorted, for comparing records whatever order their keys were written in.
+    param($Value)
+    $sort = $null
+    $sort = {
+        param($v)
+        if ($v -is [System.Collections.IDictionary]) { $h = [ordered]@{}; foreach ($k in (@($v.Keys) | Sort-Object)) { $h[[string]$k] = & $sort $v[$k] }; return $h }
+        if ($v -is [System.Collections.IEnumerable] -and -not ($v -is [string])) { return ,@(@($v) | ForEach-Object { & $sort $_ }) }
+        return $v
+    }
+    return (ConvertTo-JsonText -InputObject (& $sort (ConvertTo-PlainObject $Value)) -Compress)
+}
+
 function Set-UpgradePhases {
     # Replaces the phase list while the plan is being composed (before approval).
     param([Parameter(Mandatory)][string]$ProjectRoot, [Parameter(Mandatory)]$Phases)
@@ -372,6 +402,17 @@ function Set-UpgradePhases {
     if ($state['gates']['planApproval']['status'] -eq 'approved') { throw 'Phases are frozen after plan approval.' }
     $list = ConvertTo-PlainObject $Phases
     if ($list -is [System.Collections.IDictionary]) { $list = @($list) }
+    # After execution started (a re-approval of an amended plan), phases that ran stay exactly as recorded and in
+    # the same order; only phases that never started may change, and new ones are added after them.
+    $ran = @(@($state['phases']) | Where-Object { $_['status'] -ne 'pending' })
+    foreach ($old in $ran) {
+        $new = @($list | Where-Object { $_['id'] -eq $old['id'] }) | Select-Object -First 1
+        if ($null -eq $new) { throw "Phase $($old['id']) has run ($($old['status'])) and cannot be removed from the plan." }
+        if ((ConvertTo-SortedJson $new) -ne (ConvertTo-SortedJson $old)) { throw "Phase $($old['id']) has run ($($old['status'])) and must stay exactly as recorded. Take the list from state.ps1 get -Field phases and add new phases after it." }
+    }
+    for ($i = 0; $i -lt $ran.Count; $i++) {
+        if ($i -ge @($list).Count -or $list[$i]['id'] -ne @($state['phases'])[$i]['id']) { throw 'Phases that have run must keep their order at the start of the list.' }
+    }
     foreach ($p in $list) {
         if (-not $p.Contains('status')) { $p['status'] = 'pending' }
         if (-not $p.Contains('startedAt')) { $p['startedAt'] = $null }
@@ -394,6 +435,7 @@ function Set-PhaseStatus {
         $check = Test-PlanHash -ProjectRoot $ProjectRoot
         if (-not $check.matches) { throw 'plan.md changed after approval. The approval no longer covers it; request approval again.' }
         if ($state['gates']['safety']['status'] -ne 'passed') { throw 'Phases can start only after gate 3 (safety setup) has passed.' }
+        if ($state['gates']['final']['status'] -in @('in-progress', 'passed')) { throw "Gate 5 is '$($state['gates']['final']['status'])'. A follow-up phase starts only after gate 5 is set back to failed with the reason (state.ps1 gate -Gate final -Status failed -Notes ...)." }
         foreach ($p in @($state['phases'])) {
             if ($p['id'] -eq $PhaseId) { break }
             if ($p['status'] -notin @('done', 'deferred')) { throw "Phase $($p['id']) is '$($p['status'])'. Phases run in plan order; finish or defer it first." }
@@ -473,8 +515,82 @@ function Set-PhaseCheckpoint {
     return (Save-UpgradeState -ProjectRoot $ProjectRoot -State $state -Event 'checkpoint' -Detail "$PhaseId $Commit")
 }
 
+# ---------------------------------------------------------------- gate 5 verification
+
+function Set-VerificationChecks {
+    # Records the gate 5 checklist composed by Get-VerificationPlan.ps1. Only while gate 5 is in progress; a new
+    # list replaces the old one (earlier results stay in history and in the evidence).
+    param([Parameter(Mandatory)][string]$ProjectRoot, [Parameter(Mandatory)]$Checks)
+    $state = Read-UpgradeState $ProjectRoot
+    if ($state['gates']['final']['status'] -ne 'in-progress') { throw "Gate 5 is '$($state['gates']['final']['status'])'. Start it first: state.ps1 gate -Gate final -Status in-progress." }
+    $list = ConvertTo-PlainObject $Checks
+    if ($list -is [System.Collections.IDictionary]) { $list = @($list) }
+    if (@($list).Count -eq 0) { throw 'The verification checklist is empty.' }
+    $seen = @{}
+    foreach ($c in @($list)) {
+        foreach ($k in @('id', 'rule', 'category', 'title', 'method')) { if (-not $c.Contains($k) -or -not $c[$k]) { throw "A verification check has no '$k'." } }
+        if ($seen.ContainsKey($c['id'])) { throw "Duplicate verification check id '$($c['id'])'." }
+        $seen[$c['id']] = $true
+        $c['result'] = 'pending'
+        foreach ($k in @('note', 'recovery', 'recordedAt')) { $c[$k] = $null }
+        $c['evidence'] = @()
+    }
+    if ([version]([string]$state['schemaVersion']) -lt [version]'1.1.0') {
+        $from = [string]$state['schemaVersion']
+        $state['schemaVersion'] = $script:SchemaVersion
+        Add-HistoryEntry -State $state -Event 'schema-migrated' -Detail "$from -> $script:SchemaVersion (verification records)"
+    }
+    $state['verification'] = [ordered]@{ composedAt = (Get-UtcTimestamp); checks = @($list) }
+    return (Save-UpgradeState -ProjectRoot $ProjectRoot -State $state -Event 'verification' -Detail ("checks=" + @($list).Count))
+}
+
+function Set-VerificationResult {
+    # Records the result of one gate 5 check.
+    #   verified: automated checks only through Invoke-Verification.ps1 (-ByScript); manual checks need evidence under
+    #             .umbraco-upgrade/ and the user's words in -Note
+    #   failed: what failed in -Note and how to recover in -Recovery
+    #   not-verified: why not in -Note (for an earlier failure, the user's decision to leave it unverified)
+    param(
+        [Parameter(Mandatory)][string]$ProjectRoot, [Parameter(Mandatory)][string]$CheckId,
+        [Parameter(Mandatory)][ValidateSet('verified', 'failed', 'not-verified')][string]$Result,
+        [string[]]$Evidence = @(), [string]$Note = '', [string]$Recovery = '', [switch]$ByScript
+    )
+    $state = Read-UpgradeState $ProjectRoot
+    if ($state['gates']['final']['status'] -ne 'in-progress') { throw "Gate 5 is '$($state['gates']['final']['status'])', not in progress." }
+    if (-not $state.Contains('verification')) { throw 'No verification checklist is recorded (state.ps1 verification).' }
+    $c = @($state['verification']['checks']) | Where-Object { $_['id'] -eq $CheckId } | Select-Object -First 1
+    if ($null -eq $c) { throw "Unknown verification check '$CheckId'." }
+    $ev = @($Evidence | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+    $dir = Get-StateDir $ProjectRoot
+    foreach ($e in $ev) {
+        if ($e -match '(^|[\\/])\.\.([\\/]|$)' -or [System.IO.Path]::IsPathRooted($e)) { throw "Evidence '$e' must be a path relative to .umbraco-upgrade/." }
+        if (-not [System.IO.File]::Exists((Join-Path $dir $e))) { throw "Evidence file '$e' does not exist under .umbraco-upgrade/." }
+    }
+    switch ($Result) {
+        'verified' {
+            if ($c['method'] -eq 'automated' -and -not $ByScript) { throw "Check $CheckId is automated: Invoke-Verification.ps1 records its result from the evidence it checks. Record a failure or a reason it was not verified instead." }
+            if ($ev.Count -eq 0) { throw "Check $CheckId can be verified only with evidence (for a manual check, write the user's confirmation with Write-Evidence.ps1 first)." }
+            if ($c['method'] -eq 'manual' -and -not $Note.Trim()) { throw 'A manual check is verified only with the user''s words in -Note.' }
+        }
+        'failed' {
+            if (-not $Note.Trim()) { throw 'A failed check needs what failed in -Note.' }
+            if (-not $Recovery.Trim()) { throw 'A failed check needs the recovery steps in -Recovery.' }
+        }
+        'not-verified' { if (-not $Note.Trim()) { throw 'A check that is not verified needs the reason in -Note.' } }
+    }
+    $c['result'] = $Result
+    $c['evidence'] = @($ev)
+    $c['note'] = $(if ($Note) { $Note } else { $null })
+    $c['recovery'] = $(if ($Recovery) { $Recovery } else { $null })
+    $c['recordedAt'] = Get-UtcTimestamp
+    $detail = "$CheckId=$Result"
+    if ($Note) { $detail += " note: $Note" }
+    return (Save-UpgradeState -ProjectRoot $ProjectRoot -State $state -Event 'verification-result' -Detail $detail)
+}
+
 function Update-StateSchemaVersion {
-    # Upgrades older 1.x minors in place. No migrations exist yet for 1.0.0.
+    # Upgrades older 1.x minors in place. 1.0.0 to 1.1.0 adds the optional verification section, so only the
+    # version changes.
     param([Parameter(Mandatory)][string]$ProjectRoot)
     $state = Read-UpgradeState $ProjectRoot
     $from = [string]$state['schemaVersion']
@@ -486,4 +602,7 @@ function Update-StateSchemaVersion {
     return [ordered]@{ from = $from; to = $script:SchemaVersion; changed = $true }
 }
 
-Export-ModuleMember -Function Get-StateDir, Get-StatePath, Test-StateExists, Get-PluginVersion, Get-StateSchema, Test-UpgradeState, Read-UpgradeState, Save-UpgradeState, New-UpgradeState, Set-UpgradeGate, Set-GateFields, Request-PlanApproval, Add-Approval, Test-ApprovalAvailable, Test-PlanHash, Update-StateSection, Add-Decision, Add-Unresolved, Set-UpgradePhases, Set-PhaseStatus, Set-PhaseCheckpoint, Set-AcceptanceCriterion, Add-PhaseFailure, Set-UnresolvedStatus, Update-StateSchemaVersion, Get-PlanPath
+function Get-GateOrder { return $script:GateOrder }
+function Get-StateSchemaVersion { return $script:SchemaVersion }
+
+Export-ModuleMember -Function Get-StateDir, Get-StatePath, Test-StateExists, Get-PluginVersion, Get-StateSchema, Test-UpgradeState, Read-UpgradeState, Save-UpgradeState, New-UpgradeState, Set-UpgradeGate, Set-GateFields, Request-PlanApproval, Add-Approval, Test-ApprovalAvailable, Test-PlanHash, Update-StateSection, Add-Decision, Add-Unresolved, Set-UpgradePhases, Set-PhaseStatus, Set-PhaseCheckpoint, Set-AcceptanceCriterion, Add-PhaseFailure, Set-UnresolvedStatus, Set-VerificationChecks, Set-VerificationResult, Update-StateSchemaVersion, Get-PlanPath, Get-GateOrder, Get-StateSchemaVersion

@@ -30,6 +30,22 @@ Describe 'Invoke-Discovery' -Tag 'fixture-based' {
             @($status | Where-Object { $_ -notmatch '\.umbraco-upgrade/' }).Count | Should -Be 0
         } finally { Remove-TestDirectory $d }
     }
+
+    It 'reports configuration that had uncommitted changes when the upgrade started' {
+        $d = Copy-Fixture -Baseline 'gen.v13'
+        try {
+            Initialize-GitRepo -Path $d -Commit
+            $cfg = Join-Path $d 'appsettings.json'
+            [System.IO.File]::WriteAllText($cfg, [System.IO.File]::ReadAllText($cfg) + "`n")
+            [System.IO.File]::WriteAllText((Join-Path $d 'appsettings.Local.json'), '{ }')
+            (Invoke-State $d @('init', '-Mode', 'plan', '-Target', '17')).ExitCode | Should -Be 0
+            $r = Invoke-PluginScript -Script 'scripts/Invoke-Discovery.ps1' -Arguments @('-ProjectRoot', $d)
+            $r.ExitCode | Should -Be 0 -Because $r.StdOut
+            @($r.Json.patterns | ForEach-Object { $_.pattern }) | Should -Contain 'config.untracked-environment-config'
+            $p = Get-Content -Raw (Join-Path $d '.umbraco-upgrade/evidence/discovery/patterns.json') | ConvertFrom-Json
+            @($p.hits | Where-Object { $_.detector -eq 'uncommitted-config' } | ForEach-Object { $_.file }) | Should -Be @('appsettings.json', 'appsettings.Local.json')
+        } finally { Remove-TestDirectory $d }
+    }
 }
 
 Describe 'Test-SafetyPreconditions' -Tag 'fixture-based' {

@@ -25,6 +25,9 @@
     criterion              -PhaseId P1 -CriterionId P1-AC1 -Status met|not-met|waived|pending [-Evidence a,b] [-Note text]
     phase-failure          -PhaseId P1 -Summary text -Recovery text [-EvidenceFile path]
     unresolved-update      -Id U-001 -Status decided|resolved|deferred|awaiting-user [-Proposal port|replace|redesign] [-DecisionId D-001]
+    verification           -JsonFile path   (gate 5 checklist from Get-VerificationPlan.ps1)
+    verify-check           -CheckId V-01 -Result verified|failed|not-verified [-Evidence a,b] [-Note text] [-Recovery text]
+                           (automated checks are verified only by Invoke-Verification.ps1)
     migrate
     session-marker         -SessionId <id> -DataDir <plugin data dir> [-Remove]
 
@@ -33,7 +36,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet('init', 'get', 'validate', 'gate', 'gate-fields', 'request-plan-approval', 'approve', 'require-approval', 'check-plan', 'set', 'decision', 'unresolved', 'unresolved-update', 'phases', 'phase', 'checkpoint', 'criterion', 'phase-failure', 'migrate', 'session-marker')]
+    [ValidateSet('init', 'get', 'validate', 'gate', 'gate-fields', 'request-plan-approval', 'approve', 'require-approval', 'check-plan', 'set', 'decision', 'unresolved', 'unresolved-update', 'phases', 'phase', 'checkpoint', 'criterion', 'phase-failure', 'verification', 'verify-check', 'migrate', 'session-marker')]
     [string]$Command,
     [string]$ProjectRoot = '',
     [string]$Mode, [string]$Target,
@@ -44,6 +47,7 @@ param(
     [string]$PhaseId, [string]$Commit,
     [string]$CriterionId, [string]$Summary, [string]$Recovery, [string]$EvidenceFile,
     [string]$Id, [string]$DecisionId,
+    [string]$CheckId, [string]$Result,
     [string]$Field,
     [string]$SessionId, [string]$DataDir, [switch]$Remove,
     [switch]$Invalidate
@@ -192,6 +196,17 @@ try {
             $p2 = ''; if ($PSBoundParameters.ContainsKey('Proposal')) { $p2 = $Proposal }
             [void](Set-UnresolvedStatus -ProjectRoot $ProjectRoot -Id $Id -Status $Status -Proposal $p2 -Decision $DecisionId)
             $out.id = $Id; $out.status = $Status
+        }
+        'verification' {
+            if (-not $JsonFile) { throw 'verification needs -JsonFile.' }
+            $s = Set-VerificationChecks -ProjectRoot $ProjectRoot -Checks (Read-JsonFile $JsonFile)
+            $out.count = @($s['verification']['checks']).Count
+        }
+        'verify-check' {
+            if (-not $CheckId -or -not $Result) { throw 'verify-check needs -CheckId and -Result.' }
+            $s = Set-VerificationResult -ProjectRoot $ProjectRoot -CheckId $CheckId -Result $Result -Evidence $Evidence -Note $Note -Recovery $Recovery
+            $out.check = @($s['verification']['checks']) | Where-Object { $_['id'] -eq $CheckId } | Select-Object -First 1
+            $out.pending = @(@($s['verification']['checks']) | Where-Object { $_['result'] -eq 'pending' } | ForEach-Object { $_['id'] })
         }
         'migrate' {
             $out.migration = Update-StateSchemaVersion -ProjectRoot $ProjectRoot

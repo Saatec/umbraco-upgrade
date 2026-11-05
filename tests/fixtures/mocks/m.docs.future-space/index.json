@@ -1,0 +1,14 @@
+{
+  "description": "Derived from the real docs index (llms.txt) of 2026-10-14 by appending one line that links a 25.latest space. Synthetic: Umbraco 25 does not exist.",
+  "recordedAt": "2026-10-14",
+  "entries": [
+    {
+      "url": "https://docs.umbraco.com/llms.txt",
+      "status": 200,
+      "contentType": "text/markdown; charset=utf-8",
+      "file": "62dea0d0-docs.umbraco.com_llms.txt.txt",
+      "trimmed": "header and the umbraco-cms upgrade and legacy lines only",
+      "derived": "appended one line for a synthetic 25.latest space"
+    }
+  ]
+}

@@ -95,7 +95,7 @@
         "regex": { "type": "string", "minLength": 1 },
         "pluginScope": { "enum": ["matched", "unmatched"] },
         "excludeFiles": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-        "derived": { "enum": ["app-plugin-orphan", "implicit-namespace", "package-metadata"] },
+        "derived": { "enum": ["app-plugin-orphan", "implicit-namespace", "package-metadata", "uncommitted-config"] },
         "namespaces": {
           "type": "array",
           "items": {
