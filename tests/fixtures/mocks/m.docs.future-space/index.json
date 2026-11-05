@@ -6,7 +6,7 @@
       "url": "https://docs.umbraco.com/llms.txt",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "62dea0d0-docs.umbraco.com_llms.txt.txt",
+      "file": "62dea0d0.txt",
       "trimmed": "header and the umbraco-cms upgrade and legacy lines only",
       "derived": "appended one line for a synthetic 25.latest space"
     }

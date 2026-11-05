@@ -6,93 +6,93 @@
       "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/upgrade-details.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "fefe0dde-s.umbraco.com_umbraco-cms_get-started_upgrading-and-migrating_upgrade-details.md.txt",
+      "file": "fefe0dde.txt",
       "edited": "example connection string line removed (it contains a password placeholder)"
     },
     {
       "url": "https://docs.umbraco.com/umbraco-cms/17.latest/get-started/upgrading-and-migrating/upgrade-details.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "8e1cb1ac-com_umbraco-cms_17.latest_get-started_upgrading-and-migrating_upgrade-details.md.txt",
+      "file": "8e1cb1ac.txt",
       "edited": "example connection string line removed (it contains a password placeholder)"
     },
     {
       "url": "https://docs.umbraco.com/umbraco-cms/13.latest/fundamentals/setup/upgrading.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "bb154abd-docs.umbraco.com_umbraco-cms_13.latest_fundamentals_setup_upgrading.md.txt",
+      "file": "bb154abd.txt",
       "edited": "example connection string line removed (it contains a password placeholder)"
     },
     {
       "url": "https://docs.umbraco.com/umbraco-cms/13.latest/fundamentals/setup/upgrading/version-specific.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "ba5e00c4-braco.com_umbraco-cms_13.latest_fundamentals_setup_upgrading_version-specific.md.txt",
+      "file": "ba5e00c4.txt",
       "trimmed": "first 40 lines"
     },
     {
       "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "a05132dd-co.com_umbraco-cms_get-started_upgrading-and-migrating_find-your-upgrade-path.md.txt"
+      "file": "a05132dd.txt"
     },
     {
       "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/upgrade-from-8-to-latest.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "99536f6b-arted_upgrading-and-migrating_find-your-upgrade-path_upgrade-from-8-to-latest.md.txt",
+      "file": "99536f6b.txt",
       "edited": "example connection string line removed (it contains a password placeholder)"
     },
     {
       "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-8.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "abdc9b79-d_upgrading-and-migrating_find-your-upgrade-path_migrate-content-to-umbraco-8.md.txt"
+      "file": "abdc9b79.txt"
     },
     {
       "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/migrate-content-to-umbraco-15.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "1f755c81-upgrading-and-migrating_find-your-upgrade-path_migrate-content-to-umbraco-15.md.txt"
+      "file": "1f755c81.txt"
     },
     {
       "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/version-specific.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "55dc866d-.umbraco.com_umbraco-cms_get-started_upgrading-and-migrating_version-specific.md.txt",
+      "file": "55dc866d.txt",
       "trimmed": "first 40 lines (preparation section)"
     },
     {
       "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/minor-upgrades-for-umbraco-7.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "713ab6e4-d_upgrading-and-migrating_find-your-upgrade-path_minor-upgrades-for-umbraco-7.md.txt",
+      "file": "713ab6e4.txt",
       "trimmed": "first 30 lines"
     },
     {
       "url": "https://docs.umbraco.com/umbraco-cms/get-started/upgrading-and-migrating/find-your-upgrade-path/minor-upgrades-for-umbraco-8.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "e65d6ba6-d_upgrading-and-migrating_find-your-upgrade-path_minor-upgrades-for-umbraco-8.md.txt",
+      "file": "e65d6ba6.txt",
       "trimmed": "first 30 lines"
     },
     {
       "url": "https://docs.umbraco.com/umbraco-cms/understand-umbraco-cms/product-and-releases/legacy-documentation.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "50dc0989-umbraco-cms_understand-umbraco-cms_product-and-releases_legacy-documentation.md.txt"
+      "file": "50dc0989.txt"
     },
     {
       "url": "https://docs.umbraco.com/documentation-and-versions.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "e5cee7c5-docs.umbraco.com_documentation-and-versions.md.txt"
+      "file": "e5cee7c5.txt"
     },
     {
       "url": "https://docs.umbraco.com/llms.txt",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "62dea0d0-docs.umbraco.com_llms.txt.txt",
+      "file": "62dea0d0.txt",
       "trimmed": "header and the umbraco-cms upgrade and legacy lines only"
     },
     {
@@ -100,144 +100,144 @@
       "status": 200,
       "finalUrl": "https://docs.umbraco.com/umbraco-cms/17.latest/get-started/upgrading-and-migrating/upgrade-details.md",
       "contentType": "text/markdown; charset=utf-8",
-      "file": "550a906a-mbraco.com_umbraco-cms_16.latest_fundamentals_setup_upgrading_upgrade-details.md.txt",
+      "file": "550a906a.txt",
       "edited": "example connection string line removed (it contains a password placeholder)"
     },
     {
       "url": "https://docs.umbraco.com/umbraco-cms/19.latest/get-started/upgrading-and-migrating/upgrade-details.md",
       "status": 200,
       "contentType": "text/markdown; charset=utf-8",
-      "file": "c6374366-com_umbraco-cms_19.latest_get-started_upgrading-and-migrating_upgrade-details.md.txt"
+      "file": "c6374366.txt"
     },
     {
       "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/10/umbraco-cms/SUMMARY.md",
       "status": 200,
       "contentType": "text/plain; charset=utf-8",
-      "file": "3747c01e-ercontent.com_umbraco_UmbracoDocs_umbraco-eol-versions_10_umbraco-cms_SUMMARY.md.txt",
+      "file": "3747c01e.txt",
       "trimmed": "lines up to the upgrade section"
     },
     {
       "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/11/umbraco-cms/SUMMARY.md",
       "status": 200,
       "contentType": "text/plain; charset=utf-8",
-      "file": "d83a65f4-ercontent.com_umbraco_UmbracoDocs_umbraco-eol-versions_11_umbraco-cms_SUMMARY.md.txt",
+      "file": "d83a65f4.txt",
       "trimmed": "lines up to the upgrade section"
     },
     {
       "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/12/umbraco-cms/SUMMARY.md",
       "status": 200,
       "contentType": "text/plain; charset=utf-8",
-      "file": "3f26f159-ercontent.com_umbraco_UmbracoDocs_umbraco-eol-versions_12_umbraco-cms_SUMMARY.md.txt",
+      "file": "3f26f159.txt",
       "trimmed": "lines up to the upgrade section"
     },
     {
       "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/14/umbraco-cms/SUMMARY.md",
       "status": 200,
       "contentType": "text/plain; charset=utf-8",
-      "file": "609a35c2-ercontent.com_umbraco_UmbracoDocs_umbraco-eol-versions_14_umbraco-cms_SUMMARY.md.txt",
+      "file": "609a35c2.txt",
       "trimmed": "lines up to the upgrade section"
     },
     {
       "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/15/umbraco-cms/SUMMARY.md",
       "status": 200,
       "contentType": "text/plain; charset=utf-8",
-      "file": "f1390c9a-ercontent.com_umbraco_UmbracoDocs_umbraco-eol-versions_15_umbraco-cms_SUMMARY.md.txt",
+      "file": "f1390c9a.txt",
       "trimmed": "lines up to the upgrade section"
     },
     {
       "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/16/umbraco-cms/SUMMARY.md",
       "status": 200,
       "contentType": "text/plain; charset=utf-8",
-      "file": "c58126af-ercontent.com_umbraco_UmbracoDocs_umbraco-eol-versions_16_umbraco-cms_SUMMARY.md.txt",
+      "file": "c58126af.txt",
       "trimmed": "lines up to the upgrade section"
     },
     {
       "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/main/17/umbraco-cms/SUMMARY.md",
       "status": 200,
       "contentType": "text/plain; charset=utf-8",
-      "file": "bf91b4cb-raw.githubusercontent.com_umbraco_UmbracoDocs_main_17_umbraco-cms_SUMMARY.md.txt",
+      "file": "bf91b4cb.txt",
       "trimmed": "lines up to the upgrade section"
     },
     {
       "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/16/umbraco-cms/fundamentals/setup/upgrading/version-specific/README.md",
       "status": 200,
       "contentType": "text/plain; charset=utf-8",
-      "file": "18ccb9da--versions_16_umbraco-cms_fundamentals_setup_upgrading_version-specific_README.md.txt",
+      "file": "18ccb9da.txt",
       "trimmed": "first 50 lines"
     },
     {
       "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/16/umbraco-cms/fundamentals/setup/upgrading/README.md",
       "status": 200,
       "contentType": "text/plain; charset=utf-8",
-      "file": "d0371615-oDocs_umbraco-eol-versions_16_umbraco-cms_fundamentals_setup_upgrading_README.md.txt"
+      "file": "d0371615.txt"
     },
     {
       "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/legacy-docs/README.md",
       "status": 200,
       "contentType": "text/plain; charset=utf-8",
-      "file": "c1e92651-raw.githubusercontent.com_umbraco_UmbracoDocs_legacy-docs_README.md.txt"
+      "file": "c1e92651.txt"
     },
     {
       "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/main/9/umbraco-cms/SUMMARY.md",
       "status": 404,
       "contentType": "text/plain; charset=utf-8",
-      "file": "0b60ebc2-raw.githubusercontent.com_umbraco_UmbracoDocs_main_9_umbraco-cms_SUMMARY.md.txt"
+      "file": "0b60ebc2.txt"
     },
     {
       "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/9/umbraco-cms/SUMMARY.md",
       "status": 404,
       "contentType": "text/plain; charset=utf-8",
-      "file": "8919d69e-sercontent.com_umbraco_UmbracoDocs_umbraco-eol-versions_9_umbraco-cms_SUMMARY.md.txt"
+      "file": "8919d69e.txt"
     },
     {
       "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/main/25/umbraco-cms/SUMMARY.md",
       "status": 404,
       "contentType": "text/plain; charset=utf-8",
-      "file": "bf1d0337-raw.githubusercontent.com_umbraco_UmbracoDocs_main_25_umbraco-cms_SUMMARY.md.txt"
+      "file": "bf1d0337.txt"
     },
     {
       "url": "https://raw.githubusercontent.com/umbraco/UmbracoDocs/umbraco-eol-versions/25/umbraco-cms/SUMMARY.md",
       "status": 404,
       "contentType": "text/plain; charset=utf-8",
-      "file": "bfb593c0-ercontent.com_umbraco_UmbracoDocs_umbraco-eol-versions_25_umbraco-cms_SUMMARY.md.txt"
+      "file": "bfb593c0.txt"
     },
     {
       "url": "https://releases.umbraco.com/",
       "status": 200,
       "contentType": "text/html; charset=utf-8",
-      "file": "eaec957b-releases.umbraco.com.txt",
+      "file": "eaec957b.txt",
       "trimmed": "the current-releases section of the page only"
     },
     {
       "url": "https://umbraco.com/products/knowledge-center/long-term-support-and-end-of-life/",
       "status": 403,
       "contentType": "text/html; charset=utf-8",
-      "file": "054108e0-umbraco.com_products_knowledge-center_long-term-support-and-end-of-life.txt",
+      "file": "054108e0.txt",
       "trimmed": "bot challenge page reduced to its title"
     },
     {
       "url": "https://endoflife.date/api/umbraco.json",
       "status": 200,
       "contentType": "application/json",
-      "file": "a1d43ed7-endoflife.date_api_umbraco.json.txt"
+      "file": "a1d43ed7.txt"
     },
     {
       "url": "https://builds.dotnet.microsoft.com/dotnet/release-metadata/releases-index.json",
       "status": 200,
       "contentType": "application/json",
-      "file": "2ef6ab14-builds.dotnet.microsoft.com_dotnet_release-metadata_releases-index.json.txt"
+      "file": "2ef6ab14.txt"
     },
     {
       "url": "https://raw.githubusercontent.com/dotnet/core/main/release-notes/README.md",
       "status": 200,
       "contentType": "text/plain; charset=utf-8",
-      "file": "ff8263ba-raw.githubusercontent.com_dotnet_core_main_release-notes_README.md.txt"
+      "file": "ff8263ba.txt"
     },
     {
       "url": "https://api.nuget.org/v3/index.json",
       "status": 200,
       "contentType": "application/json",
-      "file": "670c1461-api.nuget.org_v3_index.json.txt"
+      "file": "670c1461.txt"
     }
   ]
 }
