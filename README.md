@@ -176,7 +176,7 @@ The rules, their ids, and their reasons are data in `scripts/hooks/rules.json`; 
 
 ### Hook cost
 
-Outside upgrade projects the hooks add no model context; inside one, the session note adds a few lines. The plugin's skills and agents add about 2,300 tokens of always-on context to every session where it is enabled (`claude plugin details umbraco-upgrade@umbraco-upgrade`). Each matching tool call starts one Windows PowerShell process, also outside upgrade projects, where the script exits right after its scope check:
+Outside upgrade projects the hooks add no model context; inside one, the session note adds a few lines. The plugin's skills and agents add roughly 1,500 to 2,300 tokens of always-on context to every session where it is enabled (the estimate of `claude plugin details umbraco-upgrade@umbraco-upgrade` varies between runs). Each matching tool call starts one Windows PowerShell process, also outside upgrade projects, where the script exits right after its scope check:
 
 - every `Bash` and `PowerShell` call: two starts, the guard before the call and the output redaction after it
 - every `Write`, `Edit`, and `NotebookEdit` call: one start (the guard)
