@@ -70,4 +70,27 @@ function Write-RedactedEvidence {
 
 function Get-EvidenceStamp { return [DateTime]::UtcNow.ToString('yyyyMMddTHHmmssZ') }
 
-Export-ModuleMember -Function Get-CurrentBranchName, Assert-ExecutionAllowed, Assert-EvidenceFolder, Write-RedactedEvidence, Get-EvidenceStamp
+function Get-BlockLabelTemplates {
+    # Block labels written as AngularJS templates ({{ }}) in block editor data type configuration rows
+    # (dataTypeId, dataTypeName, editorAlias, config). Pattern content.block-label-templates. Labels are redacted
+    # and shortened to 200 characters. Rows whose configuration is not JSON are skipped.
+    param($Rows = @())
+    $found = New-Object System.Collections.ArrayList
+    foreach ($row in @($Rows)) {
+        if ($null -eq $row) { continue }
+        $cfg = $null
+        try { $cfg = ([string]$row['config']) | ConvertFrom-Json } catch { continue }
+        if ($null -eq $cfg -or -not $cfg.PSObject.Properties['blocks']) { continue }
+        foreach ($b in @($cfg.blocks)) {
+            if ($null -eq $b -or -not $b.PSObject.Properties['label']) { continue }
+            $label = [string]$b.label
+            if ($label -notmatch '\{\{') { continue }
+            if ($label.Length -gt 200) { $label = $label.Substring(0, 200) }
+            $key = $(if ($b.PSObject.Properties['contentElementTypeKey']) { [string]$b.contentElementTypeKey } else { '' })
+            [void]$found.Add([ordered]@{ dataTypeId = [int]$row['dataTypeId']; dataTypeName = [string]$row['dataTypeName']; editorAlias = [string]$row['editorAlias']; contentElementTypeKey = $key; label = (Protect-Text $label) })
+        }
+    }
+    return $found.ToArray()
+}
+
+Export-ModuleMember -Function Get-CurrentBranchName, Assert-ExecutionAllowed, Assert-EvidenceFolder, Write-RedactedEvidence, Get-EvidenceStamp, Get-BlockLabelTemplates

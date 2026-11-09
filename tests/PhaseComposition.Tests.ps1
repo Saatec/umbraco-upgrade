@@ -158,6 +158,19 @@ Describe 'Phase composition on synthetic fixtures' -Tag 'fixture-based' {
         }
     }
 
+    It 'adds the block label check only to the database phase of the step that crosses 14' {
+        $direct = (New-Composition -Target '17').Composition
+        $db = @($direct.phases | Where-Object { $_.title -match '^Database migration' })
+        @($db[0].acceptanceCriteria | Where-Object { $_.text -match '\(content\.block-label-templates\)$' }).Count | Should -Be 1
+        $r = $script:HeavyResult
+        $crossing = @($r.Steps | Where-Object { [int](($_.from -split '\.')[0]) -lt 14 -and [int](($_.to -split '\.')[0]) -ge 14 })
+        $crossing.Count | Should -Be 1
+        foreach ($p in @($r.Composition.phases | Where-Object { $_.title -match '^Database migration' })) {
+            $n = @($p.acceptanceCriteria | Where-Object { $_.text -match '\(content\.block-label-templates\)$' }).Count
+            $n | Should -Be ([int]($p.step -eq $crossing[0].id)) -Because "step $($p.step)"
+        }
+    }
+
     It 'splits one pattern above the volume thresholds into file chunks' {
         $prepare = {
             param($dir)

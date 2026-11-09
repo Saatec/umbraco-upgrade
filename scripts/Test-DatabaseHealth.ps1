@@ -8,7 +8,9 @@
   never printed or recorded.
   - SQL Server and LocalDB: the database size from sys.database_files (8-KB pages), the largest tables by
     approximate row count from sys.partitions (heap or clustered index), and the number of foreign keys that are
-    disabled or not trusted (sys.foreign_keys). Only SELECT statements on catalog views run.
+    disabled or not trusted (sys.foreign_keys), and the block labels written as AngularJS templates ({{ }}) in
+    Block List and Block Grid data types (umbracoDataType, Umbraco 8 and later; pattern
+    content.block-label-templates). Only SELECT statements run: on catalog views, and on the data type tables.
   - SQLite and SQL CE: the size of the database file; row counts need the engine's own tools.
   Writes evidence/<folder>/db-health-<stamp>.json, where -Folder is a phase id or 'discovery'. Prints JSON.
 #>
@@ -77,6 +79,13 @@ try {
                 $result.tableCount = [int](Invoke-ReadQuery $conn 'SELECT COUNT(*) AS tableCount FROM sys.tables;')[0]['tableCount']
                 $result.largestTables = @(Invoke-ReadQuery $conn 'SELECT TOP (@top) s.name AS schemaName, t.name AS tableName, SUM(p.rows) AS approximateRows FROM sys.tables AS t JOIN sys.schemas AS s ON s.schema_id = t.schema_id JOIN sys.partitions AS p ON p.object_id = t.object_id AND p.index_id IN (0, 1) GROUP BY s.name, t.name ORDER BY SUM(p.rows) DESC, s.name, t.name;' @{ '@top' = $Top })
                 $result.foreignKeysDisabledOrNotTrusted = [int](Invoke-ReadQuery $conn 'SELECT COUNT(*) AS problems FROM sys.foreign_keys WHERE is_disabled = 1 OR is_not_trusted = 1;')[0]['problems']
+                # Block labels written as AngularJS templates (content.block-label-templates). Only when the CMS data
+                # type table with a configuration column exists (Umbraco 8 and later).
+                $labelRows = @()
+                if ([int](Invoke-ReadQuery $conn "SELECT COUNT(*) AS n FROM sys.columns WHERE object_id = OBJECT_ID(N'dbo.umbracoDataType') AND name = N'config';")[0]['n'] -gt 0) {
+                    $labelRows = @(Invoke-ReadQuery $conn "SELECT dt.nodeId AS dataTypeId, n.text AS dataTypeName, dt.propertyEditorAlias AS editorAlias, dt.config AS config FROM dbo.umbracoDataType AS dt JOIN dbo.umbracoNode AS n ON n.id = dt.nodeId WHERE dt.propertyEditorAlias IN (N'Umbraco.BlockList', N'Umbraco.BlockGrid') AND dt.config LIKE N'%{{%';")
+                }
+                $result.blockLabelTemplates = @(Get-BlockLabelTemplates -Rows $labelRows)
             } finally { $conn.Dispose() }
         }
         { $_ -in @('sqlite', 'sqlce') } {

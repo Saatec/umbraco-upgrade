@@ -225,7 +225,26 @@ Describe 'Test-DatabaseHealth.ps1 (read-only, local copy only)' -Tag 'fixture-ba
         [int]$r.Json.tableCount | Should -BeGreaterOrEqual 0
         @($r.Json.largestTables).Count | Should -BeLessOrEqual 5
         [int]$r.Json.foreignKeysDisabledOrNotTrusted | Should -BeGreaterOrEqual 0
+        # master has no CMS data type table, so no block labels are listed.
+        @($r.Json.blockLabelTemplates).Count | Should -Be 0
         $r.StdOut | Should -Not -Match 'Integrated Security'
+    }
+
+    It 'lists block labels written as AngularJS templates from data type configuration rows' {
+        Import-Module (Join-Path (Get-RepoRoot) 'scripts/lib/Execution.psm1') -Force -DisableNameChecking
+        $long = 'Long (' + ('x' * 250) + ' {{ title }})'
+        $rows = @(
+            [ordered]@{ dataTypeId = 1063; dataTypeName = 'Home - Blocks'; editorAlias = 'Umbraco.BlockGrid'; config = '{"blocks":[{"contentElementTypeKey":"k1","label":"Rich Text ({{richText | ncRichText | truncate:true:36}})"},{"contentElementTypeKey":"k2","label":"Image"},{"contentElementTypeKey":"k3","label":"Headline ({umbValue: headline})"}]}' },
+            [ordered]@{ dataTypeId = 1064; dataTypeName = 'Long'; editorAlias = 'Umbraco.BlockList'; config = ('{"blocks":[{"contentElementTypeKey":"k4","label":"' + $long + '"}]}') },
+            [ordered]@{ dataTypeId = 1065; dataTypeName = 'Not JSON'; editorAlias = 'Umbraco.BlockList'; config = '<not json {{x}}>' },
+            [ordered]@{ dataTypeId = 1066; dataTypeName = 'No blocks'; editorAlias = 'Umbraco.BlockList'; config = '{"maxItems":3}' })
+        $found = @(Get-BlockLabelTemplates -Rows $rows)
+        $found.Count | Should -Be 2
+        $found[0].dataTypeId | Should -Be 1063
+        $found[0].contentElementTypeKey | Should -Be 'k1'
+        $found[0].label | Should -Be 'Rich Text ({{richText | ncRichText | truncate:true:36}})'
+        $found[1].label.Length | Should -Be 200
+        @(Get-BlockLabelTemplates -Rows @()).Count | Should -Be 0
     }
 }
 

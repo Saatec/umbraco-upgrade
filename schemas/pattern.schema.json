@@ -36,6 +36,7 @@
       "properties": {
         "pathHasDatabaseStep": { "type": "boolean" },
         "maxSourceMajor": { "type": "integer" },
+        "stepCrosses": { "description": "Only for a path step that crosses this major: its source major is below it and its target major is at or above it.", "type": "integer" },
         "anyPattern": { "type": "array", "items": { "type": "string" } }
       }
     },

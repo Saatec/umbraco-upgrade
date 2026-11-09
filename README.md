@@ -200,7 +200,7 @@ All scripts are PowerShell, written for Windows PowerShell 5.1 and PowerShell 7,
 | `Get-ProjectInventory.ps1` | Lists solutions, projects, target frameworks, package references, loose assemblies, `App_Plugins` folders and manifests, views, configuration, CI, publish, and IIS files. |
 | `Find-Patterns.ps1` | Runs the detector registry (`knowledge/patterns/`) and reports hits with redacted one-line snippets, plus unclassified Umbraco usage. |
 | `Read-RedactedConfig.ps1` | Shows a configuration file with secret values redacted. Use it instead of printing settings files, which the guard blocks. |
-| `Test-DatabaseHealth.ps1` | Read-only catalog counts (size, largest tables, untrusted foreign keys) on the declared local database copy; refuses any other database. |
+| `Test-DatabaseHealth.ps1` | Read-only catalog counts (size, largest tables, untrusted foreign keys) and block labels written as AngularJS templates on the declared local database copy; refuses any other database. |
 
 **Versions, paths, documentation, and packages (read-only; network through the plugin cache)**
 

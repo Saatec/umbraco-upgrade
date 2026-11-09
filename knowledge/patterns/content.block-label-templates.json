@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "1.1.0",
+  "id": "content.block-label-templates",
+  "title": "Block editor labels written as AngularJS templates",
+  "description": "Block List and Block Grid block labels configured for the AngularJS backoffice, such as {{ title }} or {{ text | ncRichText | truncate:true:36 }}. They live in the data type configuration in the database, and in serialized configuration files when a synchronization package or a deployment tool is used.",
+  "kind": "customization",
+  "area": "content-database",
+  "owner": "migrate-content-database",
+  "prevalence": "common",
+  "status": "verified",
+  "detection": "database-review",
+  "flagOnly": false,
+  "requiresDecision": false,
+  "detectors": [
+    {
+      "id": "serialized-label-template",
+      "weight": "strong",
+      "files": [
+        "**/uSync/**/*.config",
+        "**/*.uda"
+      ],
+      "regex": "\"[Ll]abel\"\\s*:\\s*\"[^\"\\r\\n]*\\{\\{",
+      "generations": [
+        "v8",
+        "v9-v13"
+      ]
+    }
+  ],
+  "appliesWhen": {
+    "pathHasDatabaseStep": true,
+    "stepCrosses": 14
+  },
+  "impact": [
+    {
+      "crosses": 14,
+      "difficulty": "low",
+      "summary": "The AngularJS backoffice is removed and block labels are rendered with Umbraco Flavored Markdown. Labels written as AngularJS templates must be rewritten: on a 13.10.1 to 17.8.1 upgrade the migrations left them unchanged and the backoffice showed the template as raw text in the block and in the block editor title.",
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/model-your-content/property-editors/umbraco-flavored-markdown.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-11-09",
+          "evidence": "With the removal of AngularJS, advanced label rendering is now handled using Umbraco Flavored Markdown"
+        },
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/17.latest/model-your-content/property-editors/umbraco-flavored-markdown.md",
+          "docsVersion": "17",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-11-09",
+          "evidence": "With the removal of AngularJS, advanced label rendering is now handled using Umbraco Flavored Markdown"
+        }
+      ]
+    }
+  ],
+  "handling": [
+    {
+      "id": "rewrite-as-ufm",
+      "option": "Rewrite each label in Umbraco Flavored Markdown after the database migration, keeping the text around the template: {{ alias }} becomes {umbValue: alias}, the ncRichText filter becomes stripHtml, and truncate:true:N becomes truncate:N. Do it in the backoffice of every environment after its upgrade, or in the serialized files the environments import, so an import does not bring the old labels back.",
+      "when": "Test-DatabaseHealth.ps1 lists blockLabelTemplates on the local copy, or discovery found labels with {{ }} in serialized configuration files",
+      "targets": [
+        "v14+"
+      ],
+      "status": "verified",
+      "sources": [
+        {
+          "url": "https://docs.umbraco.com/umbraco-cms/model-your-content/property-editors/umbraco-flavored-markdown.md",
+          "docsVersion": "18",
+          "appliesTo": "14+",
+          "verifiedAt": "2026-11-09",
+          "evidence": "To display a rich-text value, stripping out the HTML markup and limiting it to the first 15 words could use the following filters"
+        }
+      ],
+      "requiresApproval": "db-migration-local"
+    }
+  ],
+  "checks": [
+    {
+      "text": "No block editor label on the local copy or in serialized configuration files uses AngularJS template syntax ({{ }}) after the database migration (Test-DatabaseHealth.ps1 lists no blockLabelTemplates)",
+      "verification": "automated"
+    }
+  ],
+  "sources": []
+}

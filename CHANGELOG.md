@@ -36,7 +36,8 @@ First release.
 ### Knowledge
 
 - Version knowledge for Umbraco 7 to 18 and .NET 5.0 to 10.0, path rules, and package mappings, each fact with its source, status, and verification date (verified 2026-10-14; latest releases updated 2026-11-05).
-- A registry of 87 customization patterns with detectors, impacts, and handling options per target generation, each cited or marked as a hypothesis.
+- A registry of 88 customization patterns with detectors, impacts, and handling options per target generation, each cited or marked as a hypothesis.
+- Pattern `content.block-label-templates`: Block List and Block Grid labels written as AngularJS templates (`{{ }}`), which the upgrade to 14 and later leaves unchanged and the backoffice shows as raw text. `Test-DatabaseHealth.ps1` lists them on the local copy, discovery finds them in serialized configuration files, and the database phase of the step that crosses 14 checks that none are left (`appliesWhen.stepCrosses`). Found on a 13.10.1 to 17.8.1 upgrade.
 
 ### Known limitations
 

@@ -583,6 +583,7 @@ function Get-PhaseComposition {
             $aw = $rec.appliesWhen; $ok = $true
             if ($aw.PSObject.Properties['pathHasDatabaseStep'] -and $aw.pathHasDatabaseStep -and $kinds -notcontains 'database') { $ok = $false }
             if ($aw.PSObject.Properties['maxSourceMajor'] -and $SourceMajor -gt [int]$aw.maxSourceMajor) { $ok = $false }
+            if ($aw.PSObject.Properties['stepCrosses'] -and -not ((Get-VersionMajor ([string]$s.from)) -lt [int]$aw.stepCrosses -and (Get-VersionMajor ([string]$s.to)) -ge [int]$aw.stepCrosses)) { $ok = $false }
             if ($aw.PSObject.Properties['anyPattern'] -and @(@($aw.anyPattern) | Where-Object { $firedIds -contains $_ }).Count -eq 0) { $ok = $false }
             if ($ok) { foreach ($c in @($rec.checks)) { $dbCriteria += ,(New-Criterion "$($c.text) ($($rec.id))" $c.verification) } }
         }

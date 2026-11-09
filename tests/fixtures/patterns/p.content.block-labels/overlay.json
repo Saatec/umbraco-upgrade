@@ -1,0 +1,10 @@
+{
+  "id": "p.content.block-labels",
+  "baseline": "gen.v13",
+  "expects": [
+    "content.block-label-templates",
+    "content.block-editors",
+    "content.model-source-of-truth"
+  ],
+  "description": "A Block List data type serialized by a synchronization package, with a block label written as an AngularJS template."
+}

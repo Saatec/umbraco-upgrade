@@ -5,7 +5,7 @@ Detectors and handling options live in `${CLAUDE_PLUGIN_ROOT}/knowledge/patterns
 ## What a record holds
 
 - `kind`: `customization` (counted for phases) or `baseline` (present in default installations of some generation: reported under `baselineSignals`, adds mandatory work, never counted as a customization).
-- `detection`: `static` (detectors run in gate 1), `package-metadata` (classified at gate 4 by `Test-PackageCompatibility.ps1` from NuGet metadata), or `database-review` (checked on the declared local database copy during a database phase).
+- `detection`: `static` (detectors run in gate 1), `package-metadata` (classified at gate 4 by `Test-PackageCompatibility.ps1` from NuGet metadata), or `database-review` (checked on the declared local database copy during a database phase). A `database-review` record adds its checks to the database phase of a path step as its `appliesWhen` says: the path has a database step (`pathHasDatabaseStep`), the source major is at most `maxSourceMajor`, one of `anyPattern` fired, and the step crosses `stepCrosses` (its source major is below it and its target major at or above it). Its detectors, if any, still run in gate 1 (for example on serialized configuration files).
 - `detectors`: file globs plus a regular expression (`strong` hits make a pattern fire; `supporting` hits are reported only for patterns that fired), file-presence detectors (no regular expression), detectors limited to App_Plugins folders that do or do not match a package reference (`pluginScope`), and derived detectors (`app-plugin-orphan`, `implicit-namespace`).
 - `impact`: what changes when the upgrade crosses a major (`crosses`: applies when the source major is below it and the target major is at or above it), with a difficulty and sources.
 - `handling`: a list of options, each with when it fits, the target generations it applies to, its sources, and `status` (`verified` when an official page confirms it, else `hypothesis`). Some options need an approval (`requiresApproval`). No option is a default: the owning skill chooses per project and records the alternatives.
@@ -66,6 +66,7 @@ A pattern that did not fire is "not detected", never "absent". Files that use CM
 | `config.static-readers` | Static configuration readers | migrate-custom-code | static | hypothesis |  |
 | `config.untracked-environment-config` | Environment configuration outside source control | deployment-rehearsal | static | hypothesis |  |
 | `content.block-editors` | Block list and block grid page builders | migrate-content-database | static | verified |  |
+| `content.block-label-templates` | Block editor labels written as AngularJS templates | migrate-content-database | database-review | verified |  |
 | `content.code-first-doctypes` | Code-first content type libraries | migrate-custom-code | static | hypothesis |  |
 | `content.datatype-config-reads` | Server-side reads of data type configuration | migrate-custom-code | static | hypothesis |  |
 | `content.deploy-or-courier` | Vendor deployment and transfer tools | migrate-content-database | static | verified | flag |
