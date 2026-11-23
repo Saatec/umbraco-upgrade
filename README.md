@@ -35,14 +35,14 @@ More documentation: [example prompts](docs/example-prompts.md), [manual validati
 This repository is its own marketplace (named `umbraco-upgrade`). In a Claude Code session, add the marketplace, then install the plugin:
 
 ```
-/plugin marketplace add progproger/umbraco-upgrade
+/plugin marketplace add Saatec/umbraco-upgrade
 /plugin install umbraco-upgrade@umbraco-upgrade
 ```
 
 On Claude Code 2.1.275 or later you can do both in one step:
 
 ```
-/plugin install umbraco-upgrade --marketplace progproger/umbraco-upgrade
+/plugin install umbraco-upgrade --marketplace Saatec/umbraco-upgrade
 ```
 
 In a session, `/plugin install` opens the plugin's details and asks for an installation scope before it installs anything.
@@ -50,7 +50,7 @@ In a session, `/plugin install` opens the plugin's details and asks for an insta
 From your shell instead:
 
 ```
-claude plugin marketplace add progproger/umbraco-upgrade
+claude plugin marketplace add Saatec/umbraco-upgrade
 claude plugin install umbraco-upgrade@umbraco-upgrade --scope project
 ```
 
@@ -72,7 +72,7 @@ The plugin is not listed in the community marketplace yet. Once it is, add that 
 Load a clone for one session without installing it:
 
 ```
-git clone https://github.com/progproger/umbraco-upgrade
+git clone https://github.com/Saatec/umbraco-upgrade
 claude --plugin-dir ./umbraco-upgrade
 ```
 
@@ -334,7 +334,7 @@ Documentation follows the official Umbraco documentation for the exact version f
 
 ## Report a problem or contribute
 
-The plugin improves from what it gets wrong on real upgrades. If it missed custom code, gave wrong version or package information, or did something wrong, [open an issue](https://github.com/progproger/umbraco-upgrade/issues/new/choose) and pick the form that fits.
+The plugin improves from what it gets wrong on real upgrades. If it missed custom code, gave wrong version or package information, or did something wrong, [open an issue](https://github.com/Saatec/umbraco-upgrade/issues/new/choose) and pick the form that fits.
 
 **Issues are public.** Do not post client or project names, code or configuration from a real project, secrets, or private package names. Describe the problem in general terms and use placeholder names.
 

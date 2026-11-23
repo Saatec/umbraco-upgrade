@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        **Issues are public.** Do not post client, project, company, or server names, secrets, or private package names. Public NuGet package ids and public documentation links are fine. See [Keep client data out](https://github.com/progproger/umbraco-upgrade/blob/main/CONTRIBUTING.md#keep-client-data-out).
+        **Issues are public.** Do not post client, project, company, or server names, secrets, or private package names. Public NuGet package ids and public documentation links are fine. See [Keep client data out](https://github.com/Saatec/umbraco-upgrade/blob/main/CONTRIBUTING.md#keep-client-data-out).
   - type: dropdown
     id: kind
     attributes:

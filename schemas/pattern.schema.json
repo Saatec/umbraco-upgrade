@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/progproger/umbraco-upgrade/schemas/pattern.schema.json",
+  "$id": "https://github.com/Saatec/umbraco-upgrade/schemas/pattern.schema.json",
   "title": "umbraco-upgrade pattern record",
   "description": "One customization pattern in knowledge/patterns/: how discovery detects it, what changes when an upgrade crosses a given major, and the handling options a migrate-* skill chooses from. Schema version 1.1.0. Validated in the test suite with the subset in scripts/lib/JsonSchema.psm1.",
   "type": "object",

@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        **Issues are public.** Do not post client, project, company, or server names, code or configuration from a real project, secrets, or private package names. Replace names in any output you paste. See [Keep client data out](https://github.com/progproger/umbraco-upgrade/blob/main/CONTRIBUTING.md#keep-client-data-out).
+        **Issues are public.** Do not post client, project, company, or server names, code or configuration from a real project, secrets, or private package names. Replace names in any output you paste. See [Keep client data out](https://github.com/Saatec/umbraco-upgrade/blob/main/CONTRIBUTING.md#keep-client-data-out).
 
         If a safety hook let a blocked operation through, or the plugin printed or wrote a secret, do not use this form. Report it privately on the **Security** tab with **Report a vulnerability**.
   - type: input

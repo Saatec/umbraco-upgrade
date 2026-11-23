@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/progproger/umbraco-upgrade/schemas/knowledge.schema.json",
+  "$id": "https://github.com/Saatec/umbraco-upgrade/schemas/knowledge.schema.json",
   "title": "umbraco-upgrade version knowledge",
   "description": "Schema version 1.0.0 for knowledge/versions.json, paths.json, packages.json, and sources.json (and their refreshed copies in the plugin data directory). Each file is validated against the $defs entry named <kind>File. The plugin validates with the same JSON Schema subset as the state file. Readers accept the same major schema version.",
   "$defs": {
