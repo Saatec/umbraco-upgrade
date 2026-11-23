@@ -1,0 +1,98 @@
+name: Bug
+description: A command, script, or safety hook did something wrong or stopped with an error.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Issues are public.** Do not post client, project, company, or server names, code or configuration from a real project, secrets, or private package names. Replace names in any output you paste. See [Keep client data out](https://github.com/progproger/umbraco-upgrade/blob/main/CONTRIBUTING.md#keep-client-data-out).
+
+        If a safety hook let a blocked operation through, or the plugin printed or wrote a secret, do not use this form. Report it privately on the **Security** tab with **Report a vulnerability**.
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      description: From `claude plugin list`.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: claude-version
+    attributes:
+      label: Claude Code version
+      description: From `claude --version`.
+      placeholder: "2.1.296"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Operating system and PowerShell
+      placeholder: "Windows 11, Windows PowerShell 5.1"
+    validations:
+      required: true
+  - type: input
+    id: umbraco-versions
+    attributes:
+      label: Umbraco versions
+      description: Source version and target version.
+      placeholder: "7.15.7 to 13"
+    validations:
+      required: true
+  - type: dropdown
+    id: command
+    attributes:
+      label: Command
+      options:
+        - start
+        - plan
+        - resume
+        - verify
+        - report
+        - update-knowledge
+        - Not during a command
+    validations:
+      required: true
+  - type: input
+    id: position
+    attributes:
+      label: Gate or phase
+      description: Where the upgrade was when it happened, if you know.
+      placeholder: "Gate 3, or phase 4 of 9"
+    validations:
+      required: false
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: If you can, describe a small project, written from scratch with placeholder names, where it happens.
+    validations:
+      required: false
+  - type: textarea
+    id: output
+    attributes:
+      label: Error message or script output
+      description: Copy only the lines you need, and replace names first.
+      render: text
+    validations:
+      required: false
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Client data
+      options:
+        - label: This issue contains no client names, real code or configuration, secrets, or private package names.
+          required: true

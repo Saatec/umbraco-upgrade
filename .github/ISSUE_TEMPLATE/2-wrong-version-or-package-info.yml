@@ -1,0 +1,72 @@
+name: Wrong version or package information
+description: A version fact, upgrade path, or package compatibility result is wrong or out of date, or a new Umbraco or .NET version is out.
+title: "[Knowledge]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Issues are public.** Do not post client, project, company, or server names, secrets, or private package names. Public NuGet package ids and public documentation links are fine. See [Keep client data out](https://github.com/progproger/umbraco-upgrade/blob/main/CONTRIBUTING.md#keep-client-data-out).
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is wrong
+      options:
+        - "Version fact (LTS status, support dates, .NET version)"
+        - "Upgrade path"
+        - "Package compatibility"
+        - "New Umbraco or .NET version"
+        - "Other"
+    validations:
+      required: true
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      description: From `claude plugin list`.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: umbraco-versions
+    attributes:
+      label: Umbraco versions
+      description: Source version and target version, if this came up during an upgrade.
+      placeholder: "13.10.1 to 17"
+    validations:
+      required: false
+  - type: textarea
+    id: plugin-says
+    attributes:
+      label: What the plugin says
+      description: Quote the line from `compatibility.md`, `decisions.md`, or the command output. Replace any project names.
+    validations:
+      required: true
+  - type: textarea
+    id: correct
+    attributes:
+      label: What is correct
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: Link to the official page that shows the correct value, such as the Umbraco documentation, the release notes, or the NuGet package page.
+    validations:
+      required: true
+  - type: textarea
+    id: patch
+    attributes:
+      label: Knowledge patch
+      description: If you ran `/umbraco-upgrade:update-knowledge`, paste `maintainer.patch` here or drag the file into this box. It holds public facts only.
+      render: diff
+    validations:
+      required: false
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Client data
+      options:
+        - label: This issue contains no client names, real code or configuration, secrets, or private package names.
+          required: true

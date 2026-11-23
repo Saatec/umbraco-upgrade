@@ -1,0 +1,71 @@
+name: Missed or wrong customization
+description: Discovery missed custom code, reported stock or package files as custom, or put something in the wrong group.
+title: "[Discovery]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Issues are public.** Do not post client, project, company, or server names, code or configuration from a real project, secrets, or private package names. Describe the customization in general terms and use placeholder names such as `SampleSite`. See [Keep client data out](https://github.com/progproger/umbraco-upgrade/blob/main/CONTRIBUTING.md#keep-client-data-out).
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What went wrong
+      options:
+        - "Missed: custom code was not reported"
+        - "False positive: stock or package files were reported as custom"
+        - "Wrong group: reported under the wrong pattern"
+    validations:
+      required: true
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      description: From `claude plugin list`.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: umbraco-versions
+    attributes:
+      label: Umbraco versions
+      description: Source version and target version.
+      placeholder: "8.18.8 to 13"
+    validations:
+      required: true
+  - type: textarea
+    id: customization
+    attributes:
+      label: The customization
+      description: "What is it? General terms only. For example: an App_Plugins folder with a custom AngularJS property editor, or a class that handles content service events."
+    validations:
+      required: true
+  - type: textarea
+    id: location
+    attributes:
+      label: Where it is
+      description: "File types and folders, for example `App_Plugins/<folder>/package.manifest`, `Views/Partials`, or a separate class library."
+    validations:
+      required: false
+  - type: textarea
+    id: reported
+    attributes:
+      label: What the plugin reported
+      description: The pattern shown in `.umbraco-upgrade/inventory.md` (for example `code.surface-controller`), "unclassified", or nothing.
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Short example
+      description: A few lines written from scratch with placeholder names. Do not paste code from a real project.
+      render: text
+    validations:
+      required: false
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Client data
+      options:
+        - label: This issue contains no client names, real code or configuration, secrets, or private package names.
+          required: true

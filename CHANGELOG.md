@@ -39,6 +39,10 @@ First release.
 - A registry of 88 customization patterns with detectors, impacts, and handling options per target generation, each cited or marked as a hypothesis.
 - Pattern `content.block-label-templates`: Block List and Block Grid labels written as AngularJS templates (`{{ }}`), which the upgrade to 14 and later leaves unchanged and the backoffice shows as raw text. `Test-DatabaseHealth.ps1` lists them on the local copy, discovery finds them in serialized configuration files, and the database phase of the step that crosses 14 checks that none are left (`appliesWhen.stepCrosses`). Found on a 13.10.1 to 17.8.1 upgrade.
 
+### Contributing
+
+- `CONTRIBUTING.md` and GitHub issue forms for missed customizations, wrong version or package information, and bugs, with rules for keeping client data out of public issues and a private route for security problems.
+
 ### Known limitations
 
 - Tested on Windows with Windows PowerShell 5.1 only. PowerShell 7, macOS, and Linux are untested.
