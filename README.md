@@ -22,10 +22,11 @@ Status: version 0.1.0, the first release. Tested on Windows only (see [Tested pl
 - [Plugin data directory](#plugin-data-directory)
 - [Version facts and secondary sources](#version-facts-and-secondary-sources)
 - [Tested platforms](#tested-platforms)
+- [Report a problem or contribute](#report-a-problem-or-contribute)
 - [Development](#development)
 - [License and no warranty](#license-and-no-warranty)
 
-More documentation: [example prompts](docs/example-prompts.md), [manual validation procedure](docs/manual-validation.md), [architecture](docs/architecture.md), [changelog](CHANGELOG.md), [evals](evals/README.md).
+More documentation: [example prompts](docs/example-prompts.md), [manual validation procedure](docs/manual-validation.md), [architecture](docs/architecture.md), [changelog](CHANGELOG.md), [evals](evals/README.md), [contributing](CONTRIBUTING.md).
 
 ## Install
 
@@ -330,6 +331,16 @@ Documentation follows the official Umbraco documentation for the exact version f
 | PowerShell 7 on Windows | Not tested |
 | macOS and Linux (scripts and hooks through a `powershell` command that starts `pwsh`) | Not tested |
 | `claude plugin eval` cases (`evals/`) | Written, not run: they grant shell tools, which need an OS sandbox that native Windows lacks |
+
+## Report a problem or contribute
+
+The plugin improves from what it gets wrong on real upgrades. If it missed custom code, gave wrong version or package information, or did something wrong, [open an issue](https://github.com/progproger/umbraco-upgrade/issues/new/choose) and pick the form that fits.
+
+**Issues are public.** Do not post client or project names, code or configuration from a real project, secrets, or private package names. Describe the problem in general terms and use placeholder names.
+
+If a safety hook let a blocked operation through, or the plugin printed or wrote a secret, report it privately on the repository's **Security** tab with **Report a vulnerability**, not as an issue.
+
+When a new Umbraco or .NET version comes out, you can run `/umbraco-upgrade:update-knowledge` and send the `maintainer.patch` it writes. Fixes are welcome as pull requests. [CONTRIBUTING.md](CONTRIBUTING.md) explains all three.
 
 ## Development
 

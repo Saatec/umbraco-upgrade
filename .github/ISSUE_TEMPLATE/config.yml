@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security problem
+    url: https://github.com/progproger/umbraco-upgrade/security/advisories/new
+    about: A safety hook let a blocked operation through, or the plugin printed or wrote a secret. Report it privately, not as a public issue.
+  - name: Contributing guide
+    url: https://github.com/progproger/umbraco-upgrade/blob/main/CONTRIBUTING.md
+    about: How to report problems, send version information, and send fixes without posting client data.
