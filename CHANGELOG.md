@@ -2,6 +2,19 @@
 
 All notable changes to this plugin are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [semantic versioning](https://semver.org/). Releases are tagged with `claude plugin tag` as `umbraco-upgrade--v<version>`.
 
+## [0.2.0] - Unreleased
+
+### Added
+
+- Experimental support for GitHub Copilot (CLI and VS Code agent mode), OpenAI Codex, and Cursor: plugin manifests for each tool (`.github/plugin/plugin.json`, `.codex-plugin/plugin.json`, `.cursor-plugin/plugin.json`) and marketplace files (`.agents/plugins/marketplace.json`, `.cursor-plugin/marketplace.json`).
+- The hook scripts take `-HostTool copilot|codex|cursor`: `HostAdapter.psm1` converts each tool's hook input to the Claude Code shape and writes decisions in the tool's own output format. Without `-HostTool` nothing changes for Claude Code.
+- `Install-HostHooks.ps1` writes the safety hooks into a project for Copilot (`.github/hooks/umbraco-upgrade.json`) or Codex (merged into `.codex/hooks.json`), with absolute script paths, excluded from git. Cursor loads `hooks/cursor-hooks.json` from the plugin.
+- `skills/upgrade-workflow/references/other-tools.md`: how the skills read outside Claude Code (paths, data folder, subagents, hooks, approvals, secrets). Each command skill points to it and has Codex metadata that keeps it user-invoked.
+
+### Changed
+
+- Display name: Umbraco Upgrader. The plugin id stays `umbraco-upgrade`.
+
 ## [0.1.0] - 2026-11-23
 
 First release.

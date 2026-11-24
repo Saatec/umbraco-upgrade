@@ -9,6 +9,8 @@ allowed-tools: Bash(powershell -NoProfile -ExecutionPolicy Bypass -File "${CLAUD
 
 Arguments as typed: `$ARGUMENTS`
 
+Outside Claude Code (GitHub Copilot, OpenAI Codex, Cursor), first read [other-tools.md](../upgrade-workflow/references/other-tools.md).
+
 This command takes no arguments. If any were given, say so, show the usage line `/umbraco-upgrade:update-knowledge`, and stop.
 
 It reads public sources only (NuGet, the Umbraco documentation site and its GitHub branches, releases.umbraco.com, the .NET release metadata, and endoflife.date as a labelled secondary source) and writes only to `${CLAUDE_PLUGIN_DATA}/knowledge/`. It never writes to the plugin's install directory and never touches a project.

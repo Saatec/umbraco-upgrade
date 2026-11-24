@@ -11,6 +11,8 @@ allowed-tools: Bash(powershell -NoProfile -ExecutionPolicy Bypass -File "${CLAUD
 
 Arguments as typed: `$ARGUMENTS`
 
+Outside Claude Code (GitHub Copilot, OpenAI Codex, Cursor), first read [other-tools.md](../upgrade-workflow/references/other-tools.md).
+
 ## 1. Validate the arguments
 
 If more than two arguments were given, stop and print the usage line below.

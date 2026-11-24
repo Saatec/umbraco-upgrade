@@ -162,6 +162,19 @@ All use `model: inherit` and `omitClaudeMd: true`, and leave out the `Agent` too
 - Hook tests pipe hook payloads to the guard: every rule blocks its positive cases (including wrapped forms), near misses pass, and every positive case is inactive outside an upgrade project and in a sibling folder.
 - `evals/` holds `claude plugin eval` cases with scaffold scripts and graders. Shell-granting suites need an OS sandbox, which native Windows lacks, so they run under Linux or WSL2. See `evals/README.md`.
 
+## Other AI tools
+
+GitHub Copilot, OpenAI Codex, and Cursor load the same skills and scripts. Only the packaging and the hook wiring differ:
+
+- **Manifests.** `.github/plugin/plugin.json` (Copilot reads it before `.claude-plugin/`), `.codex-plugin/plugin.json`, and `.cursor-plugin/plugin.json`. The Copilot and Codex manifests declare empty inline hooks, so neither tool loads `hooks/hooks.json`, which is in Claude Code's format. The Cursor manifest points to `hooks/cursor-hooks.json`. Marketplaces: Copilot reads `.claude-plugin/marketplace.json`; Codex reads `.agents/plugins/marketplace.json`; Cursor reads `.cursor-plugin/marketplace.json`.
+- **Hook input and output.** `guard.ps1`, `redact-output.ps1`, and `session-context.ps1` take `-HostTool`. `scripts/hooks/HostAdapter.psm1` converts the tool's input to the Claude Code shape (shell commands become `Shell` and are read in both the bash and the PowerShell dialect; Codex `apply_patch` files are checked one by one as writes) and writes the decision as the tool's JSON on stdout with exit code 0, because a shell wrapper can turn exit code 2 into 1. Tools that cannot ask the user get a deny that says so.
+- **Hook wiring.** Cursor runs plugin hooks from the plugin folder, so `hooks/cursor-hooks.json` uses relative paths. Copilot and Codex document no reliable plugin-folder path for hook commands, so `Install-HostHooks.ps1` writes a project hook file with absolute paths that work in cmd.exe and PowerShell.
+- **Data folder.** Outside Claude Code it is `UMBRACO_UPGRADE_DATA` or `~/.umbraco-upgrade/data` (`Get-HostDataDir`), used by the skills and the hooks alike.
+- **Skills.** Each command skill points to `skills/upgrade-workflow/references/other-tools.md`, which says how to read `${CLAUDE_PLUGIN_ROOT}`, `${CLAUDE_PLUGIN_DATA}`, `${CLAUDE_SESSION_ID}`, `$ARGUMENTS`, skill loading, and subagents in other tools. `skills/<command>/agents/openai.yaml` keeps the commands user-invoked in Codex.
+- **Safety net.** The gate 3 guard self-test runs through whichever tool is in use. If that tool's hooks are not active, gate 3 fails before anything changes.
+
+Tests: `tests/HostAdapters.Tests.ps1`.
+
 ## Extending the plugin
 
 **Add a customization pattern.**

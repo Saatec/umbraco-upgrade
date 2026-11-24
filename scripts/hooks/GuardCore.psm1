@@ -987,4 +987,4 @@ function Write-CanaryEvidence {
     return $nonce
 }
 
-Export-ModuleMember -Function Get-GuardRules, New-GuardDecision, Split-CommandText, Expand-CommandRecord, Get-AnalyzedCommands, Get-CommandDirectories, Get-GitInvocation, Test-OneCommand, Test-ShellToolInput, Test-WriteToolInput, Test-McpToolInput, Write-CanaryEvidence, Test-SecretFileName, Resolve-CommandPath, Get-CurrentBranchFast
+Export-ModuleMember -Function Get-GuardRules, New-GuardDecision, Get-StrongestDecision, Split-CommandText, Expand-CommandRecord, Get-AnalyzedCommands, Get-CommandDirectories, Get-GitInvocation, Test-OneCommand, Test-ShellToolInput, Test-WriteToolInput, Test-McpToolInput, Write-CanaryEvidence, Test-SecretFileName, Resolve-CommandPath, Get-CurrentBranchFast

@@ -1,0 +1,11 @@
+{
+  "name": "umbraco-upgrade",
+  "version": "0.2.0",
+  "description": "Plans and runs Umbraco CMS major-version upgrades with discovery, verified upgrade paths, approval gates, checkpoints, safety hooks, and a verification report.",
+  "author": { "name": "David Mazmanov" },
+  "homepage": "https://github.com/Saatec/umbraco-upgrade",
+  "repository": "https://github.com/Saatec/umbraco-upgrade",
+  "license": "MIT",
+  "keywords": ["umbraco", "upgrade", "migration", "cms", "dotnet"],
+  "hooks": "./hooks/cursor-hooks.json"
+}

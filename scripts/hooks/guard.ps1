@@ -7,6 +7,12 @@
 #   - returns permissionDecision "ask" for approval-tier operations
 #   - blocks with "guard error" if anything inside the guard fails (fail-closed)
 # Rules: scripts/hooks/rules.json. Logic: scripts/hooks/GuardCore.psm1.
+#
+# -HostTool copilot|codex|cursor runs the same rules for GitHub Copilot, OpenAI Codex, or Cursor:
+# their input is converted to the Claude Code shape (HostAdapter.psm1), and decisions are written as
+# that tool's JSON output with exit code 0. Without -HostTool the behavior is Claude Code's, unchanged.
+
+param([ValidateSet('claude', 'copilot', 'codex', 'cursor')][string]$HostTool = 'claude')
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
@@ -33,6 +39,18 @@ try {
     $hookInput = $raw | ConvertFrom-Json
 } catch { $hookInput = $null }
 
+# Other AI tools: convert their input to the Claude Code shape, and use the per-user data directory.
+$hostKind = 'shell'
+$hostPatchFiles = @()
+if ($HostTool -ne 'claude') {
+    Import-Module (Join-Path $PSScriptRoot 'HostAdapter.psm1') -DisableNameChecking
+    $env:CLAUDE_PLUGIN_DATA = Get-HostDataDir -HostTool $HostTool
+    $converted = $null
+    try { $converted = ConvertFrom-HostHookInput -HostTool $HostTool -InputObject $hookInput } catch { $converted = $null }
+    if ($null -ne $converted) { $hostKind = [string]$converted.host_kind; $hostPatchFiles = @($converted.host_patch_files) }
+    $hookInput = $converted
+}
+
 function Get-InputValue {
     param($Object, [string]$Name)
     if ($null -eq $Object) { return $null }
@@ -56,8 +74,20 @@ function Find-UpgradeRoot {
 
 function Exit-Blocked {
     param([string]$Message)
+    if ($HostTool -ne 'claude') {
+        Write-HookText -To out -Text (Get-HostDecisionJson -HostTool $HostTool -Kind $hostKind -Decision deny -Message $Message)
+        exit 0
+    }
     Write-HookText -To err -Text $Message
     exit 2
+}
+
+function Exit-Allowed {
+    if ($HostTool -ne 'claude') {
+        $json = Get-HostDecisionJson -HostTool $HostTool -Kind $hostKind -Decision allow
+        if ($json) { Write-HookText -To out -Text $json }
+    }
+    exit 0
 }
 
 $toolName = [string](Get-InputValue $hookInput 'tool_name')
@@ -67,7 +97,9 @@ $sessionId = [string](Get-InputValue $hookInput 'session_id')
 
 # ---- 1. Cheap scope check.
 $root = $null
-foreach ($candidate in @($cwd, $env:CLAUDE_PROJECT_DIR)) {
+$candidates = @($cwd, $env:CLAUDE_PROJECT_DIR)
+if ($HostTool -ne 'claude') { $candidates += (Get-Location).ProviderPath }
+foreach ($candidate in $candidates) {
     $root = Find-UpgradeRoot $candidate
     if ($root) { break }
 }
@@ -86,15 +118,25 @@ if (-not $root -and $null -ne $toolInput) {
             $pv = [string](Get-InputValue $toolInput $nm)
             if ($pv) { $root = Find-UpgradeRoot $pv; if ($root) { break } }
         }
-    } elseif ($toolName -in @('Bash', 'PowerShell')) {
+    } elseif ($toolName -eq 'Patch') {
+        foreach ($pf in $hostPatchFiles) {
+            $pv = [string]$pf.file_path
+            if ($pv -and $cwd -and -not [System.IO.Path]::IsPathRooted($pv)) { $pv = [System.IO.Path]::Combine($cwd, $pv) }
+            if ($pv) { $root = Find-UpgradeRoot $pv; if ($root) { break } }
+        }
+    } elseif ($toolName -in @('Bash', 'PowerShell', 'Shell')) {
         $cmd = [string](Get-InputValue $toolInput 'command')
         if ($cmd -match '(?i)(\bcd\b|\bchdir\b|\bpushd\b|set-location|push-location|\bsl\b|\s-C\s|--project|--startup-project|\s-p\s|\s-s\s)') {
             try {
                 Import-Module (Join-Path $PSScriptRoot 'GuardCore.psm1') -DisableNameChecking
-                $dialect = $(if ($toolName -eq 'PowerShell') { 'powershell' } else { 'bash' })
-                $records = Get-AnalyzedCommands -Text $cmd -Dialect $dialect
-                foreach ($d in (Get-CommandDirectories -Records $records -Cwd $cwd)) {
-                    $root = Find-UpgradeRoot $d
+                # Shell (other AI tools) does not say which shell runs the command, so both dialects are read.
+                $dialects = $(if ($toolName -eq 'PowerShell') { @('powershell') } elseif ($toolName -eq 'Shell') { @('bash', 'powershell') } else { @('bash') })
+                foreach ($dialect in $dialects) {
+                    $records = Get-AnalyzedCommands -Text $cmd -Dialect $dialect
+                    foreach ($d in (Get-CommandDirectories -Records $records -Cwd $cwd)) {
+                        $root = Find-UpgradeRoot $d
+                        if ($root) { break }
+                    }
                     if ($root) { break }
                 }
             } catch {
@@ -109,7 +151,10 @@ if (-not $root) {
     if ($null -eq $hookInput -and (Find-UpgradeRoot $env:CLAUDE_PROJECT_DIR)) {
         Exit-Blocked 'umbraco-upgrade guard error, blocking: the hook input could not be read in an upgrade project.'
     }
-    exit 0
+    if ($HostTool -ne 'claude' -and $null -eq $hookInput -and (Find-UpgradeRoot (Get-Location).ProviderPath)) {
+        Exit-Blocked 'umbraco-upgrade guard error, blocking: the hook input could not be read in an upgrade project.'
+    }
+    Exit-Allowed
 }
 
 # ---- 2. In scope: evaluate rules. Any internal failure blocks.
@@ -121,23 +166,36 @@ try {
     $effectiveCwd = $cwd; if (-not $effectiveCwd) { $effectiveCwd = $root }
     $context = @{ projectRoot = $root; state = $state; cwd = $effectiveCwd; sessionId = $sessionId }
     $decision = $null
-    if ($toolName -in @('Bash', 'PowerShell')) {
+    if ($toolName -in @('Bash', 'PowerShell', 'Shell')) {
         $cmd = [string](Get-InputValue $toolInput 'command')
         $marker = [string](Get-GuardRules).canaryMarker
         if ($cmd.Contains($marker)) {
             [void](Write-CanaryEvidence -ProjectRoot $root -Command $cmd -SessionId $sessionId)
             $decision = New-GuardDecision 'guard.canary'
+        } elseif ($toolName -eq 'Shell') {
+            $decision = Get-StrongestDecision @(
+                (Test-ShellToolInput -Command $cmd -ToolName 'Bash' -Context $context),
+                (Test-ShellToolInput -Command $cmd -ToolName 'PowerShell' -Context $context))
         } else {
             $decision = Test-ShellToolInput -Command $cmd -ToolName $toolName -Context $context
         }
     } elseif ($toolName -in @('Write', 'Edit', 'NotebookEdit')) {
         $decision = Test-WriteToolInput -HookInput $hookInput -Context $context
-    } else {
+    } elseif ($toolName -eq 'Patch') {
+        if ($hostPatchFiles.Count -eq 0) { Exit-Blocked 'umbraco-upgrade guard: the files this patch changes could not be read, so it is blocked in an upgrade project.' }
+        $decision = Get-StrongestDecision @(foreach ($pf in $hostPatchFiles) {
+                Test-WriteToolInput -HookInput ([pscustomobject]@{ tool_input = [pscustomobject]@{ file_path = [string]$pf.file_path; content = [string]$pf.content } }) -Context $context
+            })
+    } elseif ($HostTool -eq 'claude' -or $hostKind -eq 'mcp') {
         $decision = Test-McpToolInput -Context $context
     }
-    if ($null -eq $decision) { exit 0 }
+    if ($null -eq $decision) { Exit-Allowed }
     $message = "umbraco-upgrade guard [$($decision.ruleId)]: $($decision.reason)"
     if ($decision.decision -eq 'deny') { Exit-Blocked $message }
+    if ($HostTool -ne 'claude') {
+        Write-HookText -To out -Text (Get-HostDecisionJson -HostTool $HostTool -Kind $hostKind -Decision ask -Message $message)
+        exit 0
+    }
     $out = [ordered]@{ hookSpecificOutput = [ordered]@{ hookEventName = 'PreToolUse'; permissionDecision = 'ask'; permissionDecisionReason = $message } }
     Write-HookText -To out -Text (ConvertTo-Json -InputObject $out -Depth 5 -Compress)
     exit 0

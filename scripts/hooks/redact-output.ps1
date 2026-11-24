@@ -8,6 +8,14 @@
 # Code 2.1.296: the replacement is also what the session transcript stores); for the other tools the same
 # object with every string value redacted, because a replacement that does not match the shape is ignored.
 # A failure here never blocks: PostToolUse cannot undo the read, so the hook stays silent on errors.
+#
+# -HostTool copilot|codex|cursor, in an upgrade project, when the result holds secret values:
+#   copilot  postToolUse: replaces the result with the redacted text (modifiedResult)
+#   codex    PostToolUse: withholds the whole result (Codex cannot rewrite it) and says why
+#   cursor   beforeReadFile: denies the read and points to Read-RedactedConfig.ps1 (Cursor cannot
+#            rewrite what a read returns); every other read gets an explicit allow
+
+param([ValidateSet('claude', 'copilot', 'codex', 'cursor')][string]$HostTool = 'claude')
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
@@ -57,6 +65,46 @@ function Protect-Tree {
         return ,($list.ToArray())
     }
     return $Node
+}
+
+if ($HostTool -ne 'claude') {
+    $allow = $(if ($HostTool -eq 'cursor') { '{"permission":"allow"}' } else { '' })
+    $result = $allow
+    try {
+        Import-Module (Join-Path $PSScriptRoot 'HostAdapter.psm1') -DisableNameChecking
+        $env:CLAUDE_PLUGIN_DATA = Get-HostDataDir -HostTool $HostTool
+        $n = ConvertFrom-HostHookInput -HostTool $HostTool -InputObject (Read-HookInput | ConvertFrom-Json)
+        $root = $null
+        if ($null -ne $n) {
+            $readPath = [string]$n.host_read_path
+            if ($readPath -and $n.cwd -and -not [System.IO.Path]::IsPathRooted($readPath)) { $readPath = [System.IO.Path]::Combine([string]$n.cwd, $readPath) }
+            foreach ($c in @($readPath, [string]$n.cwd, (Get-Location).ProviderPath)) { $root = Find-UpgradeRoot $c; if ($root) { break } }
+        }
+        if ($root) {
+            Import-Module (Join-Path (Split-Path $PSScriptRoot -Parent) 'lib/Redaction.psm1') -DisableNameChecking
+            $note = 'umbraco-upgrade: secret values were found. Read configuration files with scripts/Read-RedactedConfig.ps1 from the plugin folder.'
+            if ($HostTool -eq 'cursor') {
+                $content = $n.host_read_content
+                if ($null -eq $content -and $readPath -and [System.IO.File]::Exists($readPath)) { $content = [System.IO.File]::ReadAllText($readPath) }
+                $content = [string]$content
+                if ($content -and (Protect-Text $content) -ne $content) {
+                    $result = ConvertTo-Json -Compress -InputObject ([ordered]@{ permission = 'deny'; user_message = $note; agent_message = $note })
+                }
+            } else {
+                $text = [string]$n.host_output_text
+                $redacted = Protect-Text $text
+                if ($text -and $redacted -ne $text) {
+                    if ($HostTool -eq 'copilot') {
+                        $result = ConvertTo-Json -Compress -Depth 4 -InputObject ([ordered]@{ modifiedResult = [ordered]@{ resultType = 'success'; textResultForLlm = $redacted }; additionalContext = $note })
+                    } else {
+                        $result = ConvertTo-Json -Compress -InputObject ([ordered]@{ decision = 'block'; reason = 'umbraco-upgrade withheld this output because it contained secret values. Read configuration files with scripts/Read-RedactedConfig.ps1 from the plugin folder.' })
+                    }
+                }
+            }
+        }
+    } catch { $result = $allow }
+    if ($result) { Write-HookText -To out -Text $result }
+    exit 0
 }
 
 try {

@@ -1,14 +1,15 @@
-# Umbraco Upgrade
+# Umbraco Upgrader
 
 A Claude Code plugin that plans and runs Umbraco CMS major-version upgrades: from legacy Umbraco 7 and 8, through 9 to 13, to current versions such as 17 and 18, and later LTS releases once their facts are verified.
 
 It discovers the project, selects an upgrade path from versioned knowledge and live official documentation, writes a phased plan and stops for your approval, executes the plan on a dedicated branch with a checkpoint commit per phase, verifies the result, and writes a report that separates what was verified automatically, what you verified manually, and what was not verified.
 
-Status: version 0.1.0, the first release. Tested on Windows only (see [Tested platforms](#tested-platforms)). Provided without warranty (see [License and no warranty](#license-and-no-warranty)).
+Status: version 0.2.0. Tested on Windows only (see [Tested platforms](#tested-platforms)). Provided without warranty (see [License and no warranty](#license-and-no-warranty)).
 
 ## Contents
 
 - [Install](#install)
+- [Other AI tools: GitHub Copilot, OpenAI Codex, Cursor](#other-ai-tools-github-copilot-openai-codex-cursor)
 - [Prerequisites](#prerequisites)
 - [Commands](#commands)
 - [How an upgrade runs: the gates](#how-an-upgrade-runs-the-gates)
@@ -77,6 +78,35 @@ claude --plugin-dir ./umbraco-upgrade
 ```
 
 A plugin loaded this way has the id `umbraco-upgrade@inline` and its own data directory (see [Plugin data directory](#plugin-data-directory)).
+
+## Other AI tools: GitHub Copilot, OpenAI Codex, Cursor
+
+**Experimental.** The same skills, scripts, and safety rules also run under GitHub Copilot (CLI and VS Code agent mode), OpenAI Codex, and Cursor. The hook scripts are tested on Windows with each tool's documented hook input and with the installed command lines, but not yet inside the tools themselves. The gate 3 guard self-test protects you either way: if the safety hooks are not active in your tool, gate 3 fails and the plugin changes nothing in your project.
+
+**Install**
+
+| Tool | Install | Safety hooks |
+|---|---|---|
+| GitHub Copilot CLI | `copilot plugin marketplace add Saatec/umbraco-upgrade`, then `copilot plugin install umbraco-upgrade@umbraco-upgrade` | The plugin runs `Install-HostHooks.ps1 -Tool copilot` in your project, which writes `.github/hooks/umbraco-upgrade.json` |
+| VS Code (Copilot agent mode) | Turn on `chat.plugins.enabled`, then run **Chat: Install Plugin from Source** with `https://github.com/Saatec/umbraco-upgrade` | As for the Copilot CLI |
+| OpenAI Codex | `codex plugin marketplace add Saatec/umbraco-upgrade`, then install it from `/plugins` in Codex | The plugin runs `Install-HostHooks.ps1 -Tool codex` in your project, which merges its hooks into `.codex/hooks.json`. Open `/hooks` in Codex and trust them; the project must be trusted. |
+| Cursor | **Customize**, **From GitHub Repository**, `https://github.com/Saatec/umbraco-upgrade`, then **Install** | Included in the plugin (`hooks/cursor-hooks.json`) |
+
+The hook file that `Install-HostHooks.ps1` writes is added to `.git/info/exclude`, so it is never committed. It calls the hook scripts by their absolute path, so the plugin runs the script again after a plugin update. If the hook file is already tracked in git, the script changes nothing and asks you to add the hooks yourself.
+
+**Starting a command.** The commands are the skills `start`, `plan`, `resume`, `verify`, `report`, and `update-knowledge`. Start them the way your tool starts skills, for example `/umbraco-upgrade:plan 17` in the Copilot CLI.
+
+**Differences from Claude Code**
+
+| | Claude Code | GitHub Copilot | OpenAI Codex | Cursor |
+|---|---|---|---|---|
+| Prohibited operations | Blocked | Blocked | Blocked | Blocked |
+| Operations that need approval | You are asked | You are asked | Blocked: you run them yourself | Shell: you are asked. File edits: blocked |
+| Secrets in tool output | Replaced with `***REDACTED***` | Replaced | The whole output is withheld | Reading a file with secrets is blocked |
+| Subagents | Used | Used when the tool loads them | Not used: the main agent does the work | Used when the tool loads them |
+| Data folder | Claude Code's plugin data directory | `~/.umbraco-upgrade/data` | `~/.umbraco-upgrade/data` | `~/.umbraco-upgrade/data` |
+
+Set `UMBRACO_UPGRADE_DATA` to use another data folder. Outside Claude Code the session id is not available, so open your tool with the project folder as the working folder. The skills point the agent to [skills/upgrade-workflow/references/other-tools.md](skills/upgrade-workflow/references/other-tools.md), which explains these rules.
 
 ## Prerequisites
 
@@ -299,7 +329,7 @@ Everything the plugin records lives in the project under `.umbraco-upgrade/`. On
 | `evidence/<gate or phase>/` | Outputs of checks and builds, redacted |
 | `tmp/` | Short-lived files that scripts read and remove |
 
-In upgrade mode the plugin also creates the upgrade branch (`umbraco-upgrade/<source major>-to-<target>`) at gate 3, changes project files on that branch only after you approve the plan, and ends each phase with a checkpoint commit. In plan mode it changes nothing outside `.umbraco-upgrade/` and creates no branch.
+In upgrade mode the plugin also creates the upgrade branch (`umbraco-upgrade/<source major>-to-<target>`) at gate 3, changes project files on that branch only after you approve the plan, and ends each phase with a checkpoint commit. In plan mode it changes nothing outside `.umbraco-upgrade/` and creates no branch. In GitHub Copilot and OpenAI Codex it also writes one hook file, excluded from git (see [Other AI tools](#other-ai-tools-github-copilot-openai-codex-cursor)).
 
 ## Plugin data directory
 
@@ -331,6 +361,7 @@ Documentation follows the official Umbraco documentation for the exact version f
 | PowerShell 7 on Windows | Not tested |
 | macOS and Linux (scripts and hooks through a `powershell` command that starts `pwsh`) | Not tested |
 | `claude plugin eval` cases (`evals/`) | Written, not run: they grant shell tools, which need an OS sandbox that native Windows lacks |
+| GitHub Copilot, OpenAI Codex, Cursor on Windows | Hook scripts tested with each tool's documented input and with the installed command lines run through cmd.exe and PowerShell. Not yet tested inside the tools. |
 
 ## Report a problem or contribute
 

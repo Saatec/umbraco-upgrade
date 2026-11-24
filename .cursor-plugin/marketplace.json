@@ -1,0 +1,12 @@
+{
+  "name": "umbraco-upgrade",
+  "owner": { "name": "David Mazmanov" },
+  "metadata": { "description": "Marketplace for the umbraco-upgrade plugin." },
+  "plugins": [
+    {
+      "name": "umbraco-upgrade",
+      "source": "./",
+      "description": "Umbraco CMS major-version upgrade workflow."
+    }
+  ]
+}

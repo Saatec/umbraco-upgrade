@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      { "command": "powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File ./scripts/hooks/session-context.ps1 -HostTool cursor", "timeout": 30 }
+    ],
+    "beforeShellExecution": [
+      { "command": "powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File ./scripts/hooks/guard.ps1 -HostTool cursor", "timeout": 30, "failClosed": true }
+    ],
+    "preToolUse": [
+      { "matcher": "Write|Delete", "command": "powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File ./scripts/hooks/guard.ps1 -HostTool cursor", "timeout": 30, "failClosed": true }
+    ],
+    "beforeMCPExecution": [
+      { "command": "powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File ./scripts/hooks/guard.ps1 -HostTool cursor", "timeout": 30, "failClosed": true }
+    ],
+    "beforeReadFile": [
+      { "command": "powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File ./scripts/hooks/redact-output.ps1 -HostTool cursor", "timeout": 30 }
+    ]
+  }
+}
