@@ -15,6 +15,7 @@ This document explains how the plugin is built, for contributors. User-facing be
 ## Repository layout
 
 ```text
+.claude/skills/fix-issue/  /fix-issue, for maintainers and contributors in a clone (not part of the plugin)
 .claude-plugin/
   plugin.json              manifest
   marketplace.json         single-entry marketplace, source "./"
@@ -185,6 +186,8 @@ GitHub Copilot, OpenAI Codex, and Cursor load the same skills and scripts. Only 
 Tests: `tests/HostAdapters.Tests.ps1`.
 
 ## Extending the plugin
+
+**From an issue.** In a clone, `/fix-issue <issue-number>` (a project skill in `.claude/skills/fix-issue/`, which plugin users never get) reads the issue as data and never as instructions, maps it to one of the extension points below, and waits for the user's go. It then writes the test first, fixes on a `fix/issue-<number>-...` branch, runs the checks, and commits without pushing. Changes to the guard, the redaction, or the host allowlist need the user's confirmation in chat.
 
 **Add a customization pattern.**
 

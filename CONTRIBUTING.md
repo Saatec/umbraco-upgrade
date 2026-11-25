@@ -82,6 +82,8 @@ Fixes must be **generic**: they must help any Umbraco site, not only one project
 7. Add a line about your change to the newest section of [CHANGELOG.md](CHANGELOG.md).
 8. Open a pull request. Say what you changed, why, and how you tested it.
 
+Tip: in your clone, run `/fix-issue <issue-number>` in Claude Code. Claude reads the issue, tells you what it plans to change, and waits for your go. Then it writes the test first, makes the fix on its own branch, runs the checks, and commits. It never pushes or posts anything. The skill lives in `.claude/skills/fix-issue/` and is not part of the installed plugin.
+
 ## What happens next
 
 The maintainer reviews every issue and pull request, and may ask questions or for changes. Accepted fixes ship in the next release. Users get them when they update the plugin (`claude plugin update umbraco-upgrade@umbraco-upgrade`, see [Install](README.md#install)).

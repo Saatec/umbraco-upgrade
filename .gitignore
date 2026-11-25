@@ -15,6 +15,9 @@ TestResults/
 .DS_Store
 Thumbs.db
 
+# Claude Code settings of one person
+.claude/settings.local.json
+
 # Local scratch
 .scratch/
 *.tmp

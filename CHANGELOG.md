@@ -2,6 +2,12 @@
 
 All notable changes to this plugin are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [semantic versioning](https://semver.org/). Releases are tagged with `claude plugin tag` as `umbraco-upgrade--v<version>`.
 
+## [Unreleased]
+
+### Added
+
+- For maintainers and contributors: `/fix-issue <issue-number>` in `.claude/skills/fix-issue/`. In a clone of this repository it turns one GitHub issue into a fix on its own branch, with the test written first and the checks run. It treats the issue text as data, waits for the user's go, and never pushes or posts. Plugin users do not get it.
+
 ## [0.2.0] - 2026-11-25
 
 ### Added
