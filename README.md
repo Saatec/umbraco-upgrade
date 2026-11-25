@@ -1,5 +1,12 @@
 # Umbraco Upgrader
 
+[![Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FSaatec%2Fumbraco-upgrade%2Fmain%2F.claude-plugin%2Fplugin.json&query=%24.version&label=version&color=0b6b74)](CHANGELOG.md)
+[![License: MIT](https://img.shields.io/github/license/Saatec/umbraco-upgrade?color=2f6b2c)](LICENSE)
+[![Claude Code plugin](https://img.shields.io/badge/Claude%20Code-plugin-d97757)](#install)
+[![Umbraco 7 to 18](https://img.shields.io/badge/Umbraco-7%20to%2018-3544b1)](#supported-scenarios-and-limitations)
+[![Tested on Windows](https://img.shields.io/badge/tested%20on-Windows-0078d6)](#tested-platforms)
+[![PowerShell 5.1 or 7](https://img.shields.io/badge/PowerShell-5.1%20%7C%207-5391fe)](#prerequisites)
+
 A Claude Code plugin that plans and runs Umbraco CMS major-version upgrades: from legacy Umbraco 7 and 8, through 9 to 13, to current versions such as 17 and 18, and later LTS releases once their facts are verified.
 
 It discovers the project, selects an upgrade path from versioned knowledge and live official documentation, writes a phased plan and stops for your approval, executes the plan on a dedicated branch with a checkpoint commit per phase, verifies the result, and writes a report that separates what was verified automatically, what you verified manually, and what was not verified.
