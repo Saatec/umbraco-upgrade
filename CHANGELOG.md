@@ -2,7 +2,7 @@
 
 All notable changes to this plugin are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [semantic versioning](https://semver.org/). Releases are tagged with `claude plugin tag` as `umbraco-upgrade--v<version>`.
 
-## [0.2.0] - Unreleased
+## [0.2.0] - 2026-11-25
 
 ### Added
 
