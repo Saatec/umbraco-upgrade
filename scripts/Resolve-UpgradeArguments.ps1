@@ -6,14 +6,14 @@
   Read-only. Prints one JSON object. Exit code 0 when the arguments are usable, 1 otherwise.
   Each failure has a stable code and a specific message. No state is written.
   start and plan take a target and a path, and refuse a project that already has upgrade state. resume, verify,
-  and report take only a path and need the state; for them a project the version detection does not recognize
-  is a warning, because resume reconciliation reports what changed.
+  report, and feedback take only a path and need the state; for them a project the version detection does not
+  recognize is a warning, because resume reconciliation reports what changed.
 #>
 [CmdletBinding()]
 param(
     [string]$Target = '',
     [string]$Path = '',
-    [ValidateSet('start', 'plan', 'resume', 'verify', 'report')][string]$Command = 'start'
+    [ValidateSet('start', 'plan', 'resume', 'verify', 'report', 'feedback')][string]$Command = 'start'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -21,7 +21,7 @@ Set-StrictMode -Version 2.0
 Import-Module (Join-Path $PSScriptRoot 'lib/Compat.psm1') -DisableNameChecking
 Import-Module (Join-Path $PSScriptRoot 'lib/Discovery.psm1') -DisableNameChecking
 
-$stateCommand = ($Command -in @('resume', 'verify', 'report'))
+$stateCommand = ($Command -in @('resume', 'verify', 'report', 'feedback'))
 $usage = $(if ($stateCommand) { "Usage: /umbraco-upgrade:$Command [project-path]. Example: /umbraco-upgrade:$Command C:\src\MySite" } else { "Usage: /umbraco-upgrade:$Command <target-version> [project-path]. Example: /umbraco-upgrade:$Command 17 C:\src\MySite" })
 $result = [ordered]@{ ok = $false; command = $Command; usage = $usage; target = $null; projectRoot = $null; detected = $null; stateExists = $false; errors = @(); warnings = @() }
 $errors = New-Object System.Collections.ArrayList

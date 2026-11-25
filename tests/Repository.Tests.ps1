@@ -29,33 +29,33 @@ Describe 'Repository files' -Tag 'fixture-based' {
     It 'command skills disable model invocation and declare their arguments' {
         foreach ($name in @('start', 'plan')) {
             $text = Get-Content -Raw (Join-Path $script:root "skills/$name/SKILL.md")
-            $text | Should -Match '(?m)^disable-model-invocation: true$'
-            $text | Should -Match '(?m)^argument-hint: <target-version> \[project-path\]$'
-            $text | Should -Match '(?m)^arguments: \[target, path\]$'
+            $text | Should -Match '(?m)^disable-model-invocation: true\r?$'
+            $text | Should -Match '(?m)^argument-hint: <target-version> \[project-path\]\r?$'
+            $text | Should -Match '(?m)^arguments: \[target, path\]\r?$'
         }
-        foreach ($name in @('resume', 'verify', 'report')) {
+        foreach ($name in @('resume', 'verify', 'report', 'feedback')) {
             $text = Get-Content -Raw (Join-Path $script:root "skills/$name/SKILL.md")
-            $text | Should -Match '(?m)^disable-model-invocation: true$'
-            $text | Should -Match '(?m)^argument-hint: \[project-path\]$'
-            $text | Should -Match '(?m)^arguments: \[path\]$'
+            $text | Should -Match '(?m)^disable-model-invocation: true\r?$'
+            $text | Should -Match '(?m)^argument-hint: \[project-path\]\r?$'
+            $text | Should -Match '(?m)^arguments: \[path\]\r?$'
             $text | Should -Match ([regex]::Escape("Resolve-UpgradeArguments.ps1`" -Command $name -Path"))
         }
         # Windows PowerShell 5.1 drops an empty native argument, so -Path "" reaches the script without a value.
-        foreach ($name in @('start', 'plan', 'resume', 'verify', 'report')) {
+        foreach ($name in @('start', 'plan', 'resume', 'verify', 'report', 'feedback')) {
             Get-Content -Raw (Join-Path $script:root "skills/$name/SKILL.md") | Should -Match 'If no project path was given, leave out `-Path`' -Because $name
         }
     }
     It 'update-knowledge is a command that only the user can start' {
         $text = Get-Content -Raw (Join-Path $script:root 'skills/update-knowledge/SKILL.md')
-        $text | Should -Match '(?m)^disable-model-invocation: true$'
-        $text | Should -Not -Match '(?m)^user-invocable: false$'
+        $text | Should -Match '(?m)^disable-model-invocation: true\r?$'
+        $text | Should -Not -Match '(?m)^user-invocable: false\r?$'
         $text | Should -Match 'Update-Knowledge\.ps1" -DataDir "\$\{CLAUDE_PLUGIN_DATA\}"'
     }
     It 'shared skills are not user-invocable and every skill stays under 500 lines' {
         foreach ($dir in (Get-ChildItem -LiteralPath (Join-Path $script:root 'skills') -Directory)) {
             $text = Get-Content -Raw (Join-Path $dir.FullName 'SKILL.md')
             ($text -split "`n").Count | Should -BeLessThan 500
-            if ($dir.Name -notin @('start', 'plan', 'resume', 'verify', 'report', 'update-knowledge')) { $text | Should -Match '(?m)^user-invocable: false$' }
+            if ($dir.Name -notin @('start', 'plan', 'resume', 'verify', 'report', 'feedback', 'update-knowledge')) { $text | Should -Match '(?m)^user-invocable: false\r?$' }
         }
     }
     It 'every script a skill or an agent references exists' {

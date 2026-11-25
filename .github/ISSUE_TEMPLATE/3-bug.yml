@@ -50,6 +50,7 @@ body:
         - resume
         - verify
         - report
+        - feedback
         - update-knowledge
         - Not during a command
     validations:

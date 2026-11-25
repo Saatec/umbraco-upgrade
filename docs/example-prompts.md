@@ -121,6 +121,16 @@ V-09 not verified: the payment sandbox is not reachable from this machine.
 
 The report separates what was verified automatically, what you verified manually, and what was not verified, with reasons, risks, and next steps.
 
+## Tell the maintainer what the plugin got wrong
+
+After an upgrade, whether the plugin ran it or you did it by hand after `/umbraco-upgrade:plan`:
+
+```
+/umbraco-upgrade:feedback
+```
+
+Expect a comparison of the plan with what changed since the upgrade started, questions about each difference (a miss, normal upgrade work, or specific to your project), and a draft issue in `.umbraco-upgrade/feedback.md` with names removed. Read it and post it yourself; the plugin never posts anything.
+
 ## Refresh version knowledge
 
 Before planning, when a new Umbraco release may have appeared:

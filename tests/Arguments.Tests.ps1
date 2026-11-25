@@ -117,8 +117,8 @@ Describe 'Resolve-UpgradeArguments' -Tag 'fixture-based' {
         }
     }
 
-    Context 'resume, verify, and report take only a path and need state' {
-        It '<command> accepts a project with upgrade state' -ForEach @(@{ command = 'resume' }, @{ command = 'verify' }, @{ command = 'report' }) {
+    Context 'resume, verify, report, and feedback take only a path and need state' {
+        It '<command> accepts a project with upgrade state' -ForEach @(@{ command = 'resume' }, @{ command = 'verify' }, @{ command = 'report' }, @{ command = 'feedback' }) {
             $dir = New-UpgradeProject -Baseline 'gen.v13'
             try {
                 $r = Invoke-Args '' $dir $command
@@ -127,7 +127,7 @@ Describe 'Resolve-UpgradeArguments' -Tag 'fixture-based' {
                 $r.Json.usage | Should -Match ([regex]::Escape("/umbraco-upgrade:$command [project-path]"))
             } finally { Remove-TestDirectory $dir }
         }
-        It '<command> refuses a project without state' -ForEach @(@{ command = 'resume' }, @{ command = 'verify' }, @{ command = 'report' }) {
+        It '<command> refuses a project without state' -ForEach @(@{ command = 'resume' }, @{ command = 'verify' }, @{ command = 'report' }, @{ command = 'feedback' }) {
             $r = Invoke-Args '' (Get-FixturePath 'gen.v13') $command
             $r.ExitCode | Should -Be 1
             @($r.Json.errors | ForEach-Object { $_.code }) | Should -Contain 'no-state'

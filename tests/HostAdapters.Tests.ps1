@@ -308,7 +308,7 @@ Describe 'Manifests for other AI tools' -Tag 'fixture-based' {
     It 'the Claude Code hooks file is unchanged: no -HostTool' {
         (Get-Content -Raw (Join-Path $script:root 'hooks/hooks.json')) | Should -Not -Match 'HostTool'
     }
-    It 'command skill <_> is user-only in Codex and points to other-tools.md' -ForEach @('start', 'plan', 'resume', 'verify', 'report', 'update-knowledge') {
+    It 'command skill <_> is user-only in Codex and points to other-tools.md' -ForEach @('start', 'plan', 'resume', 'verify', 'report', 'feedback', 'update-knowledge') {
         (Get-Content -Raw (Join-Path $script:root "skills/$_/agents/openai.yaml")) | Should -Match 'allow_implicit_invocation: false'
         (Get-Content -Raw (Join-Path $script:root "skills/$_/SKILL.md")) | Should -Match ([regex]::Escape('(../upgrade-workflow/references/other-tools.md)'))
     }

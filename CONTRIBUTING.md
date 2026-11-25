@@ -28,7 +28,9 @@ Public NuGet package ids (for example `Umbraco.Forms`) and public documentation 
 
 ## Report a problem
 
-Open an issue and pick the form that fits:
+After an upgrade, run `/umbraco-upgrade:feedback`. It compares what the plugin planned with what really changed, asks you about each difference, and writes `.umbraco-upgrade/feedback.md`: a draft for the forms below, with project and client names removed and checked. Read it, then post it yourself. It never posts anything.
+
+Or open an issue directly and pick the form that fits:
 
 | Form | Use it when |
 |---|---|

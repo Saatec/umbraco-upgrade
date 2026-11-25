@@ -51,6 +51,7 @@ Commands are skills with `disable-model-invocation: true`, an `argument-hint`, a
 | `resume` | `upgrade-state` (reconciliation), then `upgrade-workflow` at the recorded position |
 | `verify` | `verification` |
 | `report` | `reporting` |
+| `feedback` | runs `Compare-UpgradeOutcome.ps1`, reviews the differences with the user, writes `feedback.md`, and checks it with `Test-FeedbackDraft.ps1` (instructions inline, like `update-knowledge`) |
 | `update-knowledge` | runs `Update-Knowledge.ps1`, then `doc-retrieval` for review items |
 
 Shared skills (`user-invocable: false`, short descriptions so the always-on listing stays small):
@@ -112,6 +113,14 @@ gate 1 discovery -> gate 2 version and path -> gate 3 safety (upgrade mode) -> g
 - `New-Checkpoint.ps1` enforces the no-removal rule at every checkpoint: deleted files need a `remove-custom-feature` approval that names them; stubs and secrets are refused; commented-out code and compile exclusions are warnings.
 - Gate 5: `Get-VerificationPlan.ps1` composes the checklist from discovery and the package check; `Invoke-Verification.ps1` records automated results from evidence (only it can record an automated check as verified); manual checks are recorded only with the user's words and an evidence file; `New-Report.ps1` writes the report, linking evidence and redacting text.
 - `Test-StateReality.ps1` (`lib/Reconcile.psm1`) compares state with reality and returns the position, mismatches, warnings, and per-check options. It never changes anything. The resume flow reports mismatches and asks; the user's decisions are recorded before any state change.
+
+## Feedback
+
+`lib/Feedback.psm1` serves `/umbraco-upgrade:feedback`, which turns a finished upgrade into a draft issue for the maintainer.
+
+- **Comparison.** `Compare-UpgradeOutcome.ps1` diffs the base commit from state against the working tree (renames detected, untracked files included, `.umbraco-upgrade/` left out) and sorts each file against `evidence/discovery/patterns.json` and the phases. A hit of a planned pattern, or a file in the same `App_Plugins` folder, is planned. Files no hit explains are expected (project, package, startup, configuration), flagged (listed as unclassified), added, or not found. Generated and serialized files (the phase rules' volume exclusions plus build output) are counted only. It also lists planned patterns none of whose files changed, and compares `evidence/planning/package-compatibility.json` with the package references now. The file groups are plugin heuristics. Every result is a candidate: the user decides what is a plugin problem.
+- **Draft check.** `Test-FeedbackDraft.ps1` derives names from the project and git (solution, project, and assembly names, folders, remote hosts and paths, authors, custom `App_Plugins` folders, private packages), drops generic words, and reports lines with those names, email addresses, hosts other than official documentation and package feeds, local paths, or secrets. It cannot know every name, so the skill also rereads the draft and the user reads it before posting.
+- **No posting.** The command writes only `feedback.md` and the comparison evidence, and never sends anything. The user posts the issue.
 
 ## Documentation retrieval
 

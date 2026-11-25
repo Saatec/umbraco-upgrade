@@ -11,6 +11,8 @@ All notable changes to this plugin are listed here. The format follows [Keep a C
 - `Install-HostHooks.ps1` writes the safety hooks into a project for Copilot (`.github/hooks/umbraco-upgrade.json`) or Codex (merged into `.codex/hooks.json`), with absolute script paths, excluded from git. Cursor loads `hooks/cursor-hooks.json` from the plugin.
 - `skills/upgrade-workflow/references/other-tools.md`: how the skills read outside Claude Code (paths, data folder, subagents, hooks, approvals, secrets). Each command skill points to it and has Codex metadata that keeps it user-invoked.
 
+- `/umbraco-upgrade:feedback [project-path]`: after an upgrade, compares the plan and discovery with what changed since the base commit (`Compare-UpgradeOutcome.ps1`), goes through each difference with the user, and writes `.umbraco-upgrade/feedback.md`, a draft for the issue forms. `Test-FeedbackDraft.ps1` checks the draft for names derived from the project, email addresses, hosts, local paths, and secrets. Nothing is posted.
+
 ### Changed
 
 - Display name: Umbraco Upgrader. The plugin id stays `umbraco-upgrade`.

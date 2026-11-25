@@ -7,6 +7,8 @@ body:
     attributes:
       value: |
         **Issues are public.** Do not post client, project, company, or server names, code or configuration from a real project, secrets, or private package names. Describe the customization in general terms and use placeholder names such as `SampleSite`. See [Keep client data out](https://github.com/Saatec/umbraco-upgrade/blob/main/CONTRIBUTING.md#keep-client-data-out).
+
+        After an upgrade, `/umbraco-upgrade:feedback` compares the plan with what changed and drafts this issue for you, with names removed.
   - type: dropdown
     id: kind
     attributes:

@@ -14,7 +14,7 @@ The skills and scripts also run under GitHub Copilot, OpenAI Codex, and Cursor. 
 - "Load the `umbraco-upgrade:<name>` skill" means: read `<plugin folder>/skills/<name>/SKILL.md` and follow it.
 - `allowed-tools` in skill frontmatter applies to Claude Code only.
 - The subagents `umbraco-upgrade:inventory-analyst`, `umbraco-upgrade:docs-researcher`, and `umbraco-upgrade:independent-verifier` are described in `<plugin folder>/agents/<name>.md`. If your tool cannot run them as subagents, do the task yourself with the instructions in that file.
-- The commands are the skills `start`, `plan`, `resume`, `verify`, `report`, and `update-knowledge`. Start them the way your tool starts skills.
+- The commands are the skills `start`, `plan`, `resume`, `verify`, `report`, `feedback`, and `update-knowledge`. Start them the way your tool starts skills.
 
 ## Safety hooks
 

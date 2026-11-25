@@ -6,8 +6,45 @@ It discovers the project, selects an upgrade path from versioned knowledge and l
 
 Status: version 0.2.0. Tested on Windows only (see [Tested platforms](#tested-platforms)). Provided without warranty (see [License and no warranty](#license-and-no-warranty)).
 
+## Quick start
+
+You need Claude Code, Git, and Windows PowerShell (it comes with Windows). Replace `17` below with the Umbraco version you want.
+
+1. Open Claude Code in your Umbraco project folder.
+2. Install the plugin. When it asks where to install, pick **project**.
+
+   ```
+   /plugin marketplace add Saatec/umbraco-upgrade
+   /plugin install umbraco-upgrade@umbraco-upgrade
+   ```
+
+3. See what the upgrade needs. This changes nothing in your project:
+
+   ```
+   /umbraco-upgrade:plan 17
+   ```
+
+   Then read `.umbraco-upgrade/plan.md`.
+4. Run the upgrade. It works on a new branch, and it stops and waits until you type `approve` before it changes any code:
+
+   ```
+   /umbraco-upgrade:start 17
+   ```
+
+   If you ran `plan` first, move or delete the `.umbraco-upgrade` folder before you run `start`.
+5. When the upgrade is done, tell us what the plugin got wrong:
+
+   ```
+   /umbraco-upgrade:feedback
+   ```
+
+   It writes a draft GitHub issue with your client and project names removed. You read it and post it yourself.
+
+If a session stops halfway (closed window, usage limit), run `/umbraco-upgrade:resume` to continue.
+
 ## Contents
 
+- [Quick start](#quick-start)
 - [Install](#install)
 - [Other AI tools: GitHub Copilot, OpenAI Codex, Cursor](#other-ai-tools-github-copilot-openai-codex-cursor)
 - [Prerequisites](#prerequisites)
@@ -94,7 +131,7 @@ A plugin loaded this way has the id `umbraco-upgrade@inline` and its own data di
 
 The hook file that `Install-HostHooks.ps1` writes is added to `.git/info/exclude`, so it is never committed. It calls the hook scripts by their absolute path, so the plugin runs the script again after a plugin update. If the hook file is already tracked in git, the script changes nothing and asks you to add the hooks yourself.
 
-**Starting a command.** The commands are the skills `start`, `plan`, `resume`, `verify`, `report`, and `update-knowledge`. Start them the way your tool starts skills, for example `/umbraco-upgrade:plan 17` in the Copilot CLI.
+**Starting a command.** The commands are the skills `start`, `plan`, `resume`, `verify`, `report`, `feedback`, and `update-knowledge`. Start them the way your tool starts skills, for example `/umbraco-upgrade:plan 17` in the Copilot CLI.
 
 **Differences from Claude Code**
 
@@ -131,6 +168,7 @@ Every command validates its arguments first (target format `<major>[.<minor>[.<p
 | `/umbraco-upgrade:resume [project-path]` | Continues an interrupted upgrade. First compares the recorded state with the repository and the files (branch, HEAD, checkpoint commits, uncommitted changes, plan hash, cited files, CMS version, declared database copy). | On any mismatch: it reports what differs and asks. It never repairs or repeats a phase on its own. |
 | `/umbraco-upgrade:verify [project-path]` | After the last phase: gate 5 final verification (automated checks, an independent review, a manual checklist for you). During an upgrade: an interim check that records nothing. | After the report, or while waiting for your answers to the manual checks. |
 | `/umbraco-upgrade:report [project-path]` | Writes or rewrites `.umbraco-upgrade/report.md` from the state, the evidence, and the decisions, at any point. | After writing the report. |
+| `/umbraco-upgrade:feedback [project-path]` | After an upgrade: compares what the plugin planned with what really changed, asks you about each difference, and writes a draft GitHub issue to `.umbraco-upgrade/feedback.md` with client and project names removed. Works whether the plugin did the upgrade or you did it by hand after `plan`. It never posts anything. | After the draft is written. You read it and post it yourself. |
 | `/umbraco-upgrade:update-knowledge` | Refreshes version facts (releases, LTS labels, .NET requirements, docs spaces, support dates) from public sources into the plugin data directory, and writes a diff for the plugin maintainer. | After the refresh report. It never writes into a project or into the plugin's install directory. |
 
 Example prompts for common scenarios: [docs/example-prompts.md](docs/example-prompts.md).
@@ -280,7 +318,14 @@ All scripts are PowerShell, written for Windows PowerShell 5.1 and PowerShell 7,
 | `Invoke-Verification.ps1` | Runs the automated gate 5 checks (build and tests evidence, CMS version, package ranges, phase criteria, checkpoints, no removed functionality, no secrets, unresolved items) and records their results; `-Interim` checks an upgrade in progress without recording anything. |
 | `New-Report.ps1` | Writes `report.md` from state, evidence, and decisions; links evidence without copying it. |
 
-Libraries live in `scripts/lib/` (state, schema validation, Git, HTTP with the host allowlist, docs, NuGet, knowledge, discovery, redaction, connection-string locality, path selection, planning, execution, reconciliation, verification, report).
+**Feedback (read-only on the project)**
+
+| Script | What it does |
+|---|---|
+| `Compare-UpgradeOutcome.ps1` | Compares the base commit with the files as they are now and sorts each changed file against discovery and the plan (planned, found but not planned, expected, flagged, added, not found, generated); reports planned patterns whose files did not change and package outcomes against the gate 4 package check. Writes `evidence/feedback/comparison.json`. `-ShowDiff <file>` prints the redacted diff of one file. |
+| `Test-FeedbackDraft.ps1` | Checks the feedback draft for names derived from the project (solution, project, and assembly names, folders, git remotes and authors, custom `App_Plugins` folders, private packages), email addresses, hosts, local paths, and secrets. |
+
+Libraries live in `scripts/lib/` (state, schema validation, Git, HTTP with the host allowlist, docs, NuGet, knowledge, discovery, redaction, connection-string locality, path selection, planning, execution, reconciliation, verification, report, feedback).
 
 ## Network access
 
@@ -326,6 +371,7 @@ Everything the plugin records lives in the project under `.umbraco-upgrade/`. On
 | `decisions.md` | Each decision with its sources (URL, the version it applies to, date) |
 | `rollback.md` | Backup, database snapshot, and rollback plan (gate 3) |
 | `report.md` | The report: verified automatically, verified manually, not verified, decisions, unresolved items, follow-ups |
+| `feedback.md` | Only after `/umbraco-upgrade:feedback`: a draft issue for the plugin maintainer, with project and client names removed |
 | `evidence/<gate or phase>/` | Outputs of checks and builds, redacted |
 | `tmp/` | Short-lived files that scripts read and remove |
 
@@ -365,7 +411,7 @@ Documentation follows the official Umbraco documentation for the exact version f
 
 ## Report a problem or contribute
 
-The plugin improves from what it gets wrong on real upgrades. If it missed custom code, gave wrong version or package information, or did something wrong, [open an issue](https://github.com/Saatec/umbraco-upgrade/issues/new/choose) and pick the form that fits.
+The plugin improves from what it gets wrong on real upgrades. If it missed custom code, gave wrong version or package information, or did something wrong, [open an issue](https://github.com/Saatec/umbraco-upgrade/issues/new/choose) and pick the form that fits. After an upgrade, `/umbraco-upgrade:feedback` finds these differences and drafts the issue for you.
 
 **Issues are public.** Do not post client or project names, code or configuration from a real project, secrets, or private package names. Describe the problem in general terms and use placeholder names.
 
