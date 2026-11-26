@@ -163,7 +163,8 @@ Describe 'Phase skills and subagents' -Tag 'fixture-based' {
         foreach ($c in $cases) {
             $fm = Get-Frontmatter (Join-Path $c.FullName 'prompt.md')
             foreach ($k in $fm.Keys) { $promptKeys | Should -Contain $k -Because "$($c.Name)/prompt.md" }
-            $yaml = [System.IO.File]::ReadAllText((Join-Path $c.FullName 'case.yaml'))
+            # A Windows checkout with core.autocrlf=true has CRLF line ends; the line patterns below expect LF.
+            $yaml = [System.IO.File]::ReadAllText((Join-Path $c.FullName 'case.yaml')) -replace "`r`n", "`n"
             $yaml | Should -Match '(?m)^schema_version: "1\.1"$'
             $yaml | Should -Match "(?m)^name: $([regex]::Escape($c.Name))$"
             if ($yaml -match '(?m)^\s+scaffold_script:\s*(\S+)$') {
