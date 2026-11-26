@@ -4,6 +4,8 @@ All notable changes to this plugin are listed here. The format follows [Keep a C
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-27
+
 ### Changed
 
 - `/umbraco-upgrade:start` reuses a plan made by `/umbraco-upgrade:plan` for the same target (the requested or the resolved version) instead of refusing it. It first compares the plan with the repository and the files as they are now (`Test-StateReality.ps1`, read-only) and asks about every difference. Then `state.ps1 adopt-plan` turns the plan-only run into an upgrade run: discovery, the version and path, decisions, unresolved items, phases, and the plan files stay; gates 3 and 4 go back to pending. Gate 3 runs, gate 4 updates the gate 3 section of `plan.md` and asks for approval again. Before, `start` stopped and you had to move the folder away, and discovery ran a second time. A plan for another target is still refused, with the command that uses it.
