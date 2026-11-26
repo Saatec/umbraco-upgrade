@@ -5,7 +5,8 @@
 .DESCRIPTION
   Read-only. Prints one JSON object. Exit code 0 when the arguments are usable, 1 otherwise.
   Each failure has a stable code and a specific message. No state is written.
-  start and plan take a target and a path, and refuse a project that already has upgrade state. resume, verify,
+  start and plan take a target and a path, and refuse a project that already has upgrade state. The one exception:
+  start accepts the state of a plan-only run for the same target (stateMode "plan"), which it adopts. resume, verify,
   report, and feedback take only a path and need the state; for them a project the version detection does not
   recognize is a warning, because resume reconciliation reports what changed.
 #>
@@ -20,10 +21,11 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2.0
 Import-Module (Join-Path $PSScriptRoot 'lib/Compat.psm1') -DisableNameChecking
 Import-Module (Join-Path $PSScriptRoot 'lib/Discovery.psm1') -DisableNameChecking
+Import-Module (Join-Path $PSScriptRoot 'lib/State.psm1') -DisableNameChecking
 
 $stateCommand = ($Command -in @('resume', 'verify', 'report', 'feedback'))
 $usage = $(if ($stateCommand) { "Usage: /umbraco-upgrade:$Command [project-path]. Example: /umbraco-upgrade:$Command C:\src\MySite" } else { "Usage: /umbraco-upgrade:$Command <target-version> [project-path]. Example: /umbraco-upgrade:$Command 17 C:\src\MySite" })
-$result = [ordered]@{ ok = $false; command = $Command; usage = $usage; target = $null; projectRoot = $null; detected = $null; stateExists = $false; errors = @(); warnings = @() }
+$result = [ordered]@{ ok = $false; command = $Command; usage = $usage; target = $null; projectRoot = $null; detected = $null; stateExists = $false; stateMode = $null; planRun = $null; errors = @(); warnings = @() }
 $errors = New-Object System.Collections.ArrayList
 $warnings = New-Object System.Collections.ArrayList
 
@@ -69,7 +71,19 @@ try {
         if ($stateCommand -and -not $result.stateExists) {
             Add-Problem $errors 'no-state' "No upgrade state in '$full' (looked for .umbraco-upgrade/state.json). Start with /umbraco-upgrade:start or /umbraco-upgrade:plan."
         } elseif ($result.stateExists -and -not $stateCommand) {
-            Add-Problem $errors 'state-exists' "An upgrade state already exists at '$(Join-Path $full '.umbraco-upgrade')'. To continue it, run /umbraco-upgrade:resume. To start over, review that folder, then move or remove it yourself."
+            $stateDir = Join-Path $full '.umbraco-upgrade'
+            $existing = $null
+            try { $existing = Read-UpgradeState $full } catch { $existing = $null }
+            if ($Command -eq 'start' -and $null -ne $existing -and $existing['mode'] -eq 'plan') {
+                # start adopts a plan-only run for the same target instead of starting over.
+                $result.stateMode = 'plan'
+                $result.planRun = [ordered]@{ createdAt = $existing['createdAt']; targetRequested = $existing['target']['requested']; targetResolved = $existing['target']['resolved']; planApproval = $existing['gates']['planApproval']['status'] }
+                if ($result.target -and -not (Test-PlanTargetMatch -State $existing -TargetRequested $result.target.requested)) {
+                    Add-Problem $errors 'plan-target-differs' "The plan-only run in '$stateDir' is for target $($existing['target']['requested']), not $($result.target.requested). Run /umbraco-upgrade:start $($existing['target']['requested']) to use that plan. To start over for $($result.target.requested), review that folder, then move or remove it yourself."
+                }
+            } else {
+                Add-Problem $errors 'state-exists' "An upgrade state already exists at '$stateDir'. To continue it, run /umbraco-upgrade:resume. To start over, review that folder, then move or remove it yourself."
+            }
         }
         if ($result.target -and $null -ne $v.resolved.major) {
             $srcMajor = [int]$v.resolved.major

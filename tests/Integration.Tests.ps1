@@ -8,6 +8,8 @@
 #     asks; it changes no state, ref, or file and continues no phase.
 #  6. E10: /umbraco-upgrade:plan changes nothing outside .umbraco-upgrade/ and creates no branch (with the gitignore
 #     folder policy chosen, which plan mode only records).
+#  7. /umbraco-upgrade:start on a finished plan-only run reuses it: no new discovery, gate 3 runs, the phases stay,
+#     and the plan waits for a new approval.
 # Label: fixture-based. Selector tag: integration (excluded by default; costs model calls, capped per run with
 # --max-budget-usd). Requires the claude CLI on PATH and logged in (claude auth status).
 
@@ -270,6 +272,59 @@ Describe 'Resume and plan commands under claude -p --plugin-dir (E4, E10)' -Tag 
             $s.gates.safety.status | Should -Be 'skipped'
             $s.gitBaseline.upgradeBranch | Should -BeNullOrEmpty
             @(Get-ShellCommands $run.Events | Where-Object { $_ -match 'New-UpgradeBranch\.ps1|git\s+(checkout\s+-b|switch\s+-c)' }).Count | Should -Be 0
+        } finally { Remove-TestDirectory $d }
+    }
+
+    It 'start reuses a finished plan-only run: gate 3 runs, the phases stay, and the plan waits for approval' {
+        Import-Module (Join-Path (Get-RepoRoot) 'scripts/lib/Compat.psm1') -DisableNameChecking
+        $d = Copy-Fixture -Baseline 'gen.v13'
+        try {
+            Initialize-GitRepo -Path $d -Commit
+            # A finished plan-only run, as /umbraco-upgrade:plan 17 leaves it.
+            [void](New-UpgradeState -ProjectRoot $d -Mode plan -TargetRequested '17')
+            $sd = Join-Path $d '.umbraco-upgrade'
+            [void](Update-StateSection -ProjectRoot $d -Section project -Values @{ stateFolderPolicy = 'exclude-local'; webProject = 'SampleSite.Web.csproj' })
+            [void](Set-UpgradeGate -ProjectRoot $d -Gate discovery -Status passed -Evidence @('evidence/discovery/git-status-at-start.json'))
+            [void](Update-StateSection -ProjectRoot $d -Section source -Values @{ umbraco = '13.10.1'; major = 13; confidence = 'high' })
+            [void](Add-Decision -ProjectRoot $d -Gate versionPath)
+            [void](Update-StateSection -ProjectRoot $d -Section target -Values @{ resolved = '17.7.1'; dotnet = 'net10.0'; lts = @{ value = $true; source = 'D-001'; verified = $true } })
+            [void](Update-StateSection -ProjectRoot $d -Section path -Values @{ selection = 'selected'; strategy = 'in-place'; decision = 'D-001'; steps = @([ordered]@{ id = 'S1'; from = '13.10.1'; to = '17.7.1'; kind = @('code', 'database') }) })
+            [void](Set-UpgradeGate -ProjectRoot $d -Gate versionPath -Status passed)
+            [void](Set-UpgradeGate -ProjectRoot $d -Gate safety -Status skipped -Notes 'plan-only mode')
+            $phases = @(
+                [ordered]@{ id = 'P1'; title = 'Packages, framework, and startup'; area = 'application-framework'; patterns = @(); acceptanceCriteria = @([ordered]@{ id = 'P1-AC1'; text = 'The solution builds'; verification = 'automated' }) },
+                [ordered]@{ id = 'P2'; title = 'Database migration on the local copy'; area = 'content-database'; patterns = @(); acceptanceCriteria = @([ordered]@{ id = 'P2-AC1'; text = 'The site starts and the migration completes'; verification = 'manual' }) })
+            [void](Set-UpgradePhases -ProjectRoot $d -Phases $phases)
+            New-Item -ItemType Directory -Force (Join-Path $sd 'evidence/planning') | Out-Null
+            [System.IO.File]::WriteAllText((Join-Path $sd 'evidence/planning/phase-composition.json'), '{ "phases": [ { "id": "P1", "step": "S1" }, { "id": "P2", "step": "S1" } ] }')
+            foreach ($f in @('inventory.md', 'compatibility.md', 'risks.md')) { [System.IO.File]::WriteAllText((Join-Path $sd $f), "# $f`n`nSynthetic record for tests.`n") }
+            [System.IO.File]::WriteAllText((Join-Path $sd 'decisions.md'), "# Decisions`n`n## D-001 Upgrade path`n`n- Decision: in place, 13.10.1 to 17.7.1 (user accepted the recommended path)`n")
+            [System.IO.File]::WriteAllText((Join-Path $sd 'plan.md'), "# Upgrade plan: SampleSite 13.10.1 to 17.7.1`n`n## Summary`n`nIn-place upgrade in two phases.`n`n## Gate 3: safety setup`n`nPlan mode: gate 3 will check the working tree, create the upgrade branch, write rollback.md, and run the guard self-test when /umbraco-upgrade:start runs.`n`nRollback: see ``rollback.md``.`n`n## Phases`n`n- P1 Packages, framework, and startup (S1). Criterion P1-AC1: the solution builds (automated).`n- P2 Database migration on the local copy (S1). Criterion P2-AC1: the site starts and the migration completes (manual).`n")
+            [void](Request-PlanApproval -ProjectRoot $d)
+            $pre = Invoke-PluginScript -Script 'scripts/Test-StateReality.ps1' -Arguments @('-ProjectRoot', $d)
+            $pre.Json.mismatches | Should -Be 0 -Because $pre.StdOut
+            $system = 'This run is unattended. When the umbraco-upgrade workflow asks the user a question, use these answers and continue: reuse the existing plan; no restored local copy of the site database exists yet; a production backup exists. For any other question before the plan approval, choose the option the workflow recommends. Never approve the plan yourself: when the workflow asks for plan approval, end your turn after asking.'
+            $run = Invoke-ClaudePrint -WorkingDirectory $d -Prompt '/umbraco-upgrade:start 17' -BudgetUsd '6' -TimeoutSeconds 2400 -AppendSystemPrompt $system
+            $cmds = Get-ShellCommands $run.Events
+            $s = Get-Content -Raw (Join-Path $sd 'state.json') | ConvertFrom-Json
+            $s.mode | Should -Be 'upgrade' -Because (Get-FinalText $run.Events)
+            @($s.history | Where-Object { $_.event -eq 'plan-adopted' }).Count | Should -Be 1
+            @($s.history | Where-Object { $_.event -eq 'initialized' }).Count | Should -Be 1 -Because 'the plan-only state is reused, not created again'
+            @($cmds | Where-Object { $_ -match 'Test-StateReality\.ps1' }).Count | Should -BeGreaterThan 0 -Because 'start checks the plan against the repository before it reuses it'
+            @($cmds | Where-Object { $_ -match 'Invoke-Discovery\.ps1|state\.ps1"?\s+init\b' }).Count | Should -Be 0 -Because ($cmds -join ' || ')
+            $s.gates.discovery.status | Should -Be 'passed'
+            $s.gates.versionPath.status | Should -Be 'passed'
+            $s.gates.safety.status | Should -Be 'passed'
+            $s.gates.safety.guardSelfTest | Should -Be 'passed'
+            $s.gitBaseline.upgradeBranch | Should -Not -BeNullOrEmpty
+            ((& git -C $d rev-parse --abbrev-ref HEAD 2>$null) -join '') | Should -Be $s.gitBaseline.upgradeBranch
+            @($s.phases | ForEach-Object { "$($_.id)=$($_.status)" }) | Should -Be @('P1=pending', 'P2=pending')
+            $s.gates.planApproval.status | Should -Be 'awaiting-approval'
+            $s.gates.planApproval.planSha256 | Should -Be (Get-FileSha256 (Join-Path $sd 'plan.md'))
+            @($s.approvals | Where-Object { $_.action -eq 'start-plan-execution' }).Count | Should -Be 0 -Because 'only the user approves the plan'
+            (Get-Content -Raw (Join-Path $sd 'plan.md')) | Should -Match ([regex]::Escape($s.gitBaseline.upgradeBranch)) -Because 'the gate 3 section now says what gate 3 did'
+            (Get-Content -Raw (Join-Path $d '.git/info/exclude')) | Should -Match ([regex]::Escape('.umbraco-upgrade/')) -Because 'the exclude-local policy recorded in plan mode is applied'
+            (Get-FinalText $run.Events) | Should -Match '(?i)\?|\b(approve|approval|confirm|decide)\b' -Because 'start must ask for the plan approval'
         } finally { Remove-TestDirectory $d }
     }
 }

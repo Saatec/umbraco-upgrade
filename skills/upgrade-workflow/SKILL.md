@@ -6,7 +6,7 @@ user-invocable: false
 
 # Upgrade workflow (gate engine)
 
-You run a fixed sequence of gates for one project. The caller gives you: the project root, the requested target, the mode (`upgrade` for start, `plan` for plan), the session id, and the plugin data directory. After `/umbraco-upgrade:resume`, the caller also gives the position reconciliation found (a gate or a phase): continue from there, in the same order.
+You run a fixed sequence of gates for one project. The caller gives you: the project root, the requested target, the mode (`upgrade` for start, `plan` for plan), the session id, and the plugin data directory. After `/umbraco-upgrade:resume`, the caller also gives the position reconciliation found (a gate or a phase): continue from there, in the same order. After `/umbraco-upgrade:start` reused a plan-only run (`state.ps1 adopt-plan`), the caller gives the first gate that has not passed, usually gate 3: continue from there.
 
 ## Rules that apply at every step
 
@@ -43,7 +43,7 @@ Details, entry and exit criteria: [references/gates.md](references/gates.md).
 - **Upgrade mode, user approves:** record it with `state.ps1 approve -ProjectRoot "<root>" -Action start-plan-execution -Decision approved -Note "<user's words>"`. Tell the user the approval id and that it is bound to the current plan text. Then execute the plan: follow [references/phase-execution.md](references/phase-execution.md). Each phase runs through its owning `migrate-*` skill and ends with a checkpoint commit and a state checkpoint.
 - **Upgrade mode, user asks for changes:** edit the plan files, run `state.ps1 request-plan-approval` again (the plan hash changes), and ask again.
 - **Upgrade mode, user rejects:** record `-Decision rejected` and stop.
-- **Plan mode:** report where the plan is and stop. Approval and execution happen through `/umbraco-upgrade:start`.
+- **Plan mode:** report where the plan is and stop. Approval and execution happen through `/umbraco-upgrade:start <target>` in the same project: it reuses this plan, runs gate 3, and asks for approval.
 - **After the last phase:** run gate 5. Load `umbraco-upgrade:verification` and follow it: automated checks, the independent verifier, the manual checklist with the user, then the report (`umbraco-upgrade:reporting`). Gate 5 passes only when no check is open or failed.
 
 ## First run

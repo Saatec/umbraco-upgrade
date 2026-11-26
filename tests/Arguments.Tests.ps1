@@ -156,4 +156,36 @@ Describe 'Resolve-UpgradeArguments' -Tag 'fixture-based' {
             } finally { Remove-TestDirectory $dir }
         }
     }
+
+    Context 'start with a plan-only run in the project' {
+        It 'start accepts a plan-only run for the same target and describes it' {
+            $dir = New-UpgradeProject -Baseline 'gen.v13' -Mode plan
+            try {
+                $r = Invoke-Args '17' $dir
+                $r.ExitCode | Should -Be 0 -Because $r.StdOut
+                $r.Json.stateExists | Should -BeTrue
+                $r.Json.stateMode | Should -Be 'plan'
+                $r.Json.planRun.targetRequested | Should -Be '17'
+                $r.Json.planRun.planApproval | Should -Be 'pending'
+            } finally { Remove-TestDirectory $dir }
+        }
+        It 'start refuses a plan-only run for another target and names the planned one' {
+            $dir = New-UpgradeProject -Baseline 'gen.v13' -Mode plan
+            try {
+                $r = Invoke-Args '18' $dir
+                $r.ExitCode | Should -Be 1
+                $e = @($r.Json.errors | Where-Object { $_.code -eq 'plan-target-differs' })
+                $e.Count | Should -Be 1
+                $e[0].message | Should -Match ([regex]::Escape('/umbraco-upgrade:start 17'))
+            } finally { Remove-TestDirectory $dir }
+        }
+        It 'plan still refuses a project with state' {
+            $dir = New-UpgradeProject -Baseline 'gen.v13' -Mode plan
+            try {
+                $r = Invoke-Args '17' $dir 'plan'
+                $r.ExitCode | Should -Be 1
+                @($r.Json.errors | ForEach-Object { $_.code }) | Should -Contain 'state-exists'
+            } finally { Remove-TestDirectory $dir }
+        }
+    }
 }

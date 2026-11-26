@@ -40,4 +40,4 @@ Load the `umbraco-upgrade:upgrade-workflow` skill with the Skill tool and follow
 - session id: `${CLAUDE_SESSION_ID}`
 - plugin data directory: `${CLAUDE_PLUGIN_DATA}`
 
-Plan mode runs gates 1, 2, and 4. Gate 3 is described in the plan but not executed, because it creates a branch. Nothing outside `.umbraco-upgrade/` changes: no branch, no `.gitignore` or `.git/info/exclude` edit, no project file. Stop after the plan is written.
+Plan mode runs gates 1, 2, and 4. Gate 3 is described in the plan but not executed, because it creates a branch. Nothing outside `.umbraco-upgrade/` changes: no branch, no `.gitignore` or `.git/info/exclude` edit, no project file. Stop after the plan is written. To execute it later, the user runs `/umbraco-upgrade:start <target>` in the same project: start reuses this plan.

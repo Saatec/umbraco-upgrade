@@ -68,7 +68,7 @@ function Get-ResumePosition {
     if ($mode -eq 'upgrade' -and $g['safety']['status'] -ne 'passed') { return [ordered]@{ kind = 'gate'; gate = 'safety'; phase = $null; status = $g['safety']['status']; next = "Gate 3 is '$($g['safety']['status'])'. Continue the safety setup (git checks, branch, rollback document, guard self-test)." } }
     $pa = $g['planApproval']['status']
     if ($mode -eq 'plan') {
-        if ($pa -eq 'awaiting-approval') { return [ordered]@{ kind = 'done'; gate = 'planApproval'; phase = $null; status = $pa; next = 'This is a plan-only run and its plan is written. Approval and execution happen through /umbraco-upgrade:start in a project without this state; move the folder away first.' } }
+        if ($pa -eq 'awaiting-approval') { return [ordered]@{ kind = 'done'; gate = 'planApproval'; phase = $null; status = $pa; next = "This is a plan-only run and its plan is written. To execute it, run /umbraco-upgrade:start $($State['target']['requested']) in this project: start reuses this plan, runs gate 3 (safety setup), and asks for approval." } }
         return [ordered]@{ kind = 'gate'; gate = 'planApproval'; phase = $null; status = $pa; next = "Gate 4 is '$pa'. Finish writing the plan." }
     }
     if ($pa -ne 'approved') {

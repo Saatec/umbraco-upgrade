@@ -21,6 +21,7 @@ Run as `powershell -NoProfile -ExecutionPolicy Bypass -File "${CLAUDE_PLUGIN_ROO
 | Command | Use |
 |---|---|
 | `init -Mode upgrade\|plan -Target <v>` | Gate 1 start. Takes the git status snapshot, then creates `.umbraco-upgrade/`. Refuses if state exists. |
+| `adopt-plan -Target <v>` | `/umbraco-upgrade:start` only, after its reality check: turns a plan-only run for the same target (requested or resolved version) into an upgrade run. Sets gates 3 and 4 back to pending; keeps everything else. Refuses in upgrade mode. |
 | `get [-Field a.b.c]` | Read the state or one field. |
 | `validate` | Check the file against the schema. |
 | `gate -Gate <g> -Status in-progress\|passed\|failed\|skipped [-Evidence a,b] [-Notes text]` | Gate transitions. Previous gates must be done; `passed` has per-gate requirements. |
@@ -63,6 +64,6 @@ Used by `/umbraco-upgrade:resume`, and by the verification skill before gate 5. 
    | `phase`, status `blocked` or `failed` | First show its recorded failures and recovery steps and any open unresolved item, and ask. Continue only on the user's go-ahead. |
    | `phase`, status `pending` | Phase execution from that phase (`state.ps1 check-plan -Invalidate` first). |
    | `gate` final | The `umbraco-upgrade:verification` skill. |
-   | `done` | Say that nothing is left to resume; offer `/umbraco-upgrade:report`. For a plan-only run, explain that execution starts with `/umbraco-upgrade:start` in a project without this state. |
+   | `done` | Say that nothing is left to resume; offer `/umbraco-upgrade:report`. For a plan-only run, explain that `/umbraco-upgrade:start <target>` in this project reuses the plan: it runs gate 3 and asks for approval. |
 
 Failures are recorded with their recovery steps (`state.ps1 phase-failure`), so a resumed session shows them before it continues. Phases are written to be idempotent where possible: a resumed phase starts from its open criteria and the evidence already recorded.

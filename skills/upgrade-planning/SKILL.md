@@ -10,6 +10,8 @@ Templates: `${CLAUDE_PLUGIN_ROOT}/skills/upgrade-planning/templates/` (`plan.md`
 
 Scripts run as `powershell -NoProfile -ExecutionPolicy Bypass -File "${CLAUDE_PLUGIN_ROOT}/scripts/<Script>" ...`. Read `ok` and the messages of every script.
 
+**Reused plan.** When `/umbraco-upgrade:start` reused a plan-only run (the state history has a `plan-adopted` event) and `plan.md` exists, keep the plan: skip steps 1 to 4. In step 5, change only the "Gate 3: safety setup" section: replace the plan-mode text with what gate 3 did (branch, base commit, guard self-test result, local database copy declared yes or no). If the user chose to reuse the plan despite a warning (for example new commits since discovery), add that to the summary. Then continue with step 6. Without `plan.md`, run every step.
+
 ## 1. Package compatibility
 
 `Test-PackageCompatibility.ps1 -ProjectRoot "<root>" -DataDir "${CLAUDE_PLUGIN_DATA}"`. It classifies every direct package reference for the target major from NuGet metadata and writes `evidence/planning/package-compatibility.json`. It fires the package patterns (`pkg.no-target-version`, `pkg.framework-only-libs`, `pkg.renamed-community`).
@@ -46,4 +48,4 @@ Review the proposal. You may merge, rename, or reorder phases only with a reason
 ## 6. Request approval
 
 - Upgrade mode: `state.ps1 request-plan-approval -ProjectRoot "<root>"`. Give the user a short summary (phases, decisions needed, key risks) and ask, following the approval protocol. **Stop and wait.** Execution starts only after an explicit approval in chat (see the workflow skill).
-- Plan mode: `state.ps1 request-plan-approval -ProjectRoot "<root>"` records the plan hash. Tell the user where the plan is and that approval and execution happen through `/umbraco-upgrade:start`. Stop.
+- Plan mode: `state.ps1 request-plan-approval -ProjectRoot "<root>"` records the plan hash. Tell the user where the plan is, and that `/umbraco-upgrade:start <target>` in the same project reuses it: it runs gate 3 (safety setup) and then asks for approval. Stop.

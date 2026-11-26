@@ -11,7 +11,7 @@ A Claude Code plugin that plans and runs Umbraco CMS major-version upgrades: fro
 
 It discovers the project, selects an upgrade path from versioned knowledge and live official documentation, writes a phased plan and stops for your approval, executes the plan on a dedicated branch with a checkpoint commit per phase, verifies the result, and writes a report that separates what was verified automatically, what you verified manually, and what was not verified.
 
-Status: version 0.2.0. Tested on Windows only (see [Tested platforms](#tested-platforms)). Provided without warranty (see [License and no warranty](#license-and-no-warranty)).
+Status: version 0.3.0. Tested on Windows only (see [Tested platforms](#tested-platforms)). Provided without warranty (see [License and no warranty](#license-and-no-warranty)).
 
 ## Quick start
 
@@ -38,7 +38,7 @@ You need Claude Code, Git, and Windows PowerShell (it comes with Windows). Repla
    /umbraco-upgrade:start 17
    ```
 
-   If you ran `plan` first, move or delete the `.umbraco-upgrade` folder before you run `start`.
+   If you ran `plan` first, `start` reuses that plan. It checks that the project has not changed since the plan, creates the branch and runs the safety checks, and then asks you to approve the plan.
 5. When the upgrade is done, tell us what the plugin got wrong:
 
    ```
@@ -170,8 +170,8 @@ Every command validates its arguments first (target format `<major>[.<minor>[.<p
 
 | Command | What it does | Where it stops |
 |---|---|---|
-| `/umbraco-upgrade:start <target-version> [project-path]` | Starts a new upgrade: gates 1 to 4, then, after your approval, the plan phases and gate 5. A bare major such as `17` means the latest released version of that major. | At gate 4, waiting for your approval. After approval it continues phase by phase. |
-| `/umbraco-upgrade:plan <target-version> [project-path]` | Discovery and plan only: gates 1, 2, and 4. Gate 3 is described in the plan but not run, because it creates a branch. Changes nothing in the project except `.umbraco-upgrade/`. | After writing the plan. Execution happens through `start` in a project without this state. |
+| `/umbraco-upgrade:start <target-version> [project-path]` | Starts a new upgrade: gates 1 to 4, then, after your approval, the plan phases and gate 5. A bare major such as `17` means the latest released version of that major. If the project holds a plan from `plan` for the same target, `start` reuses it (see [From a plan to an upgrade](#from-a-plan-to-an-upgrade)). | At gate 4, waiting for your approval. After approval it continues phase by phase. |
+| `/umbraco-upgrade:plan <target-version> [project-path]` | Discovery and plan only: gates 1, 2, and 4. Gate 3 is described in the plan but not run, because it creates a branch. Changes nothing in the project except `.umbraco-upgrade/`. | After writing the plan. To execute it, run `start` with the same target in the same project. |
 | `/umbraco-upgrade:resume [project-path]` | Continues an interrupted upgrade. First compares the recorded state with the repository and the files (branch, HEAD, checkpoint commits, uncommitted changes, plan hash, cited files, CMS version, declared database copy). | On any mismatch: it reports what differs and asks. It never repairs or repeats a phase on its own. |
 | `/umbraco-upgrade:verify [project-path]` | After the last phase: gate 5 final verification (automated checks, an independent review, a manual checklist for you). During an upgrade: an interim check that records nothing. | After the report, or while waiting for your answers to the manual checks. |
 | `/umbraco-upgrade:report [project-path]` | Writes or rewrites `.umbraco-upgrade/report.md` from the state, the evidence, and the decisions, at any point. | After writing the report. |
@@ -179,6 +179,19 @@ Every command validates its arguments first (target format `<major>[.<minor>[.<p
 | `/umbraco-upgrade:update-knowledge` | Refreshes version facts (releases, LTS labels, .NET requirements, docs spaces, support dates) from public sources into the plugin data directory, and writes a diff for the plugin maintainer. | After the refresh report. It never writes into a project or into the plugin's install directory. |
 
 Example prompts for common scenarios: [docs/example-prompts.md](docs/example-prompts.md).
+
+### From a plan to an upgrade
+
+`plan` is useful when you want to see the work before you decide: for an estimate, for your team, or to compare targets. It writes only `.umbraco-upgrade/` and creates no branch.
+
+When you then run `start` with the same target (the version you typed, or the exact version the plan resolved) in the same project, `start` reuses the plan instead of starting over:
+
+1. It compares the plan with the project as it is now (branch, commits since discovery, uncommitted changes, the files the plan cites, the CMS version). It reports every difference and asks. It never repairs anything.
+2. It keeps discovery, the version and path, your decisions, the phases, and the plan files.
+3. It runs gate 3 (safety setup): branch, rollback document, guard self-test.
+4. It updates the gate 3 part of `plan.md` and asks you to approve the plan. Nothing in your project changes before that approval.
+
+To plan for another target, or to start over, move or remove `.umbraco-upgrade/` yourself first. A folder from `start` is never reused this way: continue it with `resume`.
 
 ## How an upgrade runs: the gates
 
@@ -319,7 +332,7 @@ All scripts are PowerShell, written for Windows PowerShell 5.1 and PowerShell 7,
 
 | Script | What it does |
 |---|---|
-| `state.ps1` | The only way to change `state.json`: init, gates, approvals, decisions, unresolved items, phases, criteria, checkpoints, failures, the gate 5 checklist and results, schema migration, session markers. |
+| `state.ps1` | The only way to change `state.json`: init, reusing a plan-only run (`adopt-plan`), gates, approvals, decisions, unresolved items, phases, criteria, checkpoints, failures, the gate 5 checklist and results, schema migration, session markers. |
 | `Test-StateReality.ps1` | Resume reconciliation, read-only: compares the state with the repository, the plan hash, the cited files, the CMS version, and the declared database copy, and reports every difference with options. |
 | `Get-VerificationPlan.ps1` | Composes the gate 5 checklist and the manual checklist from what discovery and the package check found. |
 | `Invoke-Verification.ps1` | Runs the automated gate 5 checks (build and tests evidence, CMS version, package ranges, phase criteria, checkpoints, no removed functionality, no secrets, unresolved items) and records their results; `-Interim` checks an upgrade in progress without recording anything. |
@@ -382,7 +395,7 @@ Everything the plugin records lives in the project under `.umbraco-upgrade/`. On
 | `evidence/<gate or phase>/` | Outputs of checks and builds, redacted |
 | `tmp/` | Short-lived files that scripts read and remove |
 
-In upgrade mode the plugin also creates the upgrade branch (`umbraco-upgrade/<source major>-to-<target>`) at gate 3, changes project files on that branch only after you approve the plan, and ends each phase with a checkpoint commit. In plan mode it changes nothing outside `.umbraco-upgrade/` and creates no branch. In GitHub Copilot and OpenAI Codex it also writes one hook file, excluded from git (see [Other AI tools](#other-ai-tools-github-copilot-openai-codex-cursor)).
+In upgrade mode the plugin also creates the upgrade branch (`umbraco-upgrade/<source major>-to-<target>`) at gate 3, changes project files on that branch only after you approve the plan, and ends each phase with a checkpoint commit. In plan mode it changes nothing outside `.umbraco-upgrade/` and creates no branch; a later `start` with the same target reuses that folder. In GitHub Copilot and OpenAI Codex it also writes one hook file, excluded from git (see [Other AI tools](#other-ai-tools-github-copilot-openai-codex-cursor)).
 
 ## Plugin data directory
 

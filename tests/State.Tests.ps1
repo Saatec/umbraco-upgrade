@@ -308,6 +308,82 @@ Describe 'Approvals for other actions' -Tag 'fixture-based' {
     }
 }
 
+Describe 'Adopting a plan-only run' -Tag 'fixture-based' {
+    BeforeAll {
+        function New-FinishedPlan {
+            # A plan-only run as /umbraco-upgrade:plan leaves it: gates 1 and 2 passed, gate 3 skipped, one phase,
+            # one decision, plan.md written and its hash recorded.
+            $d = New-Project -Mode plan
+            Pass-Discovery $d
+            Pass-VersionPath $d
+            [void](Set-UpgradeGate -ProjectRoot $d -Gate safety -Status skipped -Notes 'plan-only mode')
+            [void](Add-Decision -ProjectRoot $d -Gate versionPath)
+            $phases = @(@{ id = 'P1'; title = 'Packages and framework'; area = 'application-framework'; patterns = @(); acceptanceCriteria = @(@{ id = 'P1-AC1'; text = 'The solution builds'; verification = 'automated' }) })
+            [void](Set-UpgradePhases -ProjectRoot $d -Phases $phases)
+            Write-Plan $d "# Plan`n`n## Gate 3: safety setup`n`nWhat gate 3 will do.`n"
+            [void](Request-PlanApproval -ProjectRoot $d)
+            return $d
+        }
+    }
+    AfterEach { if ($script:d) { Remove-TestDirectory $script:d; $script:d = $null } }
+
+    It 'turns a finished plan-only run into an upgrade run and keeps the plan' {
+        $script:d = New-FinishedPlan
+        $planFile = Join-Path $script:d '.umbraco-upgrade/plan.md'
+        $hash = Get-FileSha256 $planFile
+        $s = Convert-PlanToUpgrade -ProjectRoot $script:d -TargetRequested '17'
+        $s = Read-UpgradeState $script:d
+        $s.mode | Should -Be 'upgrade'
+        $s.gates.discovery.status | Should -Be 'passed'
+        $s.gates.versionPath.status | Should -Be 'passed'
+        @($s.gates.versionPath.decisions) | Should -Be @('D-001')
+        $s.gates.safety.status | Should -Be 'pending'
+        $s.gates.safety.PSObject.Properties.Name | Should -Not -Contain 'notes'
+        $s.gates.planApproval.status | Should -Be 'pending'
+        $s.gates.planApproval.PSObject.Properties.Name | Should -Not -Contain 'planSha256'
+        @($s.phases).Count | Should -Be 1
+        $s.phases[0].status | Should -Be 'pending'
+        Get-FileSha256 $planFile | Should -Be $hash
+        $s.history[-1].event | Should -Be 'plan-adopted'
+        $s.history[-1].detail | Should -Match ([regex]::Escape($hash))
+        (Test-UpgradeState -State (Read-UpgradeState $script:d)).Count | Should -Be 0
+    }
+
+    It 'accepts the resolved version as the target' {
+        $script:d = New-FinishedPlan
+        (Convert-PlanToUpgrade -ProjectRoot $script:d -TargetRequested '17.7.1')['mode'] | Should -Be 'upgrade'
+    }
+
+    It 'refuses another target and leaves the state unchanged' {
+        $script:d = New-FinishedPlan
+        $before = Get-FileSha256 (Join-Path $script:d '.umbraco-upgrade/state.json')
+        { Convert-PlanToUpgrade -ProjectRoot $script:d -TargetRequested '18' } | Should -Throw '*for target 17, not 18*'
+        Get-FileSha256 (Join-Path $script:d '.umbraco-upgrade/state.json') | Should -Be $before
+    }
+
+    It 'refuses an upgrade run' {
+        $script:d = New-Project
+        { Convert-PlanToUpgrade -ProjectRoot $script:d -TargetRequested '17' } | Should -Throw '*only a plan-only run*'
+    }
+
+    It 'needs gate 3 and a new approval before the plan can run' {
+        $script:d = New-FinishedPlan
+        [void](Convert-PlanToUpgrade -ProjectRoot $script:d -TargetRequested '17')
+        { Add-Approval -ProjectRoot $script:d -Action start-plan-execution -Decision approved } | Should -Throw '*not awaiting approval*'
+        { Request-PlanApproval -ProjectRoot $script:d } | Should -Throw "*gate 'safety' is 'pending'*"
+        [void](Set-UpgradeGate -ProjectRoot $script:d -Gate safety -Status in-progress)
+        [void](Update-StateSection -ProjectRoot $script:d -Section gitBaseline -Values @{ upgradeBranch = 'umbraco-upgrade/13-to-17' })
+        [System.IO.File]::WriteAllText((Join-Path $script:d '.umbraco-upgrade/rollback.md'), "# Rollback`n")
+        [void](Set-GateFields -ProjectRoot $script:d -Gate safety -Fields @{ guardSelfTest = 'passed'; rollbackDoc = 'rollback.md' })
+        [void](Set-UpgradeGate -ProjectRoot $script:d -Gate safety -Status passed -Evidence @('rollback.md'))
+        Write-Plan $script:d "# Plan`n`n## Gate 3: safety setup`n`nBranch umbraco-upgrade/13-to-17.`n"
+        [void](Request-PlanApproval -ProjectRoot $script:d)
+        (Add-Approval -ProjectRoot $script:d -Action start-plan-execution -Decision approved -Note 'approve').id | Should -Be 'A-001'
+        [void](Set-PhaseStatus -ProjectRoot $script:d -PhaseId P1 -Status in-progress)
+        (Read-UpgradeState $script:d).phases[0].status | Should -Be 'in-progress'
+    }
+}
+
 Describe 'state.ps1 CLI' -Tag 'fixture-based' {
     BeforeAll { $script:c = New-UpgradeProject -Baseline 'gen.v13' }
     AfterAll { Remove-TestDirectory $script:c }
@@ -341,6 +417,18 @@ Describe 'state.ps1 CLI' -Tag 'fixture-based' {
             $r = Invoke-PluginScript -Script 'scripts/state.ps1' -Arguments @('session-marker', '-ProjectRoot', $script:c, '-SessionId', 'abc-123', '-DataDir', $data, '-Remove')
             Test-Path (Join-Path $data 'active-sessions/abc-123.json') | Should -BeFalse
         } finally { Remove-TestDirectory $data }
+    }
+    It 'adopt-plan prints the new mode and the gates, and needs a target' {
+        $p = New-UpgradeProject -Baseline 'gen.v13' -Mode plan
+        try {
+            $r = Invoke-PluginScript -Script 'scripts/state.ps1' -Arguments @('adopt-plan', '-ProjectRoot', $p)
+            $r.ExitCode | Should -Be 1
+            $r.Json.error | Should -Match 'needs -Target'
+            $r = Invoke-PluginScript -Script 'scripts/state.ps1' -Arguments @('adopt-plan', '-ProjectRoot', $p, '-Target', '17')
+            $r.ExitCode | Should -Be 0 -Because $r.StdOut
+            $r.Json.mode | Should -Be 'upgrade'
+            $r.Json.gates.safety | Should -Be 'pending'
+        } finally { Remove-TestDirectory $p }
     }
 }
 

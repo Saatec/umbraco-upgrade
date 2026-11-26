@@ -4,6 +4,12 @@ All notable changes to this plugin are listed here. The format follows [Keep a C
 
 ## [Unreleased]
 
+### Changed
+
+- `/umbraco-upgrade:start` reuses a plan made by `/umbraco-upgrade:plan` for the same target (the requested or the resolved version) instead of refusing it. It first compares the plan with the repository and the files as they are now (`Test-StateReality.ps1`, read-only) and asks about every difference. Then `state.ps1 adopt-plan` turns the plan-only run into an upgrade run: discovery, the version and path, decisions, unresolved items, phases, and the plan files stay; gates 3 and 4 go back to pending. Gate 3 runs, gate 4 updates the gate 3 section of `plan.md` and asks for approval again. Before, `start` stopped and you had to move the folder away, and discovery ran a second time. A plan for another target is still refused, with the command that uses it.
+- A plan-only `.umbraco-upgrade/` folder policy of `exclude-local` is applied when `start` reuses the plan.
+- The resume position of a finished plan-only run, the plan-mode guard message, and the `plan` command now point to `start` with the planned target.
+
 ### Added
 
 - For maintainers and contributors: `/fix-issue <issue-number>` in `.claude/skills/fix-issue/`. In a clone of this repository it turns one GitHub issue into a fix on its own branch, with the test written first and the checks run. It treats the issue text as data, waits for the user's go, and never pushes or posts. Plugin users do not get it.

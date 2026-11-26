@@ -6,7 +6,7 @@ Readers accept the same major version. `state.ps1 migrate` upgrades older minors
 |---|---|
 | `schemaVersion` | `1.x.y` |
 | `plugin` | `name` (always `umbraco-upgrade`) and the plugin `version` that created the file |
-| `mode` | `upgrade` (start) or `plan` (plan only) |
+| `mode` | `upgrade` (start) or `plan` (plan only). `adopt-plan` turns `plan` into `upgrade` when start reuses a plan-only run; nothing turns it back. |
 | `createdAt`, `updatedAt` | UTC timestamps, ISO 8601 |
 | `project` | `root` (always `.`), `solution`, `webProject` (relative paths), `stateFolderPolicy`: `undecided`, `commit`, `exclude-local`, `gitignore` |
 | `source` | `umbraco` (version or null), `major`, `generation`, `dotnet` (target frameworks), `database` (`engine`: unknown, sqlserver, localdb, sqlce, sqlite, other; `localCopyDeclared`; `target`: unknown, local, non-local), `evidence` (relative paths), `confidence`: none, low, medium, high, conflict, confirmed-by-user; `verified` |
@@ -31,6 +31,7 @@ Readers accept the same major version. `state.ps1 migrate` upgrades older minors
 - A gate can start or pass only when every earlier gate has passed (safety may be `skipped` in plan mode; plan approval counts when `approved`).
 - `discovery` passes only with evidence files; `versionPath` only with a requested target, a source version or user confirmation (never while source signals conflict), a resolved target version, the target's LTS status and .NET version, and a selected path with its decision id; `safety` only in upgrade mode, with `guardSelfTest = passed`, a recorded upgrade branch, and a rollback document.
 - `planApproval` moves to `awaiting-approval` through `request-plan-approval` (binds the plan hash) and to `approved` or `rejected` through `approve`.
+- `adopt-plan` works only in plan mode and only for the same target (the requested or the resolved version). It sets the mode to `upgrade`, sets `safety` and `planApproval` back to `pending` (dropping the plan hash), and records a `plan-adopted` history event. Discovery, the version path, decisions, unresolved items, phases, and the plan files stay.
 - Phases are frozen once the plan is approved. A phase starts (`in-progress`) only while the approved plan is unchanged, after gate 3 passed, and when every earlier phase is `done` or `deferred`.
 - An acceptance criterion is `met` only with evidence files under `.umbraco-upgrade/`, and `waived` only with the user's words. A phase is `done` only when every acceptance criterion is met or waived and a checkpoint commit is recorded.
 - An unresolved item moves to `decided` or `resolved` only with the id of the decision that records the user's answer.

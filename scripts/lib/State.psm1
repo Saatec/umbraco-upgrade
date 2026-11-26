@@ -339,6 +339,37 @@ function Test-PlanHash {
     return $result
 }
 
+# ---------------------------------------------------------------- adopting a plan-only run
+
+function Test-PlanTargetMatch {
+    # True when a requested target names the target of the recorded run: its requested or its resolved version.
+    param([Parameter(Mandatory)]$State, [Parameter(Mandatory)][string]$TargetRequested)
+    return ($TargetRequested -in @([string]$State['target']['requested'], [string]$State['target']['resolved']))
+}
+
+function Convert-PlanToUpgrade {
+    # /umbraco-upgrade:start adopts a plan-only run: the mode becomes upgrade, and gate 3 and gate 4 go back to
+    # pending, so the safety setup runs and the plan is approved before anything executes. Discovery, the version
+    # path, decisions, unresolved items, phases, and the plan files stay as they are.
+    param([Parameter(Mandatory)][string]$ProjectRoot, [Parameter(Mandatory)][string]$TargetRequested)
+    $state = Read-UpgradeState $ProjectRoot
+    if ($state['mode'] -ne 'plan') { throw "The state is in '$($state['mode'])' mode; only a plan-only run can be adopted. To continue it, run /umbraco-upgrade:resume." }
+    if (-not (Test-PlanTargetMatch -State $state -TargetRequested $TargetRequested)) {
+        throw "The plan-only run is for target $($state['target']['requested']), not $TargetRequested. Run /umbraco-upgrade:start $($state['target']['requested']) to use it, or move the folder aside to start over."
+    }
+    $sg = $state['gates']['safety']
+    $sg['status'] = 'pending'; $sg['at'] = $null
+    if ($sg.Contains('notes')) { $sg.Remove('notes') }
+    $pg = $state['gates']['planApproval']
+    $hash = $null; if ($pg.Contains('planSha256')) { $hash = $pg['planSha256'] }
+    $pg['status'] = 'pending'; $pg['at'] = $null
+    foreach ($k in @('planSha256', 'approval')) { if ($pg.Contains($k)) { $pg.Remove($k) } }
+    $state['mode'] = 'upgrade'
+    $detail = "plan-only run adopted for target $TargetRequested; safety and planApproval set back to pending"
+    if ($hash) { $detail += "; plan.md sha256 was $hash" }
+    return (Save-UpgradeState -ProjectRoot $ProjectRoot -State $state -Event 'plan-adopted' -Detail $detail)
+}
+
 # ---------------------------------------------------------------- sections, decisions, unresolved, phases
 
 $script:MergeableSections = @('project', 'source', 'target', 'path', 'gitBaseline', 'knowledge')
@@ -605,4 +636,4 @@ function Update-StateSchemaVersion {
 function Get-GateOrder { return $script:GateOrder }
 function Get-StateSchemaVersion { return $script:SchemaVersion }
 
-Export-ModuleMember -Function Get-StateDir, Get-StatePath, Test-StateExists, Get-PluginVersion, Get-StateSchema, Test-UpgradeState, Read-UpgradeState, Save-UpgradeState, New-UpgradeState, Set-UpgradeGate, Set-GateFields, Request-PlanApproval, Add-Approval, Test-ApprovalAvailable, Test-PlanHash, Update-StateSection, Add-Decision, Add-Unresolved, Set-UpgradePhases, Set-PhaseStatus, Set-PhaseCheckpoint, Set-AcceptanceCriterion, Add-PhaseFailure, Set-UnresolvedStatus, Set-VerificationChecks, Set-VerificationResult, Update-StateSchemaVersion, Get-PlanPath, Get-GateOrder, Get-StateSchemaVersion
+Export-ModuleMember -Function Get-StateDir, Get-StatePath, Test-StateExists, Get-PluginVersion, Get-StateSchema, Test-UpgradeState, Read-UpgradeState, Save-UpgradeState, New-UpgradeState, Set-UpgradeGate, Set-GateFields, Request-PlanApproval, Add-Approval, Test-ApprovalAvailable, Test-PlanHash, Test-PlanTargetMatch, Convert-PlanToUpgrade, Update-StateSection, Add-Decision, Add-Unresolved, Set-UpgradePhases, Set-PhaseStatus, Set-PhaseCheckpoint, Set-AcceptanceCriterion, Add-PhaseFailure, Set-UnresolvedStatus, Set-VerificationChecks, Set-VerificationResult, Update-StateSchemaVersion, Get-PlanPath, Get-GateOrder, Get-StateSchemaVersion

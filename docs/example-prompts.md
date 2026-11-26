@@ -18,6 +18,14 @@ For a project in another folder:
 /umbraco-upgrade:plan 17 C:\src\SampleSite
 ```
 
+When you are ready to upgrade, run `start` with the same target in the same project:
+
+```
+/umbraco-upgrade:start 17
+```
+
+Expect: `start` finds the plan and reuses it. It first checks that the project has not changed since the plan; if it has (for example new commits or uncommitted changes), it tells you what differs and asks. Then it runs gate 3 (branch, rollback document, guard self-test), updates the gate 3 part of `plan.md`, and stops for your approval. Discovery does not run again.
+
 ## Upgrade a near-default site
 
 A site on Umbraco 13 with few customizations, to the latest 17 release:

@@ -14,7 +14,7 @@
     { "id": "shell.encoded-command", "decision": "deny", "reason": "Encoded PowerShell commands cannot be inspected and are blocked in upgrade projects." },
     { "id": "state.direct-write", "decision": "deny", "reason": "state.json is changed only through scripts/state.ps1." },
     { "id": "state.secret-write", "decision": "deny", "reason": "The content looks like it contains a secret value. Nothing in .umbraco-upgrade/ may contain secrets; redact it first." },
-    { "id": "project.plan-mode-write", "decision": "deny", "reason": "This project is in plan-only mode. /umbraco-upgrade:plan changes nothing outside .umbraco-upgrade/." },
+    { "id": "project.plan-mode-write", "decision": "deny", "reason": "This project is in plan-only mode. /umbraco-upgrade:plan changes nothing outside .umbraco-upgrade/. To execute the plan, run /umbraco-upgrade:start with the same target: it reuses the plan." },
     { "id": "project.write-before-approval", "decision": "deny", "reason": "Project files may change only after gate 3 (safety setup) has passed and the plan is approved." },
     { "id": "project.write-off-branch", "decision": "deny", "reason": "Project files may change only on the recorded upgrade branch." },
     { "id": "mcp.database", "decision": "deny", "reason": "Database MCP tools are blocked in upgrade projects unless the user has declared a local database copy." },

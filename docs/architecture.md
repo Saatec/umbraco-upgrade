@@ -47,7 +47,7 @@ Commands are skills with `disable-model-invocation: true`, an `argument-hint`, a
 
 | Command | Loads |
 |---|---|
-| `start` | `upgrade-workflow` in upgrade mode |
+| `start` | `upgrade-workflow` in upgrade mode; on a plan-only run for the same target, first `Test-StateReality.ps1` and `state.ps1 adopt-plan`, then `upgrade-workflow` from gate 3 |
 | `plan` | `upgrade-workflow` in plan mode |
 | `resume` | `upgrade-state` (reconciliation), then `upgrade-workflow` at the recorded position |
 | `verify` | `verification` |
@@ -81,6 +81,7 @@ gate 1 discovery -> gate 2 version and path -> gate 3 safety (upgrade mode) -> g
 
 - Gates are never skipped, merged, or reordered. `state.ps1 gate` refuses a gate whose predecessors have not passed, and each gate has pass conditions in `State.psm1` (for example gate 2 needs a resolved target, its LTS value and .NET version, and a selected path with its decision id).
 - Plan mode skips gate 3 (recorded as `skipped`), writes the plan, and stops.
+- `start` reuses a plan-only run for the same target. `Resolve-UpgradeArguments.ps1` accepts that state (`stateMode: plan`) instead of refusing it, the start skill runs the read-only reality check, and `state.ps1 adopt-plan` sets the mode to `upgrade` and gates 3 and 4 back to `pending`. Gate 3 then runs as usual, and gate 4 keeps the plan, updates its gate 3 section, and requests approval again. The mode never goes back from `upgrade` to `plan`.
 - After approval, phases start only in plan order, only while `plan.md` still matches the approved SHA-256, only after gate 3 passed, and only on the upgrade branch. A phase is `done` only with every acceptance criterion met (with evidence files) or waived (with the user's words) and a checkpoint commit.
 - Gate 5 starts only when every phase is `done` or `deferred`. No phase starts while gate 5 is in progress or passed; a failed check that the user wants fixed goes through gate 5 `failed`, an amended plan, a new approval, and a follow-up phase. A new phase list must keep every phase that has run exactly as recorded.
 

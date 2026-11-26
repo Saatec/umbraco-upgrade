@@ -8,6 +8,7 @@
 
   Commands:
     init                   -Mode upgrade|plan -Target <version>
+    adopt-plan             -Target <version>   (start reuses a plan-only run: upgrade mode, gates 3 and 4 pending)
     get                    [-Field dotted.path]
     validate
     gate                   -Gate <name> -Status in-progress|passed|failed|skipped [-Evidence a,b] [-Notes text]
@@ -36,7 +37,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0, Mandatory = $true)]
-    [ValidateSet('init', 'get', 'validate', 'gate', 'gate-fields', 'request-plan-approval', 'approve', 'require-approval', 'check-plan', 'set', 'decision', 'unresolved', 'unresolved-update', 'phases', 'phase', 'checkpoint', 'criterion', 'phase-failure', 'verification', 'verify-check', 'migrate', 'session-marker')]
+    [ValidateSet('init', 'adopt-plan', 'get', 'validate', 'gate', 'gate-fields', 'request-plan-approval', 'approve', 'require-approval', 'check-plan', 'set', 'decision', 'unresolved', 'unresolved-update', 'phases', 'phase', 'checkpoint', 'criterion', 'phase-failure', 'verification', 'verify-check', 'migrate', 'session-marker')]
     [string]$Command,
     [string]$ProjectRoot = '',
     [string]$Mode, [string]$Target,
@@ -109,6 +110,13 @@ try {
             $s = New-UpgradeState -ProjectRoot $ProjectRoot -Mode $Mode -TargetRequested $Target
             $out.statePath = Get-StatePath $ProjectRoot
             $out.gitBaseline = $s['gitBaseline']
+        }
+        'adopt-plan' {
+            if (-not $Target) { throw 'adopt-plan needs -Target.' }
+            $s = Convert-PlanToUpgrade -ProjectRoot $ProjectRoot -TargetRequested $Target
+            $out.mode = $s['mode']
+            $out.gates = [ordered]@{}
+            foreach ($g in @(Get-GateOrder)) { $out.gates[$g] = $s['gates'][$g]['status'] }
         }
         'get' {
             $s = Read-UpgradeState $ProjectRoot

@@ -214,6 +214,17 @@ Describe 'Resume reconciliation' -Tag 'mocked' {
         $r.Json.position.gate | Should -Be 'discovery'
     }
 
+    It 'points a finished plan-only run to start, which reuses it' {
+        Import-Module (Join-Path (Get-RepoRoot) 'scripts/lib/Reconcile.psm1') -Force -DisableNameChecking
+        $gate = { param($s) [ordered]@{ status = $s; at = $null } }
+        $state = [ordered]@{ mode = 'plan'; target = [ordered]@{ requested = '17' }; phases = @()
+            gates = [ordered]@{ discovery = (& $gate 'passed'); versionPath = (& $gate 'passed'); safety = (& $gate 'skipped'); planApproval = (& $gate 'awaiting-approval'); final = (& $gate 'pending') } }
+        $p = Get-ResumePosition $state
+        $p.kind | Should -Be 'done'
+        $p.next | Should -Match ([regex]::Escape('/umbraco-upgrade:start 17'))
+        $p.next | Should -Match 'reuses this plan'
+    }
+
     It 'fails clearly without state' {
         $script:d = Copy-Fixture -Baseline 'gen.v13'
         $r = Invoke-PluginScript -Script 'scripts/Test-StateReality.ps1' -Arguments @('-ProjectRoot', $script:d)
